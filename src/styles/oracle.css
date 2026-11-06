@@ -634,7 +634,8 @@ select {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .die-activity {
-  background: linear-gradient(160deg, color-mix(in srgb, var(--mist) 80%, #6f8f8a), var(--mist) 60%, #1b2d2d);
+  /* Steel blue, set apart from the teal mist; dark enough for the white glyphs. */
+  background: linear-gradient(160deg, #5b80aa, #33547c 60%, #1a2c46);
 }
 .die-activity img {
   filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.5));
