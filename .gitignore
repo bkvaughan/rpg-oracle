@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules
+dist
+dist-ssr
+*.local
+
+# Source card art (47 MB); the site uses the generated WebP in public/
+data/cards/*.png
+
+# Editor and OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Env files
+.env*
+
+# Logs and test output
+*.log
+coverage
+test-results
+playwright-report
+blob-report
+playwright/.cache

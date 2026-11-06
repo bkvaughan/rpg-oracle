@@ -1,0 +1,441 @@
+# RPG Oracle — Spec: Deck of Signs & Consult the Bones
+
+This document describes how the oracle simulates the two **Tales of Argosa** oracle tools and how an AI layer interprets their results for solo play. It is the source of truth for building the site: the rules, the exact dice faces, the full card list, the resolution algorithm, and the interpretation contract.
+
+**One principle above all:** randomness is done by code, never by the model. The site draws cards and rolls dice using a secure RNG, then hands the *results* to the AI to interpret. The AI never picks a card, never rolls, and never overrides an outcome.
+
+## Sources
+
+| What | Where |
+|---|---|
+| Rules: Consult the Bones | *Tales of Argosa* (playtest v10), **p.212**, "Oracle Tools" |
+| Rules: Read the Signs | *Tales of Argosa*, **p.213** |
+| Solo play / Lone Wolf | *Tales of Argosa*, **p.216** |
+| Official online deck (card art) | <https://perchance.org/tales-of-argosa-read-the-signs> |
+| Official online dice (face layout) | <https://dddice.com/dice/consult-the-bones-lnutsc0l> |
+
+Both online links are the ones printed in the book on p.212.
+
+## Project layout
+
+```
+ORACLE_SPEC.md            this document
+data/
+  deck_of_signs.json      all 50 cards: words, time icon, direction, image path, art description
+  cards/01.png … 50.png   card art (from the official Perchance deck)
+  dice/*.webp             Bones face images (from the official dddice set)
+reference/
+  bones.py                working Python roller for the Bones (port this)
+  bones_faces.png         contact sheet of the dice faces
+```
+
+---
+
+## Part 1 — Read the Signs (Deck of Signs)
+
+### What the tool is for
+The Deck of Signs answers **open questions**: anything that needs more than yes or no ("What's going on at this ruin?", "What does the leader want?", "What's the side effect of this item?").
+
+### Anatomy of a card
+The deck has **50 cards**. Each card has:
+
+| Field | Position on card | Meaning |
+|---|---|---|
+| **Noun** | top left | The archetype name (e.g. *Magician*) |
+| **Verb** | top right | A doing word (e.g. *Conjuring*) |
+| **Adjective** | bottom left | A descriptive word for nuance (e.g. *Learned*) |
+| **Mood** | bottom right | Ambience / tone / mood tag (e.g. *Enchanted*) |
+| **Time icon** | in the art | Light Sun, Dark Sun, Light Moon, or Dark Moon |
+| **Direction** | small red compass, in the top or bottom banner | An arrow pointing one of 8 directions |
+| **Art** | full card | A black-and-white illustration that can also be read |
+
+### Procedure (p.213)
+1. The player poses an **open question**.
+2. **Draw two cards.** One card is allowed, but the book recommends two "for more obvious and varied prompt combinations."
+3. Interpret the answer using **two or more** of the words and/or the art, across both cards.
+
+**Implementation decisions**
+- **No replacement within a reading.** Draw 2 distinct cards from a full 50-card deck, like a physical deck. The Perchance page draws each slot independently, so it can show the same card twice; we don't.
+- **Reshuffle every reading.** Each reading starts from the full deck. A per-session "don't repeat recent cards" option could be added later, but it isn't required by the rules.
+- **Primary card.** The book doesn't say which card's time or direction to use. We use the **first card drawn** as primary for time and direction, and show the second card's time and direction as a secondary option.
+
+### Time (p.213)
+| Icon | Time of day | Exact hour (if needed) |
+|---|---|---|
+| Light Sun | Morning (6am–Noon) | 1d6 hours from 6am |
+| Dark Sun | Afternoon (Noon–6pm) | 1d6 hours from Noon |
+| Light Moon | Evening (6pm–Midnight) | 1d6 hours from 6pm |
+| Dark Moon | Late Night (Midnight–6am) | 1d6 hours from Midnight |
+
+Deck distribution: Dark Sun 13, Light Sun 12, Dark Moon 13, Light Moon 12.
+
+### Direction
+Arrow pointing up = **North**. All 8 compass points appear in the deck (N 6, NE 4, E 7, SE 6, S 7, SW 6, W 8, NW 6). The book uses this, for example, to place a dungeon site: "Roll 2d6 for distance in hexes. Read the Signs for direction" (p.218).
+
+### The book's worked example (p.213)
+> You Read the Signs to learn more about a random barbarian tribe in a ruin. Drawing two cards reveals Magician, Conjuring, Learned, Enchanted and Death, Decaying, Uncaring, Doomed. Applying Magician, Doomed, and Decaying, you interpret this to mean the Thuel tribe camping in the ruins have been cursed by a resident undead sorcerer!
+
+That is the target voice for the core interpretation: name the words used, then give one concrete, playable fact about the world.
+
+### Full card list
+Transcribed from the official card art. `#` matches the image order on the Perchance generator (`card_urls` below).
+
+| # | Noun | Verb | Adjective | Mood | Time icon | Dir |
+|---|---|---|---|---|---|---|
+| 1 | Alien | Dreaming | Ineffable | Discordant | Dark Moon | W |
+| 2 | Ruin | Exploring | Mysterious | Cursed | Light Moon | N |
+| 3 | Undead | Leeching | Unhinged | Terrifying | Dark Moon | SW |
+| 4 | Underworld | Wailing | Confined | Arduous | Dark Sun | NE |
+| 5 | Temple | Offering | Faithful | Refuge | Light Sun | S |
+| 6 | Seer | Watching | Prophecy | Strange | Dark Sun | NE |
+| 7 | Shadow | Lurking | Hidden | Ominous | Dark Moon | E |
+| 8 | Wind | Howling | Fleeting | Erratic | Dark Moon | N |
+| 9 | War | Fighting | Furious | On the Brink | Light Sun | N |
+| 10 | Victory | Looting | Glory | Proud | Dark Sun | N |
+| 11 | Serpent | Swaying | Poison | Fear | Dark Sun | SW |
+| 12 | Storm | Obscuring | Destructive | Wild | Light Moon | SE |
+| 13 | Scribe | Marking | Focus | Understanding | Dark Moon | S |
+| 14 | Rebel | Defying | Outspoken | Unstable | Light Sun | NW |
+| 15 | Plague | Spreading | Infected | Distrust | Dark Sun | W |
+| 16 | Rival | Clashing | Respect | Tense | Dark Sun | E |
+| 17 | Water | Eroding | Clear | Protean | Dark Sun | E |
+| 18 | Relic | Awakening | Precious | Ancient | Dark Sun | NW |
+| 19 | Mutant | Changing | Shamed | Corruption | Light Moon | S |
+| 20 | Phoenix | Cleansing | Burnt | Renewal | Light Sun | SW |
+| 21 | Obelisk | Guiding | Obvious | Sacred | Light Moon | SW |
+| 22 | Omen | Revealing | Warning | Unsettling | Light Sun | SE |
+| 23 | Fire | Burning | Bright | Aroused | Light Sun | W |
+| 24 | Memory | Reliving | Hazy | Shifting | Light Moon | S |
+| 25 | Noble | Ordering | Wealthy | Arrogance | Light Moon | NW |
+| 26 | Guardian | Labouring | Unafraid | Opportunity | Dark Sun | W |
+| 27 | Light | Helping | Kind | Respite | Light Sun | NE |
+| 28 | Mimic | Waiting | Ambush | Trapped | Light Moon | W |
+| 29 | Madman | Wandering | Isolated | Confusion | Dark Sun | E |
+| 30 | Family | Caring | Devoted | Loyalty | Light Sun | W |
+| 31 | Magician | Conjuring | Learned | Enchanted | Light Moon | SE |
+| 32 | King | Commanding | Powerful | Obedience | Dark Moon | N |
+| 33 | Illusion | Deceiving | Charmed | Mischief | Light Sun | SW |
+| 34 | Escape | Running | Freedom | Dangerous | Dark Moon | SE |
+| 35 | Hunter | Feeding | Driven | Looming | Light Sun | NW |
+| 36 | Companion | Bonding | Loyal | Joined | Dark Moon | N |
+| 37 | Key | Opening | Intricate | Expectant | Light Sun | SE |
+| 38 | Creator | Growing | Curious | Expanding | Light Moon | NE |
+| 39 | Desire | Wooing | Infatuated | Romance | Dark Moon | E |
+| 40 | Earth | Crushing | Bounty | Resolute | Light Moon | S |
+| 41 | Dragon | Searching | Covetous | Gilded | Dark Sun | SE |
+| 42 | Fey | Playing | Capricious | Misleading | Dark Moon | SW |
+| 43 | Famine | Begging | Desperate | Suffering | Dark Sun | S |
+| 44 | Angel | Healing | Hope | Support | Light Sun | NW |
+| 45 | Banshee | Mourning | Sorrow | Despair | Dark Moon | W |
+| 46 | Death | Decaying | Uncaring | Doomed | Dark Moon | E |
+| 47 | Cultist | Preaching | Revered | Holy | Light Moon | S |
+| 48 | Crossroads | Deciding | Fork | Change | Dark Moon | E |
+| 49 | Alliance | Engaging | Guild | Unison | Dark Sun | W |
+| 50 | Betrayer | Scheming | Suspicious | Division | Light Moon | NW |
+
+#### Card data (JSON) and art
+The same data is in `data/deck_of_signs.json`, with the card images in `data/cards/01.png` … `50.png` (771×1071 PNG with transparent rounded corners). Each record's `image` path is relative to `data/`. A record looks like this:
+```json
+{
+  "id": 31,
+  "noun": "Magician",
+  "verb": "Conjuring",
+  "adjective": "Learned",
+  "mood": "Enchanted",
+  "time_icon": "light-moon",
+  "time": "Evening (6pm–Midnight)",
+  "direction": "SE",
+  "image": "cards/31.png",
+  "image_url": "https://i.imgur.com/gbUl91O.png",
+  "art": "A robed, belted wizard reading from an open spellbook marked with a sigil."
+}
+```
+
+<details><summary>Original image URLs (card_urls, in order 1–50)</summary>
+
+1. https://i.imgur.com/uubZrfk.png
+2. https://i.imgur.com/wHbd2xA.png
+3. https://i.imgur.com/p4nu4nv.png
+4. https://i.imgur.com/1m7rRLf.png
+5. https://i.imgur.com/tp5a47U.png
+6. https://i.imgur.com/T4gj6TJ.png
+7. https://i.imgur.com/VxlTfOl.png
+8. https://i.imgur.com/b859BOr.png
+9. https://i.imgur.com/6yEDCP7.png
+10. https://i.imgur.com/sF1tozY.png
+11. https://i.imgur.com/bD7cq7e.png
+12. https://i.imgur.com/snwFw8p.png
+13. https://i.imgur.com/GbOdHpP.png
+14. https://i.imgur.com/CeGRyCy.png
+15. https://i.imgur.com/LqIqaXa.png
+16. https://i.imgur.com/0WZiQ6R.png
+17. https://i.imgur.com/suad4gG.png
+18. https://i.imgur.com/Fk0QgV3.png
+19. https://i.imgur.com/DQE0YDF.png
+20. https://i.imgur.com/t8dUqqQ.png
+21. https://i.imgur.com/hEHDdAZ.png
+22. https://i.imgur.com/geeu9ha.png
+23. https://i.imgur.com/O1Qfmft.png
+24. https://i.imgur.com/WJIjl8L.png
+25. https://i.imgur.com/1cRts0I.png
+26. https://i.imgur.com/K4LoveJ.png
+27. https://i.imgur.com/O43JBPh.png
+28. https://i.imgur.com/w0MfU0w.png
+29. https://i.imgur.com/EP6LJCZ.png
+30. https://i.imgur.com/L3XDY86.png
+31. https://i.imgur.com/gbUl91O.png
+32. https://i.imgur.com/AaqfIVj.png
+33. https://i.imgur.com/Fe0DKtr.png
+34. https://i.imgur.com/ow8LK6f.png
+35. https://i.imgur.com/e771qmT.png
+36. https://i.imgur.com/gomXtBj.png
+37. https://i.imgur.com/rPo11sm.png
+38. https://i.imgur.com/rNAq4nb.png
+39. https://i.imgur.com/FXm4iaS.png
+40. https://i.imgur.com/fopGRnw.png
+41. https://i.imgur.com/mzwTaK2.png
+42. https://i.imgur.com/nw57xQb.png
+43. https://i.imgur.com/Wxmv4R1.png
+44. https://i.imgur.com/KARf58U.png
+45. https://i.imgur.com/XOIPOLe.png
+46. https://i.imgur.com/MY540zY.png
+47. https://i.imgur.com/bn32612.png
+48. https://i.imgur.com/Q3Uh7vF.png
+49. https://i.imgur.com/ILZAsJX.png
+50. https://i.imgur.com/jmM3VHv.png
+
+</details>
+
+**Art licensing:** The Perchance page credits the art as "© and used with permission under various stock art licences" (Earl Geier, Jeffrey Koch, Dean Spencer, Felipe da Silva, Bradley K McDevitt, and others).
+
+**Decision (2026-11-05):** ship publicly as an unofficial fan tool, with the bundled art. The site and README must say it is unofficial and not affiliated with Pickpocket Press, credit the book and the artists above, and link to the official deck, dice, and book. If Pickpocket Press asks, switch to a words-only build.
+
+---
+
+## Part 2 — Consult the Bones (dice)
+
+### What the tool is for
+Yes/no questions posed as an adventure unfolds ("Is there a sentry keeping watch?").
+
+### The four dice
+Face layout confirmed from the official dddice set linked in the book. All are d6.
+
+| Die | Faces | Role |
+|---|---|---|
+| **Hammer of Judgment** (red) | 3 × Yes, 3 × No | Always gives an answer; acts as tie breaker |
+| **Twin of Fate** #1 | 2 × Yes, 2 × No, 2 × Nil (blank) | Adds weight to an answer |
+| **Twin of Fate** #2 | 2 × Yes, 2 × No, 2 × Nil (blank) | Identical to #1 |
+| **Fortune** | 2 × Fortune (sun), 2 × Misfortune (skull), 2 × Nil | Adds a twist, independent of yes/no |
+
+Glyphs on the physical dice: Yes is a rune shaped like ᛘ/Ψ, No is a rune shaped like ᚢ/ᚱ, Fortune is a sun, and Misfortune is a skull. The official face images are in `data/dice/` (`judgment-yes`, `judgment-no`, `fate-yes`, `fate-no`, `blank`, `fortune-sun`, `misfortune-skull`; transparent WebP), with a contact sheet in `reference/bones_faces.png`. The Judgment glyphs are white, for drawing on the red die; the Fate glyphs are black.
+
+### Resolution algorithm (p.212)
+Roll all four dice, then:
+
+1. **Cancel.** Count Yes and No across Judgment and both Twins. Each Yes cancels one No.
+2. **Tie breaker.** If Judgment shows one answer and *just one* Twin shows the opposite (the other Twin is blank), Judgment wins and that Fate die is ignored. Result: a single answer matching Judgment.
+3. **Magnitude.** What's left after cancelling is the answer and its strength:
+   - 1 → ordinary **Yes / No**
+   - 2 → **Double**: a "greater", more definitive result
+   - 3 → **Triple**: an "extremely great", exaggerated result
+4. **Fortune die**, applied on top of the yes/no:
+   - **Fortune**: an *additional benefit or advantage* to the PCs. It doesn't have to relate to the question.
+   - **Misfortune**: an *additional complication, setback, or disadvantage*.
+   - **Nil**: no twist.
+   - The Fortune die is subject to GM discretion and sometimes has no practical effect.
+
+Because Judgment always shows Yes or No, the result is **never a blank**. A tie can only happen as Judgment against one Twin, and step 2 resolves it.
+
+**How we read step 2.** The book's example has "a double Yes, a single No … One Yes cancels out the single No, resulting in a final answer of Yes." So when the dice show 2 Yes and 1 No, we cancel normally to a single Yes, and we do **not** discard the No to make a Double Yes. The tie-breaker only applies when cancelling would leave nothing.
+
+### More or less likely (p.212)
+When one answer is substantially more likely, the player declares it **before** rolling. **After** the roll:
+- If any die shows the **unlikely** answer, reroll **exactly one** of those dice.
+- If the **Judgment** die is one of them, you **must** reroll Judgment (not a Fate die).
+- The rerolled result stands. Never reroll more than once, and never reroll the Fortune die.
+- If Judgment is fine but **both** Twins show the unlikely answer, reroll the **first** Twin. The Twins are identical, so the choice doesn't affect the odds; fixing it keeps ports deterministic under a seeded RNG.
+
+Likelihood values used everywhere (UI, journal, AI follow-ups): `even`, `likely-yes`, `likely-no`.
+
+The site should show the original cast **and** the reroll. Seeing "Judgment showed No → rerolled to Yes" is part of the fun.
+
+### Exact probabilities
+Calculated by enumerating every possible roll (Fortune die excluded; it's independent: ⅓ Fortune, ⅓ Misfortune, ⅓ Nil).
+
+| Mode | P(Yes) | Yes | Double Yes | Triple Yes | No | Double No | Triple No |
+|---|---|---|---|---|---|---|---|
+| Even | **50.0%** | 33.3% | 11.1% | 5.6% | 33.3% | 11.1% | 5.6% |
+| Likely Yes | **73.1%** | 37.0% | 24.1% | 12.0% | 18.5% | 5.6% | 2.8% |
+| Likely No | **26.9%** | 18.5% | 5.6% | 2.8% | 37.0% | 24.1% | 12.0% |
+
+These match the book's own fallback percentages (50% / 75% / 25%), which suggests the algorithm is right.
+
+### The book's worked example (p.212)
+> The party is sneaking into ruins held by Urgot, and you Consult the Bones: *Is there a sentry keeping watch?* The Bones reveal a double Yes, a single No, and a Sun (Fortune) result. One Yes cancels out the single No, resulting in a final answer of Yes. You interpret this as there being a sentry, but that the Fortune result means she is distracted. Rolling 1d6 on the Activities table (p.66), you get a 3: Eating. You decide the lookout is distracted sucking the marrow from an old thighbone, which will make things easier for the PCs.
+
+### Reference implementation (Python)
+This is the roller used for the demos below (`reference/bones.py`; run `python3 reference/bones.py [even|likely-yes|likely-no]`). Port it to the site's language as-is. In a browser, use `crypto.getRandomValues`, not `Math.random`.
+
+```python
+#!/usr/bin/env python3
+"""Consult the Bones (Tales of Argosa p.212).
+
+Dice (face layout from the official dddice set linked in the book):
+  Hammer of Judgment  d6: 3 Yes, 3 No
+  Twins of Fate (x2)  d6: 2 Yes, 2 No, 2 Nil
+  Fortune             d6: 2 Fortune (sun), 2 Misfortune (skull), 2 Nil
+
+Usage: bones.py [even|likely-yes|likely-no]
+"""
+import secrets, sys, json
+
+R = secrets.SystemRandom()
+JUDGMENT = ["Yes"] * 3 + ["No"] * 3
+FATE     = ["Yes"] * 2 + ["No"] * 2 + ["Nil"] * 2
+FORTUNE  = ["Fortune"] * 2 + ["Misfortune"] * 2 + ["Nil"] * 2
+
+def cast():
+    return {"judgment": R.choice(JUDGMENT),
+            "fate": [R.choice(FATE), R.choice(FATE)],
+            "fortune": R.choice(FORTUNE)}
+
+def resolve(d):
+    j, (f1, f2) = d["judgment"], d["fate"]
+    yes = [j, f1, f2].count("Yes")
+    no = [j, f1, f2].count("No")
+    if yes == no:
+        # Only possible as Judgment vs one opposite Twin (other Twin blank):
+        # Judgment is the tie breaker and the Fate die is ignored.
+        answer, strength = j, 1
+        note = "Judgment breaks the tie and trumps the Fate die"
+    else:
+        answer = "Yes" if yes > no else "No"
+        strength = abs(yes - no)
+        note = f"{yes} Yes vs {no} No, cancelling to {strength} {answer}"
+    label = {1: answer, 2: f"Double {answer} (greater)", 3: f"Triple {answer} (extremely great)"}[strength]
+    return {"answer": answer, "strength": strength, "label": label, "note": note,
+            "fortune": d["fortune"]}
+
+def consult(likelihood="even"):
+    first = cast()
+    final = json.loads(json.dumps(first))
+    reroll = None
+    unlikely = {"likely-yes": "No", "likely-no": "Yes"}.get(likelihood)
+    if unlikely:
+        if final["judgment"] == unlikely:          # must reroll Judgment if it's a candidate
+            old = final["judgment"]; final["judgment"] = R.choice(JUDGMENT)
+            reroll = f"Judgment showed the unlikely {old}; rerolled to {final['judgment']}"
+        elif unlikely in final["fate"]:
+            k = final["fate"].index(unlikely); old = final["fate"][k]
+            final["fate"][k] = R.choice(FATE)
+            reroll = f"A Fate die showed the unlikely {old}; rerolled to {final['fate'][k]}"
+    return {"likelihood": likelihood, "cast": first, "reroll": reroll,
+            "final_dice": final, "result": resolve(final)}
+
+if __name__ == "__main__":
+    print(json.dumps(consult(sys.argv[1] if len(sys.argv) > 1 else "even"), indent=1))
+```
+
+### Other places the rules call for the Bones
+- **Lone Wolf** (p.216): each time a solo PC suffers a melee or ranged hit, roll **only the Fortune die**. Sun = the attack is parried or negated. Skull = the PC counterstrikes for standard damage. Nil = no effect. A one-click "Fortune die" button is worth having.
+- **Travel Event / Night Encounter** each day (p.134), **Exploring a hex** with nothing keyed (p.136), and many dungeon-generator steps (pp.218–221).
+
+---
+
+## Part 3 — The AI interpretation layer
+
+### Division of labour
+| Code does | AI does |
+|---|---|
+| Draws cards and rolls dice with a secure RNG | Interprets the results it is given |
+| Applies the cancel / tie-break / reroll rules | Explains what the result *means* in the scene |
+| Stores the session journal | Reads the journal so new answers stay consistent |
+| Shows card art, dice faces, time, and direction | Suggests follow-up questions |
+
+The AI should be told the outcome as a fact ("Double No, Fortune"), with the raw dice for transparency. It must not re-derive or second-guess the outcome.
+
+### What the AI receives
+- The **question** and which tool was used, plus the likelihood setting for the Bones.
+- The **result**:
+  - Deck: both cards with all four words, the time icon, the direction, and the card's one-line `art` description (in `deck_of_signs.json`).
+  - Bones: the cast, any reroll, the final answer and magnitude, and the Fortune result.
+- **Session context**: PC name, class, and level; current location (hex, site, room); a short journal of recent questions, answers, and established facts. Cap this (for example, the last 20 entries plus a pinned "facts" list) so prompts stay small.
+- Optionally, the relevant **book procedure** that triggered the question (e.g. "Exploring a hex → Small Ruin → Read the Signs").
+
+### What the AI returns (both tools)
+1. **The ruling.** One or two sentences in the book's voice that commit to a concrete, playable answer. For the deck, name the words used ("Applying Undead, Covetous, Gilded…").
+2. **Why.** Briefly, how the words or dice support it. For the Bones, explain what Double or Triple changes and what the Fortune or Misfortune twist is.
+3. **An alternate reading.** One different take the player can choose instead (deck mainly; optional for the Bones).
+4. **Time and direction** when relevant (deck), tied to the fiction.
+5. **Follow-ups.** One to three questions to ask next, each tagged with a suggested tool and likelihood (e.g. "Bones, likely yes").
+
+Return this as structured JSON so the site can lay it out and log it, and keep each section short. A good shape:
+
+```json
+{
+  "ruling": "…",
+  "why": "…",
+  "alternate": "…",
+  "time": "Late Night (Midnight–6am)",
+  "direction": "SW: the trail of the fleeing grave robbers",
+  "follow_ups": [
+    {"question": "Is there still gold in the barrow?", "tool": "bones", "likelihood": "likely-yes"}
+  ],
+  "new_facts": ["The barrow lord hunts at night for a stolen gilded heirloom"]
+}
+```
+
+`new_facts` are shown as suggestions; the player accepts, edits, or discards each one before it is pinned.
+
+### The AI call
+- **Access.** Bring-your-own-key: the player's Anthropic API key is stored only in their browser and used for direct calls from the page. The static site never holds a key. All network access lives in one module (`src/ai/client.ts`) so a server proxy can replace it later.
+- **Models.** Player-selectable: Claude Sonnet 5.5 (`claude-sonnet-5-5`, default: fast and capable), Claude Opus 5.5 (`claude-opus-5-5`, richest readings), Claude Haiku 5.5 (`claude-haiku-5-5`, cheapest).
+- **Structured output.** The reading schema above is defined once in zod and sent as the request's structured-output format. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
+- **Prompt caching.** The system prompt (interpretation guidelines, the book's example voice, the card list) is static, so it is sent as a cached block. Only the question, result, and session context change per call.
+- **Errors.** Mapped to plain messages: no key, key rejected, rate limited, model refused, invalid response, network, cancelled.
+- **Optional.** The oracle works fully without AI. Interpretation is a button on a result, not a step in drawing or rolling.
+
+### Interpretation guidelines (for the system prompt)
+- Use at least two words across the two cards, as the book requires. Words can be literal or metaphorical (e.g. *Dragon* as "a hoarder").
+- Prefer **concrete and playable** over atmospheric: give a person, a thing, a motive, or a problem the PC can act on.
+- **Respect magnitude.** A Triple must feel exaggerated. A plain Yes or No stays modest.
+- **Fortune and Misfortune** are separate twists. The benefit or complication doesn't have to relate to the question.
+- **Stay consistent** with established facts. If a result seems to contradict one, look for a reading that reconciles them, or say so plainly.
+- Don't read the GM sections of published adventures for the player. The tool improvises around what the player has seen (p.216).
+- Stay within Tales of Argosa's setting and tone: dark sword-and-sorcery, with Argosa's people and places when the player names them.
+
+---
+
+## Part 4 — Worked examples (from the prototype)
+
+### Read the Signs
+**Context.** On a hexploration day, the PC explores an unkeyed hex. The Bones say something is here, and d20 on the Exploring table gives 3: Small Ruin. The rule (p.135) says "For more details, Read the Signs."
+**Question.** What's going on at this ruin?
+**Draw (secure RNG).** #3 **Undead · Leeching · Unhinged · Terrifying** (Dark Moon, SW) and #41 **Dragon · Searching · Covetous · Gilded** (Dark Sun, SE).
+
+- **Ruling.** Applying Undead, Covetous, Gilded, and Searching, the ruin is the barrow of a petty lord buried with his treasure. He rises each night, maddened, to hunt for a gilded heirloom that grave robbers stole from his tomb.
+- **Why.** *Dragon* is read as a metaphor: a dead man coiled around his hoard. *Leeching*: whoever carries his gold weakens until it's returned. *Unhinged*: he can't be reasoned with.
+- **Alternate.** Take *Dragon* literally. The ruin is built around a young dragon's gilded skeleton, and something undead and starving is stripping it.
+- **Time and direction.** He hunts in the Late Night (primary card, Dark Moon). Southwest is where the robbers fled.
+- **Follow-ups.** "Is there still gold in the barrow?" (Bones, `likely-yes`). "Is the PC carrying gilded coin?" (Bones, `likely-no`).
+
+### Consult the Bones: even odds
+**Question.** Is the dead lord stirring right now?
+**Cast.** Judgment No · Twins No, Nil · Fortune Sun.
+**Result.** 0 Yes vs 2 No → **Double No, with Fortune**.
+- **Ruling.** He's in deep torpor, sealed beneath his slab, and won't wake unless someone breaks the seal. *Fortune:* the fleeing robbers dropped a satchel at the entrance with a pry bar, a half-burned candle, and a scrap of map with an arrow pointing southwest.
+
+### Consult the Bones: likely Yes, with a reroll
+**Question.** Is there still gold in the barrow? (likely Yes)
+**Cast.** Judgment No · Twins Nil, Nil · Fortune Nil.
+**Reroll.** Judgment showed the unlikely No, so Judgment must be rerolled → Yes.
+**Result.** **Yes** (single), no twist.
+- **Ruling.** Some gold remains: a few coins the robbers missed and a ring on the corpse's finger. The heirloom itself is gone, which is why he hunts.
+
+---
+
+## Part 5 — Build decisions (settled 2026-11-05)
+- **Hosting and AI access.** Static Vite + React + TypeScript site on GitHub Pages (`bkvaughan/rpg-oracle`), with bring-your-own-key AI calls (see "The AI call").
+- **Session storage.** JSON files on disk via the browser's File System Access API (autosave to the open file), with a download/open fallback where that API is missing, and a browser copy for crash recovery.
+- **Card and dice art.** Bundled, resized to WebP at build time (the source PNGs total about 47 MB). See the licensing decision above.
+- **Extra tables (later).** Book tables that pair with the oracles (Activities p.66, Exploring p.136, Fortune examples p.135, Complications p.221) could be added as one-click rolls feeding the same AI layer.
