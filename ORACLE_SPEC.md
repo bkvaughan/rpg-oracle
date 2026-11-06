@@ -364,10 +364,33 @@ Each result has a status and examples for intelligent creatures and for other cr
 | 6 | Resting | Sleeping, relaxing, reading, recovering, waiting for something | Sleeping, relaxing, recovering, waiting (e.g. for a mate) |
 
 ### Implementation decisions
-- **Rolled alone.** It's a fourth oracle, with an Intelligent / Other creature choice and an optional question naming the creature. The book's companion Reaction roll (2d6) is not part of this tool.
+- **Rolled with the Reaction.** The Activity Die is read from the same roll as the Reaction (see Part 2c, "Reaction & Activity"), as in the book's example. It is not offered on its own. Sessions saved while it briefly was a standalone oracle still load and display (`activity` result: `roll`, `creature`).
 - **Icons.** The die faces come from the official Activity Die template (provided by Brandon; source `data/dice/templates/activity-die.png`, a die net). `npm run assets` cuts each face out of the net as a white glyph on transparency (`public/dice/activity-1.webp` … `6`): 1 dagger, 2 people, 3 drumstick, 4 shovel, 5 footprint, 6 campfire.
-- **Session files.** An `activity` result stores the `roll` and the `creature` type. It's an added union member, so older session files still load (schema version 1).
 - **AI.** The prompt states the roll, the creature type and the matching examples, and asks for one specific, visible activity that fits the scene.
+
+---
+
+## Part 2c — Reaction & Activity (p.66)
+
+### What the tool is for
+When the PCs first meet a creature, the GM rolls 2d6 for its initial reaction. Each monster's stat block has its own Reac ranges (p.166); for when the GM wants an evenly balanced spread instead, the book prints a general chart. We use that chart.
+
+| 2d6 | Reaction | Meaning (our words) |
+|---|---|---|
+| 2-3 | Hostile | Aggressive and opposed; ready for a confrontation |
+| 4-5 | Unfriendly | Wary and suspicious, with no interest in helping |
+| 6-8 | Neutral | Uncertain and careful; waiting to see what the PCs do |
+| 9-10 | Fairly friendly | Curious and open, willing to help a little |
+| 11-12 | Affable | Warm, drawn to the PCs, and very helpful |
+
+### One roll for both
+The book's worked example (the gate guards, p.67) rolls 2d6 for Reaction, 3 + 2 = 5, and reads the leftmost die as the Activity Die: 3, Eating. The site always does the same, as one oracle called **Reaction & Activity**: the first die is the Activity Die, the second a plain d6, and the total is the Reaction. Each activity still comes up 1 time in 6, exactly as if the Activity Die were rolled alone, so a player who only wants the activity can ignore the reaction line. The 2d6 total is shown plainly, so it can also be read against a monster's own Reac ranges.
+
+### Implementation decisions
+- **Balanced chart only.** Per-monster Reac ranges vary by creature and aren't included.
+- **No modifiers.** The chart is read on the plain 2d6 total.
+- **Session files.** A `reaction` result stores both `dice` and the `creature` type (which Activity column applies). The Activity roll is `dice[0]`, not stored twice. It's an added union member (schema version 1).
+- **AI.** The prompt gives the dice, the reaction and the activity, and asks for one combined picture of the encounter; if the PCs already know the creature's attitude, it leans on the activity.
 
 ---
 

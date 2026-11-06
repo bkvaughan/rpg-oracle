@@ -1,5 +1,7 @@
 import { activityFor, CREATURE_TEXT } from '../data/activity.ts'
 import { CARDS, TIME_ICON_NAMES } from '../data/deck.ts'
+import { reactionFor } from '../data/reaction.ts'
+import { reactionTotal } from '../engine/reaction.ts'
 import { bonesOutcome, type OracleResult, type Session } from './session.ts'
 
 // The slice of a session sent with each AI request (ORACLE_SPEC.md Part 3): the PC, where
@@ -30,6 +32,11 @@ export function describeResult(result: OracleResult): string {
       return `Fortune die: ${result.face}`
     case 'activity':
       return `Activity Die (${CREATURE_TEXT[result.creature].toLowerCase()}): ${result.roll} ${activityFor(result.roll).status}`
+    case 'reaction': {
+      const total = reactionTotal(result.dice)
+      const roll = result.dice[0]
+      return `Reaction & Activity (${CREATURE_TEXT[result.creature].toLowerCase()}): ${total} ${reactionFor(total).label}; ${roll} ${activityFor(roll).status}`
+    }
   }
 }
 

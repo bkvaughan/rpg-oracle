@@ -1,16 +1,16 @@
 import type { Creature } from '../data/activity.ts'
-import { rollActivity } from '../engine/activity.ts'
+import { rollReaction } from '../engine/reaction.ts'
 import { consult, rollFortune, type Likelihood } from '../engine/bones.ts'
 import type { Rng } from '../engine/rng.ts'
 import { readTheSigns } from '../engine/signs.ts'
 import type { JournalEntry, OracleResult } from '../state/session.ts'
 
-export type Tool = 'signs' | 'bones' | 'fortune' | 'activity'
+export type Tool = 'signs' | 'bones' | 'fortune' | 'reaction'
 
 export interface AskRequest {
   tool: Tool
   likelihood: Likelihood
-  /** Only used by the Activity Die. */
+  /** Reaction & Activity only: which column of the Activity table applies. */
   creature: Creature
   question: string
 }
@@ -30,7 +30,7 @@ function runOracle({ tool, likelihood, creature }: AskRequest, rng: Rng): Oracle
     }
     case 'fortune':
       return { tool, face: rollFortune(rng) }
-    case 'activity':
-      return { tool, roll: rollActivity(rng), creature }
+    case 'reaction':
+      return { tool, dice: rollReaction(rng), creature }
   }
 }

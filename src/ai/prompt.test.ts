@@ -53,8 +53,21 @@ describe('buildUserPrompt', () => {
     const entry = { ...bonesEntry('a'), question: 'The goblins at the ford', result: { tool: 'activity' as const, roll: 3 as const, creature: 'intelligent' as const } }
     const prompt = buildUserPrompt(entry, { ...sampleSession(), journal: [entry] })
     expect(prompt).toContain('Tool: the Activity Die, for an intelligent creature.')
-    expect(prompt).toContain('Result (settled): 3 Eating.')
+    expect(prompt).toContain('Activity (settled): 3 Eating.')
     expect(prompt).toContain('Example activities: Eating, cooking or preparing food')
+  })
+
+  test('gives Reaction & Activity with its dice, band and the Activity read from the first die', () => {
+    const entry = { ...bonesEntry('r'), question: 'The guards at the gate', result: { tool: 'reaction' as const, dice: [3, 2] as [3, 2], creature: 'intelligent' as const } }
+    const prompt = buildUserPrompt(entry, { ...sampleSession(), journal: [entry] })
+    expect(prompt).toContain('Tool: Reaction & Activity (2d6, balanced chart), for an intelligent creature; the first die is the Activity Die.')
+    expect(prompt).toContain('Dice: 3 and 2.')
+    expect(prompt).toContain('Reaction (settled): 5 Unfriendly.')
+    expect(prompt).toContain('Activity (settled): 3 Eating.')
+  })
+
+  test('the system prompt explains Reaction & Activity', () => {
+    expect(SYSTEM_PROMPT).toContain('2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable')
   })
 
   test('the system prompt explains the Activity Die', () => {

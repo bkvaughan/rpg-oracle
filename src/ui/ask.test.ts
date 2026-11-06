@@ -31,10 +31,10 @@ describe('ask', () => {
     })
   })
 
-  test('the Activity Die stores the roll and the creature type', () => {
-    expect(ask({ tool: 'activity', likelihood: 'even', creature: 'other', question: 'The wolves' }, scriptedRng([2]), AT, 'e4')).toMatchObject({
-      question: 'The wolves',
-      result: { tool: 'activity', roll: 3, creature: 'other' },
+  test('Reaction & Activity stores both dice and the creature type', () => {
+    expect(ask({ tool: 'reaction', likelihood: 'even', creature: 'other', question: 'The guards' }, scriptedRng([2, 1]), AT, 'r1')).toMatchObject({
+      question: 'The guards',
+      result: { tool: 'reaction', dice: [3, 2], creature: 'other' },
     })
   })
 })

@@ -67,7 +67,7 @@ Unit tests sit next to the code they test (`foo.ts` and `foo.test.ts`).
 4. When hitting issues, find the root cause with evidence before fixing
 5. Every oracle rule has a unit test; the Bones probabilities are tested against the spec's table
 6. If the rules are unclear, stop and ask Brandon. Do not invent a ruling; record the answer in ORACLE_SPEC.md
-7. UI text uses the book's terms exactly (Read the Signs, Consult the Bones, Hammer of Judgment, Twins of Fate, Fortune die, Activity Die)
+7. UI text uses the book's terms exactly (Read the Signs, Consult the Bones, Hammer of Judgment, Twins of Fate, Fortune die, Activity Die, Reaction & Activity)
 
 ## Design Rules
 

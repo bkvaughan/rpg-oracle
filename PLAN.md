@@ -14,6 +14,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 7: done and approved, committed and pushed
 - Part 8: done; live at https://bkvaughan.github.io/rpg-oracle/ (deploy run for `5eb4187` succeeded 2026-11-05; smoke-tested: page, CSP, card and dice art, fonts, no console errors). Remaining: Brandon's live checks (Chrome autosave, Safari download fallback, a real Interpret)
 - Part 9 (Activity Die, plus all dice faces from the official templates): done, approved, committed and pushed
+- Part 10 (Reaction & Activity): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -167,7 +168,7 @@ Brandon asked for the Activity Die (Tales of Argosa p.66): a d6 the GM rolls, us
 - [x] `src/data/activity.ts`: the six results with both example lists, our wording, citing p.66
 - [x] Engine: `rollActivity(rng)` (1d6 via the secure RNG)
 - [x] Session: a new `activity` result (`roll`, `creature: 'intelligent' | 'other'`). It's an added union member, so existing session files still load and the schema version stays 1
-- [x] Ask form: a fourth oracle, **Activity Die**, with an Intelligent / Other creature choice. The question is optional (e.g. "The goblins at the ford")
+- [x] Ask form: a fourth oracle, **Activity Die**, with an Intelligent / Other creature choice. The question is optional (e.g. "The goblins at the ford"). Superseded in Part 10: now rolled as part of Reaction & Activity
 - [x] Result view: an Activity die face with our own icon, the status name, and the chosen column's examples (the other column shown smaller)
 - [x] Journal line and AI prompt: describe the roll; the system prompt explains the Activity Die so readings can use it
 - [x] Tests: data, engine, ask, schema, describeResult, prompt, component, e2e flow, axe on the new view
@@ -176,6 +177,25 @@ Notes:
 - Source: printed p.66 (PDF page 68), checked against the extracted text. The book's companion Reaction table (2d6, balanced) sits beside it and is not included.
 - Die faces from the official Activity Die template Brandon provided (replacing the first-draft hand-drawn SVGs): `npm run assets` cuts the six faces out of the net in `data/dice/templates/activity-die.png`. Shown on a teal die body (`--mist`) to set it apart from the Bones. At Brandon's request, every die now comes from the official templates (`data/dice/templates/`): the asset script cuts each face out of its die net in the die's glyph colour, replacing the faces copied from the dddice set. The old dddice face files and the dice contact sheet were deleted at Brandon's request.
 - 122 unit/component tests; e2e and axe pass across 5 repeated runs.
+
+---
+
+## Part 10: Reaction & Activity
+
+Brandon asked for the Reaction table (Tales of Argosa p.66), then decided to roll it together with the Activity Die as one oracle, as the book does. When the PCs meet a creature the GM rolls 2d6 for its reaction on a balanced chart (2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable); the book's gate-guard example (p.67) reads the leftmost die as the Activity Die.
+
+- [x] `ORACLE_SPEC.md`: a Reaction & Activity section with the balanced chart (descriptions in our own words) and the one-roll reading
+- [x] `src/data/reaction.ts`: the five bands, with labels in the book's terms and descriptions in our words
+- [x] Engine: `rollReaction(rng)`, returning 2d6 as two dice; the first is the Activity Die
+- [x] Session: a `reaction` result (`dice`, `creature`); the Activity roll is `dice[0]`, not stored twice. The standalone `activity` result from Part 9 stays readable for sessions saved with it
+- [x] Ask form: one oracle, **Reaction & Activity** ("A creature you meet: how it reacts and what it's doing"), with the Intelligent / Other creature choice. It replaces the separate Activity Die option
+- [x] Result view: the teal Activity Die and a plain pip die, "Reaction (3 + 2 = 5)", the band and its meaning, then the Activity status and examples
+- [x] Journal line and AI prompt
+- [x] Tests across data, engine, schema, ask, describeResult, prompt, components, e2e and axe
+
+Notes: removed `src/engine/activity.ts` (the standalone roll is no longer offered). 131 unit/component tests; e2e and axe pass across 3 repeated runs.
+
+Not included: each monster's own Reac ranges from its stat block. Those vary per creature and the balanced chart is the book's general fallback; the 2d6 total is shown so it can be read against them.
 
 ---
 

@@ -40,9 +40,21 @@ export const fortuneResultSchema = z.object({
   face: fortuneFace,
 })
 
+// A standalone Activity Die roll. No longer offered (Reaction & Activity replaced it), but
+// kept so sessions saved with one still load and display.
 export const activityResultSchema = z.object({
   tool: z.literal('activity'),
   roll: z.literal([1, 2, 3, 4, 5, 6]),
+  creature: z.enum(['intelligent', 'other']),
+})
+
+const d6 = z.literal([1, 2, 3, 4, 5, 6])
+
+// Reaction & Activity (p.66): 2d6 for Reaction, with the first die read as the Activity
+// Die, as in the book's gate-guard example. The Activity roll is dice[0], not stored twice.
+export const reactionResultSchema = z.object({
+  tool: z.literal('reaction'),
+  dice: z.tuple([d6, d6]),
   creature: z.enum(['intelligent', 'other']),
 })
 
@@ -52,6 +64,7 @@ export const oracleResultSchema = z.discriminatedUnion('tool', [
   bonesResultSchema,
   fortuneResultSchema,
   activityResultSchema,
+  reactionResultSchema,
 ])
 
 export const entrySchema = z.object({
@@ -85,6 +98,7 @@ export type OracleResult = z.infer<typeof oracleResultSchema>
 export type SignsResult = z.infer<typeof signsResultSchema>
 export type BonesEntryResult = z.infer<typeof bonesResultSchema>
 export type ActivityResult = z.infer<typeof activityResultSchema>
+export type ReactionResult = z.infer<typeof reactionResultSchema>
 export type JournalEntry = z.infer<typeof entrySchema>
 export type Fact = z.infer<typeof factSchema>
 export type Session = z.infer<typeof sessionSchema>

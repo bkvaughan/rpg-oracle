@@ -1,5 +1,7 @@
-import { activityFor } from '../data/activity.ts'
+import { activityFor, type ActivityRoll, type Creature } from '../data/activity.ts'
 import { CARDS, TIME_ICON_NAMES, type Card } from '../data/deck.ts'
+import { reactionFor } from '../data/reaction.ts'
+import { reactionTotal } from '../engine/reaction.ts'
 import { bonesOutcome, type JournalEntry, type Session } from '../state/session.ts'
 import { promptContext } from '../state/promptContext.ts'
 
@@ -26,6 +28,8 @@ The Fortune die adds a separate twist that need not relate to the question: Fort
 The Fortune die can also be rolled alone. Under the Lone Wolf rule, when a solo PC is hit, Fortune means the attack is parried or negated, Misfortune means the PC counterstrikes for standard damage, and Nil has no effect. Otherwise treat it as a twist on the current scene.
 
 The Activity Die is a d6 rolled when the PCs come across a creature, often alongside a Reaction check, to show what it is doing at that moment: 1 Threat, 2 Socialising, 3 Eating, 4 Working, 5 Traveling, 6 Resting. You are given the result, whether the creature is intelligent, and example activities. Pick or invent one specific, visible activity that fits the creature and the scene, and say what the PCs see or hear.
+
+Reaction & Activity is one 2d6 roll made when the PCs meet a creature. The total is read on a balanced Reaction chart: 2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable. It sets the creature's first attitude to the PCs, not the outcome of anything they then try. The first die is also the Activity Die. Combine the two into one picture of the encounter, e.g. Unfriendly guards eating on duty. If the question or recent rulings show the PCs already know the creature's attitude, lean on the activity and treat the reaction lightly.
 
 # How to answer
 
@@ -84,16 +88,27 @@ function describeForAi(entry: JournalEntry): string {
     }
     case 'fortune':
       return `Tool: the Fortune die alone.\nResult (settled): ${result.face}.`
-    case 'activity': {
-      const activity = activityFor(result.roll)
-      const examples = result.creature === 'intelligent' ? activity.intelligent : activity.other
+    case 'activity':
+      return [`Tool: the Activity Die, for ${creatureText(result.creature)}.`, ...activityLines(result.roll, result.creature)].join('\n')
+    case 'reaction': {
+      const total = reactionTotal(result.dice)
+      const reaction = reactionFor(total)
       return [
-        `Tool: the Activity Die, for ${result.creature === 'intelligent' ? 'an intelligent creature' : 'a non-intelligent creature (a beast or monster)'}.`,
-        `Result (settled): ${result.roll} ${activity.status}.`,
-        `Example activities: ${examples}`,
+        `Tool: Reaction & Activity (2d6, balanced chart), for ${creatureText(result.creature)}; the first die is the Activity Die.`,
+        `Dice: ${result.dice[0]} and ${result.dice[1]}.`,
+        `Reaction (settled): ${total} ${reaction.label}. ${reaction.description}`,
+        ...activityLines(result.dice[0], result.creature),
       ].join('\n')
     }
   }
+}
+
+const creatureText = (creature: Creature) =>
+  creature === 'intelligent' ? 'an intelligent creature' : 'a non-intelligent creature (a beast or monster)'
+
+function activityLines(roll: ActivityRoll, creature: Creature): string[] {
+  const activity = activityFor(roll)
+  return [`Activity (settled): ${roll} ${activity.status}.`, `Example activities: ${activity[creature]}`]
 }
 
 /** The per-request message: the question, its settled result, and the session so far. */

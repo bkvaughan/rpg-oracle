@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
 import ActivityResult from './ActivityResult.tsx'
 import BonesResult from './BonesResult.tsx'
+import ReactionResult from './ReactionResult.tsx'
 import FortuneResult from './FortuneResult.tsx'
 import SignsResult from './SignsResult.tsx'
 
@@ -71,6 +72,18 @@ describe('ActivityResult', () => {
     expect(screen.getByText('Other creature', { selector: '.label' })).toBeInTheDocument()
     expect(screen.getByText(/^Ambushing, fighting, caught by a trap/)).toBeInTheDocument()
     expect(screen.getByText(/^Intelligent creature: Ambushing, fighting someone/)).toBeInTheDocument()
+  })
+})
+
+describe('ReactionResult', () => {
+  test('book example: 3 and 2 is Unfriendly, and the 3 on the Activity Die is Eating', () => {
+    render(<ReactionResult result={{ tool: 'reaction', dice: [3, 2], creature: 'intelligent' }} />)
+    expect(screen.getByText('Reaction (3 + 2 = 5)')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Activity Die: 3, Eating' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'd6: 2' })).toBeInTheDocument()
+    expect(document.querySelector('.reaction-status')).toHaveTextContent('5 Unfriendly')
+    expect(screen.getByText('Activity (the 3 on the Activity Die)')).toBeInTheDocument()
+    expect(screen.getByText(/^Eating, cooking or preparing food/)).toBeInTheDocument()
   })
 })
 
