@@ -1,0 +1,322 @@
+/* Design system ported from personal-blog (Torchlit Chronicles) src/styles/global.css.
+   Keep the two in step: same tokens, fonts, atmosphere layers and panel style. */
+
+/* ───────────── Tokens ───────────── */
+:root {
+  --bg: #0b0d0e;
+  --ink: #d9d4c7; /* bone */
+  --ink-dim: #8e928d;
+  --line: rgb(190 200 198 / 0.14);
+  --panel: rgb(13 15 16 / 0.82);
+  --blood: #8f2a1f;
+
+  /* Overridden per campaign via inline style on <body>. */
+  --accent: #d08a3a;
+  --mist: #2f4b4b;
+
+  --font-display: 'Pirata One', 'UnifrakturCook', serif;
+  --font-label: 'IM Fell English SC', 'Cormorant SC', serif;
+  --font-body: 'Alegreya', 'Iowan Old Style', Georgia, serif;
+
+  /* Torch position, driven by atmosphere.ts. */
+  --tx: 50vw;
+  --ty: 30vh;
+  --flicker: 1;
+  --torch-r: 520px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 0.2em;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+a:hover {
+  color: color-mix(in srgb, var(--accent) 70%, white);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: white;
+}
+
+/* ───────────── Atmosphere ───────────── */
+.atmo {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Painterly backdrop: mist glow from above, ember warmth from below, grain over all. */
+.atmo-base {
+  z-index: 0;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(ellipse 90% 60% at 50% -10%, color-mix(in srgb, var(--mist) 85%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 45% at 15% 110%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, color-mix(in srgb, var(--mist) 50%, transparent), transparent 70%),
+    linear-gradient(180deg, #111516 0%, var(--bg) 55%, #070808 100%);
+}
+
+/* Two layers of tileable fog drifting at different speeds for depth. */
+.atmo-fog {
+  z-index: 1;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+.atmo-fog > div {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(100% + 1400px);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.0022 .006' numOctaves='4' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .62  0 0 0 0 .7  0 0 0 0 .7  0 0 0 1.6 -.72'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>")
+    repeat-x 0 0 / 1400px 100%;
+  opacity: 0.22;
+  animation: drift 140s linear infinite;
+  will-change: transform;
+}
+.atmo-fog > div + div {
+  opacity: 0.14;
+  transform: scaleY(-1);
+  animation-duration: 90s;
+  animation-direction: reverse;
+  top: 20%;
+}
+
+@keyframes drift {
+  to {
+    transform: translateX(-1400px);
+  }
+}
+
+.atmo-particles {
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+/* Darkness everywhere except a warm pool of light around the torch. */
+.atmo-torch {
+  z-index: 3;
+  background:
+    radial-gradient(
+      circle calc(var(--torch-r) * var(--flicker)) at var(--tx) var(--ty),
+      color-mix(in srgb, var(--accent) 13%, transparent),
+      transparent 75%
+    ),
+    radial-gradient(
+      circle calc(var(--torch-r) * 1.7 * var(--flicker)) at var(--tx) var(--ty),
+      transparent 25%,
+      rgb(0 0 0 / 0.6) 100%
+    );
+}
+
+/* ───────────── Chrome ───────────── */
+.site-header,
+main,
+.site-footer {
+  position: relative;
+  z-index: 10;
+}
+
+.site-header {
+  padding: 1.25rem clamp(1rem, 4vw, 2.5rem);
+}
+
+.site-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-label);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.flame {
+  width: 0.9em;
+  height: 1.2em;
+  fill: var(--accent);
+  filter: drop-shadow(0 0 6px var(--accent));
+  transform-origin: 50% 100%;
+  animation: flame 2.4s ease-in-out infinite;
+}
+
+@keyframes flame {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); opacity: 1; }
+  25% { transform: scale(0.94, 1.06) rotate(-2deg); opacity: 0.9; }
+  50% { transform: scale(1.04, 0.95) rotate(1.5deg); opacity: 1; }
+  75% { transform: scale(0.97, 1.04) rotate(-1deg); opacity: 0.85; }
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+}
+
+.site-footer {
+  padding: 2rem 1rem 2.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
+.site-footer p {
+  margin: 0.25rem 0;
+}
+
+/* ───────────── Type ───────────── */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1;
+  margin: 0;
+  color: #ece6d8;
+  text-shadow:
+    0 0 30px color-mix(in srgb, var(--accent) 35%, transparent),
+    0 2px 0 rgb(0 0 0 / 0.8);
+  animation: ink-in 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes ink-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    letter-spacing: 0.12em;
+  }
+}
+
+.label {
+  font-family: var(--font-label);
+  letter-spacing: 0.12em;
+  color: var(--ink-dim);
+  font-size: 0.95rem;
+}
+
+.eyebrow {
+  font-family: var(--font-label);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+/* ───────────── Hero ───────────── */
+.hero {
+  text-align: center;
+  padding: clamp(3rem, 12vh, 7rem) 0 clamp(2rem, 6vh, 4rem);
+}
+.hero .display {
+  font-size: clamp(3rem, 11vw, 6.5rem);
+}
+.hero .lede {
+  margin: 1.25rem auto 0;
+  max-width: 36rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  font-size: 1.2rem;
+  animation: fade-up 1.2s 0.5s both;
+}
+
+.rule {
+  width: min(22rem, 70%);
+  height: 1px;
+  margin: 2rem auto 0;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+  animation: fade-up 1.2s 0.8s both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ───────────── Panels & cards ───────────── */
+.panel {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow:
+    0 30px 80px -20px rgb(0 0 0 / 0.9),
+    inset 0 1px 0 rgb(255 255 255 / 0.03);
+}
+
+/* Bracket-style corner ornaments. */
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  pointer-events: none;
+}
+.panel::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.5rem;
+}
+
+.empty {
+  text-align: center;
+  color: var(--ink-dim);
+  font-style: italic;
+  padding: 2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -6,7 +6,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 
 - Part 1: done and approved. Commit `24ee6b5`
 - Part 2: done and approved, committed and pushed to `origin/main`
-- Part 3: next
+- Design: adopted the Torchlit Chronicles look from `../personal-blog` (2026-11-05). Approved, committed and pushed
+- Part 3: in progress
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -17,6 +18,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 | AI access | BYOK. The Anthropic SDK runs in the browser with the user's key, stored only in their browser. All network calls go through one module (`src/ai/client.ts`) so a proxy can replace it later | GitHub Pages can't hold secrets, and this is the same approach as mythras Part 12 |
 | Sessions | **JSON files on disk.** Open and save a session file with the File System Access API, autosaving to the same file (Chrome, Edge, Arc). On Safari and Firefox, fall back to Download / Open file. A browser copy is kept for crash recovery | A static site can't write to disk without the browser's file picker. This is the closest match to "local JSON files" |
 | Art | Bundled art, resized to WebP at build time | Brandon's call |
+| Design | Follow Brandon's blog Torchlit Chronicles (`../personal-blog`): grimdark palette, Pirata One / IM Fell English SC / Alegreya, fog, embers and torchlight background, bracket-corner panels | Brandon's call (2026-11-05). Replaces "propose two visual directions" in Part 6 |
 | Licence | Ship publicly as an unofficial fan tool: credits, a not-affiliated notice, and links to the official deck, dice and book | Brandon's call (Part 1). Fall back to a words-only build if Pickpocket Press objects |
 
 ---
@@ -87,7 +89,7 @@ Notes: the Vite template now ships TypeScript 7 (`~7.0.2`), Vite 8 and Vitest 5.
 
 ## Part 6: Design direction and UI
 
-- [ ] Propose two visual directions (dark sword-and-sorcery feel, palette, type). Brandon picks one, and it's recorded in CLAUDE.md
+- [x] Visual direction: the Torchlit Chronicles design from `../personal-blog`, recorded under Design Rules in CLAUDE.md. Tokens, fonts, atmosphere layers, header, footer and hero were ported into the shell ahead of Part 3
 - [ ] App shell: session bar (file name, save state, PC, location), question box, tool picker (**Read the Signs** / **Consult the Bones** with Even, Likely Yes and Likely No / **Fortune die**)
 - [ ] Signs result: both cards' art and the four words, the time icon and period, a compass showing primary and secondary direction, and a "roll exact hour" button
 - [ ] Bones result: dice faces for the first cast, any reroll shown as "Judgment No → Yes", the final answer with its strength (Double or Triple), and the Fortune twist
@@ -113,7 +115,7 @@ Notes: the Vite template now ships TypeScript 7 (`~7.0.2`), Vite 8 and Vitest 5.
 
 ## Part 8: Hardening and deploy
 
-- [ ] Content-Security-Policy meta tag: `connect-src` limited to `https://api.anthropic.com`, no third-party scripts, fonts self-hosted
+- [ ] Content-Security-Policy meta tag: `connect-src` limited to `https://api.anthropic.com`, no third-party scripts, fonts self-hosted. Allow `data:` in `img-src`, because the atmosphere's noise and fog textures are inline SVG data URIs
 - [ ] Accessibility pass with axe on every view
 - [ ] `.github/workflows/deploy.yml` copied from mythras (lint, unit tests, e2e, build, deploy to Pages)
 - [ ] Enable Pages on the repo. Push to `main` only after Brandon confirms

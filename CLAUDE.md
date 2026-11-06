@@ -14,7 +14,7 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 - npm as the package manager; current Node LTS
 - Vitest + React Testing Library for unit and component tests; Playwright (Chromium only) with `@axe-core/playwright` for end-to-end and accessibility tests
 - oxlint (Vite React TypeScript template default) and `tsc -b` for typechecking
-- Plain CSS with custom properties. No UI component library
+- Plain CSS with custom properties. No UI component library. Visual design follows `../personal-blog` (Torchlit Chronicles); see Design Rules
 - zod for the card data, session files and AI responses
 - AI: bring-your-own-key. The Anthropic SDK runs in the browser with the player's own key, stored only in their browser. All network access goes through `src/ai/client.ts`
 - Sessions: JSON files on disk via the File System Access API (autosave to the open file); Download / Open fallback on browsers without it; IndexedDB copy for crash recovery. `schemaVersion` on every file
@@ -25,7 +25,7 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 ### Architecture rules
 
 - **The engine is pure.** Dice, deck and resolution logic live in `src/engine/` as pure TypeScript with no React imports. The UI never calculates oracle results itself.
-- **Randomness is injectable.** Every engine function that draws or rolls takes an `rng` argument. Production uses `crypto.getRandomValues` with rejection sampling (never `Math.random`); tests use a seeded generator.
+- **Randomness is injectable.** Every engine function that draws or rolls takes an `rng` argument. Production uses `crypto.getRandomValues` with rejection sampling (never `Math.random`); tests use a seeded generator. The decorative `src/ui/atmosphere.ts` is the one exception allowed to use `Math.random`.
 - **The AI only interprets.** The prompt states the result as fact. The AI is never asked to pick a card, roll, or override an outcome. The oracle works fully without AI.
 - **The session stores facts, the AI suggests them.** `new_facts` from the AI are suggestions; nothing is pinned until the player accepts it.
 
@@ -43,7 +43,8 @@ rpg-oracle/
     engine/           rng, signs, bones
     state/            Session type, reducer, file store, prompt context
     ai/               settings, schema, prompt, client
-    ui/               React components
+    styles/           global.css: design tokens, atmosphere, panels (ported from personal-blog)
+    ui/               React components; atmosphere.ts (decorative background effects)
   tests/e2e/          Playwright tests
 ```
 
@@ -67,6 +68,17 @@ Unit tests sit next to the code they test (`foo.ts` and `foo.test.ts`).
 5. Every oracle rule has a unit test; the Bones probabilities are tested against the spec's table
 6. If the rules are unclear, stop and ask Brandon. Do not invent a ruling; record the answer in ORACLE_SPEC.md
 7. UI text uses the book's terms exactly (Read the Signs, Consult the Bones, Hammer of Judgment, Twins of Fate, Fortune die)
+
+## Design Rules
+
+The look follows Brandon's blog, Torchlit Chronicles (`../personal-blog`), adopted 2026-11-05. `src/styles/global.css` and `src/ui/atmosphere.ts` are ports of that blog's `src/styles/global.css` and `src/scripts/atmosphere.ts`; keep them in step and extend rather than restyle.
+
+- Grimdark palette: charcoal background (`--bg`), bone text (`--ink`), desaturated teal mist (`--mist`), lantern-amber accent (`--accent`), ember-red `--blood`. Default theme: accent `#d08a3a`, mist `#2f4b4b`, effect `embers`
+- Fonts (self-hosted via @fontsource): Pirata One for display (`.display`), IM Fell English SC for labels (`.label`, `.eyebrow`), Alegreya for body
+- Decoration lives in the background layers (`.atmo-*` in `index.html`, outside React, started by `startAtmosphere()` in `main.tsx`). Readable content always sits on a solid `.panel` with bracket corners
+- All motion stops under `prefers-reduced-motion`
+- Oracle-specific: the parchment card art sits on dark panels; the Hammer of Judgment uses `--blood` red; result reveals use the existing `fade-up` / `ink-in` animations
+- No Tales of Argosa logo or trade dress
 
 ## Commands
 
