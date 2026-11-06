@@ -9,7 +9,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Design: adopted the Torchlit Chronicles look from `../personal-blog` (2026-11-05). Approved, committed and pushed
 - Part 3: done and approved, committed and pushed
 - Part 4: done and approved, committed and pushed
-- Part 5: in progress
+- Part 5: done and approved, committed and pushed
+- Part 6: in progress
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -81,13 +82,22 @@ Notes: `Rng` is `(n) => integer in [0, n)`, so modules ask for the range they ne
 
 ## Part 5: Session model and persistence
 
-- [ ] `Session` type with `schemaVersion`: PC name, class and level; current location (hex, site, room); journal entries (question, tool, likelihood, raw result, AI reading, timestamp); a pinned facts list. Validated with zod
-- [ ] Reducer and actions: ask, record result, attach reading, add/edit/remove fact, edit PC/location, delete entry
-- [ ] `src/state/fileStore.ts`: New / Open / Save As with the File System Access API, autosaving to the open file after each change
-- [ ] Fallback when that API isn't available: Download JSON and Open file, with a clear "unsaved changes" indicator
-- [ ] Crash-recovery copy in IndexedDB, offered on load if it's newer than the file
-- [ ] `promptContext(session)`: the last 20 journal entries plus all pinned facts, so prompts stay small
-- [ ] Tests: round-trip save and load, a clear error on bad files, fallback selection
+- [x] `Session` type with `schemaVersion`: PC name, class and level; current location (hex, site, room); journal entries (question, tool, likelihood, raw result, AI reading, timestamp); a pinned facts list. Validated with zod
+- [x] Reducer and actions: ask, record result, attach reading, add/edit/remove fact, edit PC/location, delete entry
+- [x] `src/state/fileStore.ts`: New / Open / Save As with the File System Access API, autosaving to the open file after each change
+- [x] Fallback when that API isn't available: Download JSON and Open file, with a clear "unsaved changes" indicator
+- [x] Crash-recovery copy in IndexedDB, offered on load if it's newer than the file
+- [x] `promptContext(session)`: the last 20 journal entries plus all pinned facts, so prompts stay small
+- [x] Tests: round-trip save and load, a clear error on bad files, fallback selection
+
+Notes:
+- Stored results hold what the dice and cards showed (card ids, cast, reroll, final dice). Answers are always re-derived by the engine.
+- Every reducer action carries its own timestamp, and new ids are made by the caller, so the reducer stays pure.
+- The AI reading schema (`src/ai/schema.ts`) was pulled forward from Part 7 so sessions can store readings. `alternate`, `time`, `direction` and follow-up `likelihood` are nullable rather than optional, to suit structured outputs.
+- `fileStore.ts` provides the functions; Part 6 wires them into the UI (buttons, the file input for the fallback, autosave on change).
+- Recovery: at startup, offer the IndexedDB copy only if it holds unsaved changes. After opening a file, offer it only if it's the same session and newer than the file. Tested with `fake-indexeddb`.
+- `describeResult()` gives the one-line summary used both in the prompt and in the journal.
+- 73 tests in total.
 
 ---
 

@@ -41,8 +41,8 @@ rpg-oracle/
   src/
     data/             deck_of_signs.json and deck.ts (typed, zod-validated card data)
     engine/           rng, signs, bones
-    state/            Session type, reducer, file store, prompt context
-    ai/               settings, schema, prompt, client
+    state/            Session type, reducer, file store (disk), recovery (IndexedDB), prompt context
+    ai/               schema (reading contract), settings, prompt, client
     styles/           global.css: design tokens, atmosphere, panels (ported from personal-blog)
     ui/               React components; atmosphere.ts (decorative background effects)
   tests/e2e/          Playwright tests
