@@ -69,7 +69,6 @@ export default function App() {
 
       <main>
         <section className="hero hero-compact">
-          <p className="eyebrow">Tales of Argosa</p>
           <h1 className="display">RPG Oracle</h1>
           <p className="lede">Read the Signs. Consult the Bones. Let the dark answer.</p>
         </section>

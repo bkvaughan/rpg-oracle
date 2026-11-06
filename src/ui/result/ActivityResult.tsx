@@ -22,7 +22,6 @@ export default function ActivityResult({ result }: { result: Result }) {
       <p className="secondary activity-alt">
         {CREATURE_TEXT[other]}: {activity[other]}
       </p>
-      <p className="secondary">See Tales of Argosa p.66.</p>
     </div>
   )
 }
