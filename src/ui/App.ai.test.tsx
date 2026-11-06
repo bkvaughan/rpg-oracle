@@ -16,7 +16,7 @@ async function castBones(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Cast the Bones' }))
 }
 
-test('Interpret is disabled until a key is saved', async () => {
+test('without a key nothing is sent, and Interpret is disabled until a key is saved', async () => {
   const user = userEvent.setup()
   render(<App />)
   await castBones(user)
@@ -25,18 +25,20 @@ test('Interpret is disabled until a key is saved', async () => {
   await user.type(screen.getByLabelText('Anthropic API key'), 'sk-ant-test')
   await user.click(within(screen.getByText(/^AI settings/).closest('details')!).getByRole('button', { name: 'Save' }))
   expect(screen.getByRole('button', { name: 'Interpret' })).toBeEnabled()
+  // Saving a key doesn't interpret results asked before it.
+  expect(interpret).not.toHaveBeenCalled()
   expect(JSON.parse(localStorage.getItem('rpg-oracle-ai-settings')!)).toEqual({ apiKey: 'sk-ant-test', model: 'claude-opus-5-5' })
 })
 
-test('a reading is shown, facts are pinned on request, and follow-ups prefill the form', async () => {
+test('with a key, a new result is interpreted by itself; facts pin on request; follow-ups prefill', async () => {
   localStorage.setItem('rpg-oracle-ai-settings', JSON.stringify({ apiKey: 'sk-ant-test', model: 'claude-sonnet-5-5' }))
   interpret.mockResolvedValue(reading)
   const user = userEvent.setup()
   render(<App />)
   await castBones(user)
-  await user.click(screen.getByRole('button', { name: 'Interpret' }))
 
   expect(await screen.findByText(reading.ruling)).toBeInTheDocument()
+  expect(interpret).toHaveBeenCalledOnce()
   expect(interpret.mock.calls[0][2]).toMatchObject({ apiKey: 'sk-ant-test', model: 'claude-sonnet-5-5' })
 
   // Suggested facts are not pinned until accepted.
@@ -61,7 +63,25 @@ test('an API error is shown and the button comes back', async () => {
   const user = userEvent.setup()
   render(<App />)
   await castBones(user)
-  await user.click(screen.getByRole('button', { name: 'Interpret' }))
   expect(await screen.findByText('The API key was rejected. Check it in AI settings.')).toHaveAttribute('role', 'alert')
   expect(screen.getByRole('button', { name: 'Interpret' })).toBeEnabled()
+})
+
+test('selecting an older entry from the journal never calls the AI', async () => {
+  localStorage.setItem('rpg-oracle-ai-settings', JSON.stringify({ apiKey: 'k', model: 'claude-opus-5-5' }))
+  const { AiError } = await import('../ai/errors.ts')
+  interpret.mockRejectedValue(new AiError('network', 'Could not reach Anthropic.'))
+  const user = userEvent.setup()
+  render(<App />)
+  await castBones(user)
+  await screen.findByText('Could not reach Anthropic.')
+  await user.click(screen.getByRole('radio', { name: /Fortune die/ }))
+  await user.click(screen.getByRole('button', { name: 'Roll the Fortune die' }))
+  await screen.findAllByText('Could not reach Anthropic.')
+  expect(interpret).toHaveBeenCalledTimes(2)
+
+  const journal = screen.getByRole('region', { name: 'Journal' })
+  await user.click(within(journal).getByRole('button', { name: /^Is there a sentry\?/ }))
+  expect(screen.getByRole('button', { name: 'Interpret' })).toBeEnabled()
+  expect(interpret).toHaveBeenCalledTimes(2)
 })

@@ -24,6 +24,8 @@ export default function App() {
   const store = useSessionStore()
   const { session, dispatch } = store
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // The entry just asked, which interprets by itself. Picking an older entry never calls the AI.
+  const [freshId, setFreshId] = useState<string | null>(null)
   const [aiSettings, setAiSettings] = useState<AiSettings>(loadSettings)
   // A follow-up remounts the ask form with its question, tool and likelihood filled in.
   const [prefill, setPrefill] = useState<{ request: Partial<AskRequest>; n: number }>({ request: {}, n: 0 })
@@ -33,8 +35,9 @@ export default function App() {
   const selected = session.journal.find((e) => e.id === selectedId) ?? session.journal.at(-1) ?? null
 
   // Show the chosen result: wait a frame so the new entry has rendered before scrolling.
-  const selectEntry = (id: string) => {
+  const selectEntry = (id: string, fresh = false) => {
     setSelectedId(id)
+    setFreshId(fresh ? id : null)
     requestAnimationFrame(() => scrollToTop(resultRef.current))
   }
 
@@ -42,7 +45,7 @@ export default function App() {
     const at = now()
     const entry = ask(request, secureRng, at, crypto.randomUUID())
     dispatch({ type: 'addEntry', entry, at })
-    selectEntry(entry.id)
+    selectEntry(entry.id, true)
   }
 
   const onRollHour = () => {
@@ -113,6 +116,7 @@ export default function App() {
                 key={selected.id}
                 entry={selected}
                 onRollHour={onRollHour}
+                autoInterpret={selected.id === freshId}
                 onSaveNote={(note) => dispatch({ type: 'setEntryNote', entryId: selected.id, note, at: now() })}
                 onChooseReading={(useAlternate) => dispatch({ type: 'chooseReading', entryId: selected.id, useAlternate, at: now() })}
                 hasKey={aiSettings.apiKey !== ''}
@@ -127,7 +131,7 @@ export default function App() {
             <Journal
               entries={session.journal}
               selectedId={selected?.id ?? null}
-              onSelect={selectEntry}
+              onSelect={(id) => selectEntry(id)}
               onDelete={(id) => dispatch({ type: 'deleteEntry', entryId: id, at: now() })}
             />
             <FactsPanel
