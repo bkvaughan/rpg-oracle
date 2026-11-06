@@ -4,7 +4,9 @@ Work through the parts in order and tick each box when it is done. Each part end
 
 ## Status
 
-- Part 1: done, awaiting Brandon's review. Initial commit made on `main`; remote `origin` added, not pushed
+- Part 1: done and approved. Commit `24ee6b5`
+- Part 2: done and approved, committed and pushed to `origin/main`
+- Part 3: next
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -26,7 +28,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 - [x] `ORACLE_SPEC.md`: state the reroll rule for the edge case: when both Twins show the unlikely answer, reroll the first one (identical dice, so it doesn't matter which)
 - [x] `ORACLE_SPEC.md`: add an "AI call" subsection to Part 3 covering the model choices, structured-output schema, prompt caching and error handling
 - [x] Card art descriptions: decided to write them. A one-line `art` field has been added to all 50 cards in `deck_of_signs.json`
-- [ ] Brandon reviews the 50 `art` descriptions
+- [x] Brandon reviews the 50 `art` descriptions (approved 2026-11-05)
 - [x] **Licence gate.** A public repo and Pages site will show the card art and words. Brandon decides: (a) ask Pickpocket Press first, (b) ship anyway as a fan tool with credits and a link to the official deck, or (c) words-only build. Record the decision in CLAUDE.md (decided: (b), recorded in CLAUDE.md and ORACLE_SPEC.md)
 - [x] `git init` on a `main` branch with an initial commit of the existing docs. Brandon created the GitHub repo `bkvaughan/rpg-oracle`, and it's added as `origin` (not pushed yet)
 
@@ -36,16 +38,18 @@ Work through the parts in order and tick each box when it is done. Each part end
 
 ## Part 2: Scaffolding
 
-- [ ] Vite + React + TypeScript project in this folder (strict). `vite.config.ts` uses `base: './'` for Pages, as mythras does
-- [ ] Vitest + React Testing Library (jsdom). Playwright, Chromium only, plus `@axe-core/playwright`
-- [ ] oxlint and a `typecheck` script
-- [ ] npm scripts: `dev`, `build`, `preview`, `test`, `test:e2e`, `lint`, `typecheck`, `assets`
-- [ ] `.gitignore` copied from mythras (`node_modules`, `dist`, test output, `.env*`), plus the original card PNGs (see Part 3)
-- [ ] Folder layout: `src/data`, `src/engine`, `src/state`, `src/ai`, `src/ui`, `scripts/`, `tests/e2e`, `public/`
-- [ ] Hello-world page, one unit test, one component test, one Playwright test
-- [ ] Minimal README and the CLAUDE.md Commands section
+- [x] Vite + React + TypeScript project in this folder (strict). `vite.config.ts` uses `base: './'` for Pages, as mythras does
+- [x] Vitest + React Testing Library (jsdom). Playwright, Chromium only, plus `@axe-core/playwright`
+- [x] oxlint and a `typecheck` script
+- [x] npm scripts: `dev`, `build`, `preview`, `test`, `test:e2e`, `lint`, `typecheck`, `assets`
+- [x] `.gitignore` copied from mythras (`node_modules`, `dist`, test output, `.env*`), plus the original card PNGs (see Part 3)
+- [x] Folder layout: `src/data`, `src/engine`, `src/state`, `src/ai`, `src/ui`, `scripts/`, `tests/e2e`, `public/`
+- [x] Hello-world page, one unit test (the source deck has 50 cards), one component test, one Playwright test
+- [x] Minimal README and the CLAUDE.md Commands section
 
 **Tests:** every script passes on a clean `npm ci`.
+
+Notes: the Vite template now ships TypeScript 7 (`~7.0.2`), Vite 8 and Vitest 5. `strict` was added to both tsconfigs. `tsconfig.node.json` also covers `playwright.config.ts`, `scripts/` and `tests/`. The `assets` script is wired up now, and its file is written in Part 3.
 
 ---
 

@@ -70,7 +70,16 @@ Unit tests sit next to the code they test (`foo.ts` and `foo.test.ts`).
 
 ## Commands
 
-Filled in during Part 2 (scaffolding).
+- `npm run dev`: development server
+- `npm run build`: production build (`tsc -b && vite build`)
+- `npm run preview`: serve the production build on port 4173
+- `npm test`: unit and component tests (Vitest, jsdom; files `src/**/*.test.{ts,tsx}`)
+  - One file: `npx vitest run src/engine/bones.test.ts`. One test by name: `npx vitest run -t "name"`. Watch: `npx vitest`
+- `npm run test:e2e`: end-to-end tests (Playwright, Chromium only; builds and serves the production build itself). First run needs `npx playwright install chromium`
+  - One file: `npx playwright test tests/e2e/smoke.spec.ts`. One test by name: `npx playwright test -g "name"`
+- `npm run lint`: oxlint (exits 0 on warnings; read its output)
+- `npm run typecheck`: `tsc -b` (TypeScript 7)
+- `npm run assets`: regenerate `public/` WebP art from `data/` (Node runs the `.ts` script directly)
 
 ## Working Documentation
 
