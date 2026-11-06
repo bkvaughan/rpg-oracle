@@ -193,7 +193,7 @@ Brandon asked for the Reaction table (Tales of Argosa p.66), then decided to rol
 - [x] Journal line and AI prompt
 - [x] Tests across data, engine, schema, ask, describeResult, prompt, components, e2e and axe
 
-Notes: removed `src/engine/activity.ts` (the standalone roll is no longer offered). Follow-up (Brandon): renamed to **Activity & Reaction**, Activity section first with its die, then Reaction with both dice as numbered pip dice (the first in teal, as it is the Activity Die). The journal line and the AI prompt list the activity first. 131 unit/component tests; e2e and axe pass across 3 repeated runs.
+Notes: removed `src/engine/activity.ts` (the standalone roll is no longer offered). Follow-up (Brandon): renamed to **Activity & Reaction**, Activity section first with its die, then Reaction with both dice as plain white d6 with black pips. The journal line and the AI prompt list the activity first. 131 unit/component tests; e2e and axe pass across 3 repeated runs.
 
 Not included: each monster's own Reac ranges from its stat block. Those vary per creature and the balanced chart is the book's general fallback; the 2d6 total is shown so it can be read against them.
 

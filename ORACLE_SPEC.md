@@ -386,7 +386,7 @@ When the PCs first meet a creature, the GM rolls 2d6 for its initial reaction. E
 ### One roll for both
 The book's worked example (the gate guards, p.67) rolls 2d6 for Reaction, 3 + 2 = 5, and reads the leftmost die as the Activity Die: 3, Eating. The site always does the same, as one oracle called **Activity & Reaction**: the first die is the Activity Die, the second a plain d6, and the total is the Reaction. Each activity still comes up 1 time in 6, exactly as if the Activity Die were rolled alone, so a player who only wants the activity can ignore the reaction line. The 2d6 total is shown plainly, so it can also be read against a monster's own Reac ranges.
 
-The result shows **Activity first** (the Activity Die face, status and examples), then **Reaction** underneath (both dice as numbered pip dice, the first in the Activity Die's teal since it is the same die, then the total and band).
+The result shows **Activity first** (the Activity Die face, status and examples), then **Reaction** underneath (both dice as plain white d6 with black pips, then the total and band).
 
 ### Implementation decisions
 - **Balanced chart only.** Per-monster Reac ranges vary by creature and aren't included.

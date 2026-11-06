@@ -17,14 +17,10 @@ const PIPS: Record<ActivityRoll, number[]> = {
   6: [0, 2, 3, 5, 6, 8],
 }
 
-/** A numbered d6. The Activity Die doubles as the first Reaction die, so it is shown in its teal. */
+/** A plain d6: white with black pips. The first Reaction die is also the Activity Die, so its label says so. */
 function PipDie({ value, activityDie }: { value: ActivityRoll; activityDie?: boolean }) {
   return (
-    <span
-      className={`die die-pips${activityDie ? ' pips-activity' : ''}`}
-      role="img"
-      aria-label={activityDie ? `Activity Die as a d6: ${value}` : `d6: ${value}`}
-    >
+    <span className="die die-pips" role="img" aria-label={activityDie ? `d6 (Activity Die): ${value}` : `d6: ${value}`}>
       <svg viewBox="0 0 30 30" aria-hidden="true">
         {PIPS[value].map((p) => (
           <circle key={p} cx={7 + (p % 3) * 8} cy={7 + Math.floor(p / 3) * 8} r="2.6" />

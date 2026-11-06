@@ -660,12 +660,12 @@ select {
 
 /* ───────────── Reaction roll ───────────── */
 .die-pips {
-  background: linear-gradient(160deg, #ece6d8, #cfc6b2 60%, #a89e88);
+  background: linear-gradient(160deg, #ffffff, #eeeeec 60%, #cfcecb);
 }
 .die-pips svg {
   width: 80%;
   height: 80%;
-  fill: #1c1b1d;
+  fill: #111111;
 }
 .reaction-part + .reaction-part {
   margin-top: 1.25rem;
@@ -675,10 +675,4 @@ select {
 .reaction-result h3 {
   font-weight: 400;
   margin: 0;
-}
-.pips-activity {
-  background: linear-gradient(160deg, color-mix(in srgb, var(--mist) 80%, #6f8f8a), var(--mist) 60%, #1b2d2d);
-}
-.pips-activity svg {
-  fill: #ece6d8;
 }

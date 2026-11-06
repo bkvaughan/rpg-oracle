@@ -62,6 +62,7 @@ test('Activity & Reaction for an encountered creature', async ({ page }) => {
   const result = page.getByRole('article')
   await expect(result.locator('.reaction-status')).toHaveText(/^\d+ (Hostile|Unfriendly|Neutral|Fairly friendly|Affable)$/)
   await expect(result.getByRole('img', { name: /^Activity Die: [1-6], (Threat|Socialising|Eating|Working|Traveling|Resting)$/ })).toBeVisible()
+  await expect(result.getByRole('img', { name: /^d6 \(Activity Die\): [1-6]$/ })).toBeVisible()
   await expect(result.getByRole('img', { name: /^d6: [1-6]$/ })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Journal' }).getByText(/Activity & Reaction \(intelligent creature\)/)).toBeVisible()
 })

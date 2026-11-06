@@ -38,6 +38,7 @@ test('Activity & Reaction needs no question and records the reaction, activity a
   await user.click(screen.getByLabelText('Other creature'))
   await user.click(screen.getByRole('button', { name: 'Roll Activity & Reaction' }))
   expect(screen.getByRole('img', { name: /^Activity Die: \d, / })).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: /^d6 \(Activity Die\): \d$/ })).toBeInTheDocument()
   expect(screen.getByRole('img', { name: /^d6: \d$/ })).toBeInTheDocument()
   const journal = screen.getByRole('region', { name: 'Journal' })
   expect(within(journal).getByText(/^Activity & Reaction \(other creature\): \d \w+; \d+ [A-Za-z ]+$/)).toBeInTheDocument()

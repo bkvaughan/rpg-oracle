@@ -80,9 +80,8 @@ describe('ReactionResult', () => {
     render(<ReactionResult result={{ tool: 'reaction', dice: [3, 2], creature: 'intelligent' }} />)
     expect(screen.getByText('Reaction (3 + 2 = 5)')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Activity Die: 3, Eating' })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'd6: 2' })).toBeInTheDocument()
+    expect(screen.getAllByRole('img', { name: /^d6/ }).map((d) => d.getAttribute('aria-label'))).toEqual(['d6 (Activity Die): 3', 'd6: 2'])
     expect(document.querySelector('.reaction-status')).toHaveTextContent('5 Unfriendly')
-    expect(screen.getByRole('img', { name: 'Activity Die as a d6: 3' })).toBeInTheDocument()
     // Activity comes first, Reaction underneath.
     const parts = screen.getAllByRole('region').map((r) => r.getAttribute('aria-label'))
     expect(parts).toEqual(['Activity', 'Reaction'])
