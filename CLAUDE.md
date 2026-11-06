@@ -34,12 +34,12 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 ```
 rpg-oracle/
   CLAUDE.md  PLAN.md  ORACLE_SPEC.md
-  data/               source data: deck_of_signs.json, cards/*.png (gitignored), dice/*.webp
+  data/               source art: cards/*.png (gitignored, 47 MB), dice/*.webp
   reference/          bones.py (reference roller) and the dice contact sheet
   scripts/            build-assets (source images -> public/ WebP)
   public/             generated card and dice WebP served by the site
   src/
-    data/             typed card data
+    data/             deck_of_signs.json and deck.ts (typed, zod-validated card data)
     engine/           rng, signs, bones
     state/            Session type, reducer, file store, prompt context
     ai/               settings, schema, prompt, client
@@ -57,7 +57,7 @@ Unit tests sit next to the code they test (`foo.ts` and `foo.test.ts`).
 - **Decision (Brandon, 2026-11-05):** the public repo and site ship as an **unofficial fan tool** with the bundled art. The site footer and README say it is unofficial and not affiliated with Pickpocket Press, credit the book and artists, and link to the official deck, dice and book. If Pickpocket Press objects, switch to a words-only build.
 - Never copy the book's prose into the app. Help text is short, in our own words, with a page reference ("see Tales of Argosa p.212").
 - Never commit the book PDF.
-- The card `art` descriptions in `deck_of_signs.json` are our own words.
+- The card `art` descriptions in `src/data/deck_of_signs.json` are our own words.
 
 ## Coding Standards
 

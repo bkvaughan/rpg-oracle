@@ -7,7 +7,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 1: done and approved. Commit `24ee6b5`
 - Part 2: done and approved, committed and pushed to `origin/main`
 - Design: adopted the Torchlit Chronicles look from `../personal-blog` (2026-11-05). Approved, committed and pushed
-- Part 3: in progress
+- Part 3: done and approved, committed and pushed
+- Part 4: in progress
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -57,10 +58,10 @@ Notes: the Vite template now ships TypeScript 7 (`~7.0.2`), Vite 8 and Vitest 5.
 
 ## Part 3: Asset pipeline
 
-- [ ] `scripts/build-assets.ts` (using `sharp`): convert `data/cards/NN.png` to `public/cards/NN.webp` at 400 px wide, plus `NN@2x.webp` at 800 px for high-DPI screens. Copy `data/dice/*.webp` to `public/dice/`
-- [ ] Commit only the generated WebP files. Keep the 47 MB of source PNGs out of git (gitignored, kept locally) so the repo stays small
-- [ ] Move `deck_of_signs.json` into `src/data/` as a typed import, validated with zod in a test (50 cards, unique ids, valid time icons and directions, image file exists)
-- [ ] Test: all 50 cards and 7 dice faces exist, and the total card payload is under about 3 MB
+- [x] `scripts/build-assets.ts` (using `sharp`): convert `data/cards/NN.png` to `public/cards/NN.webp` at 400 px wide, plus `NN@2x.webp` at the full 771 px source width (rather than upscaling to 800) for high-DPI screens. Copy `data/dice/*.webp` to `public/dice/`
+- [x] Commit only the generated WebP files. Keep the 47 MB of source PNGs out of git (gitignored, kept locally) so the repo stays small
+- [x] Move `deck_of_signs.json` into `src/data/` as a typed import (`src/data/deck.ts`), validated with zod in a test (50 cards, ids 1–50 in order, valid time icons and directions, distributions, time text matches icon, the book's example cards). Image existence is checked in `scripts/assets.test.ts`
+- [x] Test: all 50 cards (1x and 2x) and 7 dice faces exist, and the 1x card set is under 3 MB (actual: 2.1 MB at 1x, 4.5 MB at 2x; a reading loads only two cards)
 
 ---
 
