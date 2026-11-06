@@ -12,9 +12,9 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 5: done and approved, committed and pushed
 - Part 6: done and approved, committed and pushed
 - Part 7: done and approved, committed and pushed
-- Part 8: done; live at https://bkvaughan.github.io/rpg-oracle/ (deploy run for `5eb4187` succeeded 2026-11-05; smoke-tested: page, CSP, card and dice art, fonts, no console errors). Remaining: Brandon's live checks (Chrome autosave, Safari download fallback, a real Interpret)
+- Part 8: done; live at https://bkvaughan.github.io/rpg-oracle/ (deploy run for `5eb4187` succeeded 2026-11-05; smoke-tested: page, CSP, card and dice art, fonts, no console errors). Safari download fallback and Chrome autosave checked by Brandon (2026-11-05). Remaining: a real Interpret
 - Part 9 (Activity Die, plus all dice faces from the official templates): done, approved, committed and pushed
-- Part 10 (Activity & Reaction): done, approved, committed and pushed.
+- Part 10 (Activity & Reaction): done, approved, committed and pushed
 - Part 11 (code review fixes): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
