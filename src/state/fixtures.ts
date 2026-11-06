@@ -47,8 +47,6 @@ export function sampleSession(): Session {
   return {
     ...newSession(T0, 'session-1'),
     name: 'The Barrow Lord',
-    pc: { name: 'Thuel', class: 'Barbarian', level: 2 },
-    location: { hex: '0412', site: 'Small Ruin', room: '' },
     journal: [signsEntry('e1'), { ...bonesEntry('e2'), reading }],
     facts: [{ id: 'f1', text: 'The barrow lord hunts at night', source: 'ai', at: T0 }],
   }

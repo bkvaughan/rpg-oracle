@@ -116,14 +116,11 @@ function activityLines(roll: ActivityRoll, creature: Creature): string[] {
 export function buildUserPrompt(entry: JournalEntry, session: Session): string {
   // The entry being interpreted is described in full above, so leave it out of the history.
   const ctx = promptContext({ ...session, journal: session.journal.filter((e) => e.id !== entry.id) })
-  const pc = [ctx.pc.name, ctx.pc.class, ctx.pc.name || ctx.pc.class ? `level ${ctx.pc.level}` : ''].filter(Boolean).join(', ')
-  const where = [ctx.location.hex && `hex ${ctx.location.hex}`, ctx.location.site, ctx.location.room].filter(Boolean).join(' / ')
 
   const sections = [
     `# Question\n${entry.question || '(No question: interpret the result for the current scene.)'}`,
     `# Result\n${describeForAi(entry)}`,
     ...(entry.note.trim() ? [`# What happened (player's note)\n${entry.note.trim()}`] : []),
-    `# Session\nPC: ${pc || 'not given'}\nLocation: ${where || 'not given'}`,
     `# Established facts\n${ctx.facts.length ? ctx.facts.map((f) => `- ${f}`).join('\n') : 'None yet.'}`,
     `# Recent questions (oldest first)\n${
       ctx.recent.length

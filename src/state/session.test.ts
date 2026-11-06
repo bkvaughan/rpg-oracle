@@ -48,6 +48,11 @@ describe('session model', () => {
     expect(parsed.journal[0]).toMatchObject({ note: '', useAlternate: false })
   })
 
+  test('a session saved with the old PC and location fields still loads, without them', () => {
+    const old = { ...sampleSession(), pc: { name: 'Thuel', class: 'Barbarian', level: 2 }, location: { hex: '0412', site: 'Ruin', room: '' } }
+    expect(sessionSchema.parse(old)).toEqual(sampleSession())
+  })
+
   test('the Bones answer is derived from the final dice, not stored', () => {
     const entry = sampleSession().journal[1]
     if (entry.result.tool !== 'bones') throw new Error('expected a bones entry')

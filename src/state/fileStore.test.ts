@@ -27,8 +27,8 @@ describe('parseSession', () => {
     expect(parseSession('not json')).toEqual({ ok: false, error: expect.stringMatching(/isn't valid JSON/) })
     expect(parseSession('{"hello": 1}')).toEqual({ ok: false, error: expect.stringMatching(/doesn't look like an RPG Oracle session/) })
     expect(parseSession('{"schemaVersion": 9}')).toEqual({ ok: false, error: expect.stringMatching(/newer version .*format 9/) })
-    const damaged = { ...sampleSession(), pc: { name: 'Thuel', class: 'Barbarian', level: 'two' } }
-    expect(parseSession(JSON.stringify(damaged))).toEqual({ ok: false, error: expect.stringMatching(/damaged \(pc\.level: /) })
+    const damaged = { ...sampleSession(), name: 2 }
+    expect(parseSession(JSON.stringify(damaged))).toEqual({ ok: false, error: expect.stringMatching(/damaged \(name: /) })
   })
 })
 

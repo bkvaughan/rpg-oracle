@@ -170,13 +170,6 @@ textarea::placeholder {
   gap: 0.5rem;
   margin-top: 1rem;
 }
-.session-details {
-  margin-top: 1rem;
-}
-.session-details summary {
-  cursor: pointer;
-}
-
 .recovery {
   margin-bottom: 1.5rem;
   border-color: color-mix(in srgb, var(--accent) 50%, transparent);

@@ -19,7 +19,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 8 remaining check: real Interprets run live by Brandon, working (2026-11-06)
 - Part 12 (Activity & Reaction follow-ups): done, approved, committed and pushed (deploy for `a88a449` succeeded 2026-11-06)
 - Part 12 reverted (2026-11-06): Brandon tried Reaction follow-ups in play and they didn't feel right; committed and pushed (deploy for `833f76e` succeeded)
-- Part 13 (play notes, choosing the alternate, tighter layout): done, approved, committed (not pushed)
+- Part 13 (play notes, choosing the alternate, tighter layout): done, approved, committed and pushed (deploy for `1caf652` succeeded 2026-11-06)
+- Part 14 (remove the PC and location): done, approved, committed (not pushed). A "don't repeat recent cards" option was built and reverted before commit at Brandon's request
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -259,10 +260,20 @@ Notes: the journal shows one line per field (question and time, result, note), e
 
 ---
 
+## Part 14: Remove the PC and location
+
+Brandon (2026-11-06): the site is just a source of answers. He tried a "don't repeat recent cards" option and had it reverted before commit, and asked for the PC fields to go.
+
+- [x] Remove the "Character and location" panel (PC name, class, level, hex, site, room), the `setPc` / `setLocation` actions, and the fields from `Session`. Zod drops them from older files, so they still load at schema version 1
+- [x] The AI prompt no longer has a Session section
+- [x] `ORACLE_SPEC.md` "What the AI receives" updated
+- [x] Tests: an old file with the fields loads without them; prompt, context, reducer and file tests updated
+
+---
+
 ## Later (not v1)
 
 - One-click book tables that feed the AI: Activities p.66, Exploring p.136, Fortune examples p.135, Complications p.221
-- A "don't repeat recent cards" session option
 - A serverless proxy instead of BYOK
 - Cross-device sync
 

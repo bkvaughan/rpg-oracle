@@ -39,10 +39,8 @@ describe('describeResult', () => {
 })
 
 describe('promptContext', () => {
-  test('carries the PC, location, all facts and recent rulings', () => {
+  test('carries all facts and recent rulings', () => {
     const ctx = promptContext(sampleSession())
-    expect(ctx.pc).toEqual({ name: 'Thuel', class: 'Barbarian', level: 2 })
-    expect(ctx.location.site).toBe('Small Ruin')
     expect(ctx.facts).toEqual(['The barrow lord hunts at night'])
     expect(ctx.recent.map((r) => r.ruling)).toEqual([null, 'A sentry, but she is distracted.'])
     expect(ctx.omitted).toBe(0)

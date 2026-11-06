@@ -14,14 +14,6 @@ describe('sessionReducer', () => {
     expect(s).toMatchObject({ name: 'Barrow', updatedAt: T1, createdAt: T0 })
   })
 
-  test('setPc and setLocation merge partial updates', () => {
-    let s = sampleSession()
-    s = sessionReducer(s, { type: 'setPc', pc: { level: 3 }, at: T1 })
-    s = sessionReducer(s, { type: 'setLocation', location: { room: 'Crypt' }, at: T1 })
-    expect(s.pc).toEqual({ name: 'Thuel', class: 'Barbarian', level: 3 })
-    expect(s.location).toEqual({ hex: '0412', site: 'Small Ruin', room: 'Crypt' })
-  })
-
   test('journal entries are added, read, and deleted', () => {
     let s = newSession(T0, 'x')
     s = sessionReducer(s, { type: 'addEntry', entry: bonesEntry('e1'), at: T1 })

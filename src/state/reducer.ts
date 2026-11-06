@@ -8,8 +8,6 @@ import type { Fact, JournalEntry, Session } from './session.ts'
 export type Action =
   | { type: 'load'; session: Session }
   | { type: 'rename'; name: string; at: string }
-  | { type: 'setPc'; pc: Partial<Session['pc']>; at: string }
-  | { type: 'setLocation'; location: Partial<Session['location']>; at: string }
   | { type: 'addEntry'; entry: JournalEntry; at: string }
   | { type: 'attachReading'; entryId: string; reading: Reading; at: string }
   | { type: 'setEntryHour'; entryId: string; hour: HourRoll; at: string }
@@ -27,10 +25,6 @@ export function sessionReducer(state: Session, action: Action): Session {
   switch (action.type) {
     case 'rename':
       return { ...touched, name: action.name }
-    case 'setPc':
-      return { ...touched, pc: { ...state.pc, ...action.pc } }
-    case 'setLocation':
-      return { ...touched, location: { ...state.location, ...action.location } }
     case 'addEntry':
       return { ...touched, journal: [...state.journal, action.entry] }
     case 'attachReading':

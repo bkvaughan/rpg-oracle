@@ -93,8 +93,6 @@ export const sessionSchema = z.object({
   name: z.string(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
-  pc: z.object({ name: z.string(), class: z.string(), level: z.number().int().min(0) }),
-  location: z.object({ hex: z.string(), site: z.string(), room: z.string() }),
   journal: z.array(entrySchema),
   facts: z.array(factSchema),
 })
@@ -115,8 +113,6 @@ export function newSession(at: string, id: string = crypto.randomUUID()): Sessio
     name: 'Untitled session',
     createdAt: at,
     updatedAt: at,
-    pc: { name: '', class: '', level: 1 },
-    location: { hex: '', site: '', room: '' },
     journal: [],
     facts: [],
   }

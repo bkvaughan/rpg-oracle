@@ -42,8 +42,7 @@ async function mockApi(page: Page) {
 async function everyView(page: Page) {
   await mockApi(page)
   await page.goto('/')
-  await page.locator('.session-details summary').click()
-  await expectNoViolations(page, 'start, settings and details open')
+  await expectNoViolations(page, 'start, settings open')
 
   await page.getByLabel('Your question').fill('What does the leader want?')
   await page.getByRole('button', { name: 'Draw two cards' }).click()

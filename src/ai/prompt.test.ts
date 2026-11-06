@@ -38,11 +38,9 @@ describe('buildUserPrompt', () => {
     expect(prompt).toContain('Exact hour rolled: 3am.')
   })
 
-  test('includes the session, facts and earlier rulings, but not the entry itself in the history', () => {
+  test('includes the facts and earlier rulings, but not the entry itself in the history', () => {
     const session = sampleSession()
     const prompt = buildUserPrompt(session.journal[1], session)
-    expect(prompt).toContain('PC: Thuel, Barbarian, level 2')
-    expect(prompt).toContain('Location: hex 0412 / Small Ruin')
     expect(prompt).toContain('- The barrow lord hunts at night')
     const history = prompt.split('# Recent questions')[1]
     expect(history).toContain("What's going on at this ruin?")
@@ -90,9 +88,9 @@ describe('buildUserPrompt', () => {
 
   test('copes with an empty session and no question', () => {
     const entry = { ...bonesEntry('b'), question: '' }
-    const prompt = buildUserPrompt(entry, { ...sampleSession(), pc: { name: '', class: '', level: 1 }, location: { hex: '', site: '', room: '' }, facts: [], journal: [entry] })
+    const prompt = buildUserPrompt(entry, { ...sampleSession(), facts: [], journal: [entry] })
     expect(prompt).toContain('(No question: interpret the result for the current scene.)')
-    expect(prompt).toContain('PC: not given')
+    expect(prompt).not.toContain('# Session')
     expect(prompt).toContain('# Established facts\nNone yet.')
     expect(prompt).toContain('# Recent questions (oldest first)\nNone yet.')
   })

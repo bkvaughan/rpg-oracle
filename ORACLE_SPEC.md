@@ -60,7 +60,7 @@ The deck has **50 cards**. Each card has:
 
 **Implementation decisions**
 - **No replacement within a reading.** Draw 2 distinct cards from a full 50-card deck, like a physical deck. The Perchance page draws each slot independently, so it can show the same card twice; we don't.
-- **Reshuffle every reading.** Each reading starts from the full deck. A per-session "don't repeat recent cards" option could be added later, but it isn't required by the rules.
+- **Reshuffle every reading.** Each reading starts from the full deck. A "don't repeat recent cards" option was tried and dropped (Brandon, 2026-11-06).
 - **Primary card.** The book doesn't say which card's time or direction to use. We use the **first card drawn** as primary for time and direction, and show the second card's time and direction as a secondary option.
 
 ### Time (p.213)
@@ -413,7 +413,7 @@ The AI should be told the outcome as a fact ("Double No, Fortune"), with the raw
 - The **result**:
   - Deck: both cards with all four words, the time icon, the direction, and the card's one-line `art` description (in `deck_of_signs.json`).
   - Bones: the cast, any reroll, the final answer and magnitude, and the Fortune result.
-- **Session context**: PC name, class, and level; current location (hex, site, room); a short journal of recent questions, answers, and established facts. Cap this (for example, the last 20 entries plus a pinned "facts" list) so prompts stay small.
+- **Session context**: a short journal of recent questions, answers, and established facts. The session no longer keeps the PC or location (decision, Brandon, 2026-11-06: the site is a source of answers, not a character sheet); older files that have them still load, and the fields are dropped. Cap this (for example, the last 20 entries plus a pinned "facts" list) so prompts stay small.
 - **Play notes and the chosen reading** (decision, Brandon, 2026-11-06). Each entry can carry the player's note on what happened in play. Notes are sent with the recent entries, and with the entry being interpreted, and the AI treats them as established. If the player adopted a reading's alternate, later prompts receive the alternate as that entry's ruling.
 - Optionally, the relevant **book procedure** that triggered the question (e.g. "Exploring a hex → Small Ruin → Read the Signs").
 

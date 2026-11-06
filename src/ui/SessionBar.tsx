@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import type { SessionStore } from './useSessionStore.ts'
 import { now } from './useSessionStore.ts'
 
-// The session's name, file and save state, and the PC and location the AI is told about.
+// The session's name, file and save state.
 
 function statusText(store: SessionStore): string {
   const { file, canAutosave } = store
@@ -99,40 +99,6 @@ export default function SessionBar({ store }: { store: SessionStore }) {
         />
       </div>
 
-      <details className="session-details">
-        <summary className="label">Character and location</summary>
-        <div className="field-grid">
-          <label className="field">
-            <span className="label">PC name</span>
-            <input value={session.pc.name} onChange={(e) => dispatch({ type: 'setPc', pc: { name: e.target.value }, at: now() })} />
-          </label>
-          <label className="field">
-            <span className="label">Class</span>
-            <input value={session.pc.class} onChange={(e) => dispatch({ type: 'setPc', pc: { class: e.target.value }, at: now() })} />
-          </label>
-          <label className="field">
-            <span className="label">Level</span>
-            <input
-              type="number"
-              min="0"
-              value={session.pc.level}
-              onChange={(e) => dispatch({ type: 'setPc', pc: { level: Math.max(0, Math.floor(Number(e.target.value) || 0)) }, at: now() })}
-            />
-          </label>
-          <label className="field">
-            <span className="label">Hex</span>
-            <input value={session.location.hex} onChange={(e) => dispatch({ type: 'setLocation', location: { hex: e.target.value }, at: now() })} />
-          </label>
-          <label className="field">
-            <span className="label">Site</span>
-            <input value={session.location.site} onChange={(e) => dispatch({ type: 'setLocation', location: { site: e.target.value }, at: now() })} />
-          </label>
-          <label className="field">
-            <span className="label">Room</span>
-            <input value={session.location.room} onChange={(e) => dispatch({ type: 'setLocation', location: { room: e.target.value }, at: now() })} />
-          </label>
-        </div>
-      </details>
     </section>
   )
 }
