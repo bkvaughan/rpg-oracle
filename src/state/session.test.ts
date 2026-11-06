@@ -33,18 +33,12 @@ describe('session model', () => {
     expect(sessionSchema.safeParse({ ...s, journal: [{ ...entry, result: { ...entry.result, dice: [0, 7] } }] }).success).toBe(false)
   })
 
-  test('a reading saved before follow-ups had a creature still loads, with creature null', () => {
+  test('a reading saved with an Activity & Reaction follow-up loads without it', () => {
     const s = sampleSession()
-    const old = { ...reading, follow_ups: [{ question: 'Is she armed?', tool: 'bones', likelihood: 'likely-yes' }] }
+    const reaction = { question: 'How does the hermit react?', tool: 'reaction', likelihood: null, creature: 'intelligent' }
+    const old = { ...reading, follow_ups: [...reading.follow_ups, reaction] }
     const parsed = sessionSchema.parse({ ...s, journal: [{ ...s.journal[0], reading: old }] })
-    expect(parsed.journal[0].reading!.follow_ups[0].creature).toBeNull()
-  })
-
-  test('a reading can suggest an Activity & Reaction follow-up', () => {
-    const s = sampleSession()
-    const followUp = { question: 'How does the hermit react?', tool: 'reaction', likelihood: null, creature: 'intelligent' }
-    const withReaction = { ...reading, follow_ups: [followUp] }
-    expect(sessionSchema.safeParse({ ...s, journal: [{ ...s.journal[0], reading: withReaction }] }).success).toBe(true)
+    expect(parsed.journal[0].reading!.follow_ups).toEqual(reading.follow_ups)
   })
 
   test('the Bones answer is derived from the final dice, not stored', () => {

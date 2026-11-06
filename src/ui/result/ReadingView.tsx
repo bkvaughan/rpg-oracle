@@ -1,18 +1,11 @@
 import { useState } from 'react'
 import type { FollowUp, Reading } from '../../ai/schema.ts'
-import { CREATURE_TEXT } from '../../data/activity.ts'
 
 // The AI's interpretation of a result. Suggested facts are only pinned when the player
 // accepts them (optionally edited); follow-ups prefill the ask form.
 
-const TOOL_TEXT = { signs: 'Signs', bones: 'Bones', reaction: 'Activity & Reaction' }
+const TOOL_TEXT = { signs: 'Signs', bones: 'Bones' }
 const LIKELIHOOD_TEXT = { even: 'even', 'likely-yes': 'likely Yes', 'likely-no': 'likely No' }
-
-function followUpTool(f: FollowUp): string {
-  if (f.tool === 'bones' && f.likelihood) return `${TOOL_TEXT.bones}, ${LIKELIHOOD_TEXT[f.likelihood]}`
-  if (f.tool === 'reaction' && f.creature) return `${TOOL_TEXT.reaction}, ${CREATURE_TEXT[f.creature]}`
-  return TOOL_TEXT[f.tool]
-}
 
 function SuggestedFact({ text, onPin }: { text: string; onPin: (text: string) => void }) {
   const [draft, setDraft] = useState(text)
@@ -86,7 +79,8 @@ export default function ReadingView({ reading, onPinFact, onFollowUp }: Props) {
                   {f.question}
                   <span className="secondary">
                     {' '}
-                    ({followUpTool(f)})
+                    ({TOOL_TEXT[f.tool]}
+                    {f.tool === 'bones' && f.likelihood ? `, ${LIKELIHOOD_TEXT[f.likelihood]}` : ''})
                   </span>
                 </button>
               </li>

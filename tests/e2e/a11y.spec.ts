@@ -15,7 +15,7 @@ const reading = {
   alternate: null,
   time: null,
   direction: null,
-  follow_ups: [{ question: 'Is she armed?', tool: 'bones', likelihood: 'likely-yes', creature: null }],
+  follow_ups: [{ question: 'Is she armed?', tool: 'bones', likelihood: 'likely-yes' }],
   new_facts: ['A sentry watches the ruin gate'],
 }
 

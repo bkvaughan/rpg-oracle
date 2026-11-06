@@ -17,7 +17,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 10 (Activity & Reaction): done, approved, committed and pushed
 - Part 11 (code review fixes): done, approved, committed and pushed
 - Part 8 remaining check: real Interprets run live by Brandon, working (2026-11-06)
-- Part 12 (Activity & Reaction follow-ups): done, approved, committed
+- Part 12 (Activity & Reaction follow-ups): done, approved, committed and pushed (deploy for `a88a449` succeeded 2026-11-06)
+- Part 12 reverted (2026-11-06): Brandon tried Reaction follow-ups in play and they didn't feel right
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -231,6 +232,15 @@ Brandon asked whether readings should suggest the other tools as follow-ups too.
 - [x] Tests: schema (old readings without `creature` still load), prompt, ReadingView label, App prefill, e2e follow-up click into Reaction
 
 Notes: `followUpSchema` (sent to the API) keeps `creature` required, since structured outputs need every field; `storedReadingSchema` (session files) defaults a missing `creature` to null so older files load. Follow-up button names have no space before the bracket in the accessibility tree, so tests match them with a regex. 146 unit/component tests; e2e and axe pass.
+
+---
+
+## Part 12 revert
+
+Brandon tried Reaction follow-ups in play (2026-11-06) and they didn't feel right. Follow-ups go back to the Signs and the Bones only.
+
+- [x] Revert the Part 12 spec, schema, prompt, UI and tests
+- [x] Session files saved with a Reaction follow-up still load; `storedReadingSchema` drops those follow-ups (unit test)
 
 ---
 

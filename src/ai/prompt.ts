@@ -46,7 +46,7 @@ Activity & Reaction is one 2d6 roll made when the PCs meet a creature. The first
 - alternate: a different reading the player could choose instead. Always give one for the Signs; for the Bones give one only if it adds something, otherwise null.
 - time: for the Signs, the primary card's time of day tied to the fiction (and the exact hour if it was rolled); otherwise null.
 - direction: for the Signs, the primary direction tied to the fiction, e.g. "SW: where the grave robbers fled"; otherwise null.
-- follow_ups: one to three questions worth asking next. tool is "bones" for yes/no questions and "signs" for open ones. Use "reaction" (Activity & Reaction) only when your ruling brings in a creature or person the PC may meet whose attitude is not yet known, e.g. "How does the hermit at the ford react to the PC?". likelihood is "even", "likely-yes" or "likely-no" for the Bones, otherwise null. creature is "intelligent" or "other" for Activity & Reaction, otherwise null.
+- follow_ups: one to three questions worth asking next. tool is "bones" for yes/no questions and "signs" for open ones. likelihood is "even", "likely-yes" or "likely-no" for the Bones, and null for the Signs.
 - new_facts: zero to three short statements your ruling establishes as true, worth pinning. Don't repeat facts already established.
 
 # Example

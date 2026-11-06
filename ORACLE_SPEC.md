@@ -421,7 +421,7 @@ The AI should be told the outcome as a fact ("Double No, Fortune"), with the raw
 2. **Why.** Briefly, how the words or dice support it. For the Bones, explain what Double or Triple changes and what the Fortune or Misfortune twist is.
 3. **An alternate reading.** One different take the player can choose instead (deck mainly; optional for the Bones).
 4. **Time and direction** when relevant (deck), tied to the fiction.
-5. **Follow-ups.** One to three questions to ask next, each tagged with a suggested tool: the Signs, the Bones with a likelihood (e.g. "Bones, likely yes"), or Activity & Reaction with a creature type (e.g. "Activity & Reaction, intelligent creature"). The Fortune die is never a follow-up: it answers no question, and suggesting a roll for a twist would have the AI decide when randomness happens (decision, Brandon, 2026-11-06).
+5. **Follow-ups.** One to three questions to ask next, each tagged with a suggested tool and likelihood (e.g. "Bones, likely yes"). Follow-ups suggest only the Signs or the Bones: Activity & Reaction and the Fortune die are never suggested (decision, Brandon, 2026-11-06, after trying Reaction follow-ups in play).
 
 Return this as structured JSON so the site can lay it out and log it, and keep each section short. A good shape:
 
@@ -433,8 +433,7 @@ Return this as structured JSON so the site can lay it out and log it, and keep e
   "time": "Late Night (Midnight–6am)",
   "direction": "SW: the trail of the fleeing grave robbers",
   "follow_ups": [
-    {"question": "Is there still gold in the barrow?", "tool": "bones", "likelihood": "likely-yes", "creature": null},
-    {"question": "How does the barrow lord react to the PC?", "tool": "reaction", "likelihood": null, "creature": "intelligent"}
+    {"question": "Is there still gold in the barrow?", "tool": "bones", "likelihood": "likely-yes"}
   ],
   "new_facts": ["The barrow lord hunts at night for a stolen gilded heirloom"]
 }
@@ -446,7 +445,7 @@ Return this as structured JSON so the site can lay it out and log it, and keep e
 - **Access.** Bring-your-own-key: the player's Anthropic API key is stored only in their browser and used for direct calls from the page. The static site never holds a key. All network access lives in one module (`src/ai/client.ts`) so a server proxy can replace it later.
 - **Models.** Player-selectable: Claude Opus 5.5 (`claude-opus-5-5`, default: richest readings), Claude Sonnet 5.5 (`claude-sonnet-5-5`, faster and cheaper), Claude Haiku 5.5 (`claude-haiku-5-5`, fastest and cheapest). Thinking is adaptive by default on all three; requests set `output_config.effort: "medium"`, since a reading is a short creative judgement.
 - **Refusals.** Opus and Sonnet requests opt into server-side fallbacks (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`), so a declined request is re-run on Anthropic's recommended fallback model. Haiku 5.5 has no server-side fallback. A final `stop_reason: "refusal"` is shown as a plain message.
-- **Structured output.** The reading schema above is defined once in zod (`src/ai/schema.ts`) and sent as the request's structured-output format (`betaZodOutputFormat`). `alternate`, `time`, `direction` and a follow-up's `likelihood` (Bones only) and `creature` (Activity & Reaction only) are nullable. Session files saved before `creature` existed load with it set to null. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
+- **Structured output.** The reading schema above is defined once in zod (`src/ai/schema.ts`) and sent as the request's structured-output format (`betaZodOutputFormat`). `alternate`, `time`, `direction` and a follow-up's `likelihood` are nullable. Session files saved while Reaction follow-ups existed (2026-11-06) still load, with those follow-ups dropped. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
 - **Prompt caching.** The system prompt (interpretation guidelines, a worked example in our own words, and the 50-card list with art descriptions) is static, so it is sent as a cached block. Only the question, result and session context change per call, in the user message.
 - **Loading.** The SDK is most of the JavaScript, so `src/ai/client.ts` is loaded with `import()` the first time the player clicks Interpret.
 - **Errors.** Mapped to plain messages: no key, key rejected, rate limited, model refused, invalid response, network, cancelled.
@@ -459,7 +458,6 @@ Return this as structured JSON so the site can lay it out and log it, and keep e
 - **Fortune and Misfortune** are separate twists. The benefit or complication doesn't have to relate to the question.
 - **Stay consistent** with established facts. If a result seems to contradict one, look for a reading that reconciles them, or say so plainly.
 - Don't read the GM sections of published adventures for the player. The tool improvises around what the player has seen (p.216).
-- Suggest an **Activity & Reaction** follow-up only when the reading brings in a creature or person the PC may meet whose attitude is not yet known.
 - Stay within Tales of Argosa's setting and tone: dark sword-and-sorcery, with Argosa's people and places when the player names them.
 
 ---

@@ -70,11 +70,6 @@ describe('buildUserPrompt', () => {
     expect(SYSTEM_PROMPT).toContain('2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable')
   })
 
-  test('the system prompt says when to suggest an Activity & Reaction follow-up', () => {
-    expect(SYSTEM_PROMPT).toContain('Use "reaction" (Activity & Reaction) only when')
-    expect(SYSTEM_PROMPT).toContain('creature is "intelligent" or "other" for Activity & Reaction, otherwise null')
-  })
-
   test('the system prompt explains the Activity Die', () => {
     expect(SYSTEM_PROMPT).toContain('1 Threat, 2 Socialising, 3 Eating, 4 Working, 5 Traveling, 6 Resting')
   })
