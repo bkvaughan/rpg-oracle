@@ -1,11 +1,21 @@
 import { expect, test } from '@playwright/test'
+import { watchForViolations } from './csp.ts'
 
 test.use({ reducedMotion: 'reduce' })
 
-test('loads the app', async ({ page }) => {
+test('loads the app under the Content-Security-Policy', async ({ page }) => {
+  const problems = watchForViolations(page)
   await page.goto('/')
+  await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1)
   await expect(page).toHaveTitle('RPG Oracle')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('RPG Oracle')
+  // Fonts, card art and the atmosphere's data: textures all load under the policy.
+  await page.getByLabel('Your question').fill('What is here?')
+  await page.getByRole('button', { name: 'Draw two cards' }).click()
+  await expect(page.locator('.sign-card img').first()).toBeVisible()
+  await page.evaluate(() => document.fonts.ready)
+  expect(await page.evaluate(() => document.fonts.check('1em "Pirata One"'))).toBe(true)
+  expect(problems).toEqual([])
 })
 
 test('ask, draw, and the journal records it', async ({ page }) => {

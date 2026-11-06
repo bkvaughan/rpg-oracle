@@ -12,7 +12,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 5: done and approved, committed and pushed
 - Part 6: done and approved, committed and pushed
 - Part 7: done and approved, committed and pushed
-- Part 8: in progress
+- Part 8: done and approved; Pages enabled by Brandon, committed and pushed. Remaining: Brandon's live checks (Chrome autosave, Safari download fallback, a real Interpret)
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -148,11 +148,11 @@ Notes:
 
 ## Part 8: Hardening and deploy
 
-- [ ] Content-Security-Policy meta tag: `connect-src` limited to `https://api.anthropic.com`, no third-party scripts, fonts self-hosted. Allow `data:` in `img-src`, because the atmosphere's noise and fog textures are inline SVG data URIs
-- [ ] Accessibility pass with axe on every view
-- [ ] `.github/workflows/deploy.yml` copied from mythras (lint, unit tests, e2e, build, deploy to Pages)
-- [ ] Enable Pages on the repo. Push to `main` only after Brandon confirms
-- [ ] README: what it is, BYOK note, session files, credits and links to the official deck, dice and book (wording follows the licence decision)
+- [x] Content-Security-Policy meta tag: `connect-src` limited to `https://api.anthropic.com`, no third-party scripts, fonts self-hosted. Allow `data:` in `img-src`, because the atmosphere's noise and fog textures are inline SVG data URIs. Injected at build time by a small Vite plugin (`vite.config.ts`), since the dev server needs inline styles. The e2e tests fail on any CSP violation; checked by hand that a forbidden fetch is blocked and caught, and that the full-motion atmosphere is clean
+- [x] Accessibility pass with axe on every view (start, Signs, Bones, AI reading, Fortune, facts, delete confirmation, recovery banner), at desktop and phone widths: no violations
+- [x] `.github/workflows/deploy.yml` copied from mythras (lint, typecheck, unit tests, e2e, build, deploy to Pages); uploads the Playwright results if a run fails
+- [x] Enable Pages on the repo (Brandon, 2026-11-05). Push to `main` only after Brandon confirms
+- [x] README: what it is, BYOK note, session files, credits and links to the official deck, dice and book (wording follows the licence decision)
 
 **Success criteria:** the live Pages URL works end-to-end in Chrome (file autosave) and Safari (download fallback).
 

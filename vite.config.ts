@@ -1,8 +1,33 @@
 import react from '@vitejs/plugin-react'
+import type { Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 
+// Content-Security-Policy for the deployed site. Only the Anthropic API may be contacted
+// (the player's own key), and no third-party code or fonts load. `data:` images cover the
+// atmosphere's inline SVG noise and fog textures. Added at build time only, because the
+// dev server injects inline styles and scripts that this policy would block.
+export const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "connect-src 'self' https://api.anthropic.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ')
+
+function contentSecurityPolicy(): Plugin {
+  return {
+    name: 'content-security-policy',
+    apply: 'build',
+    transformIndexHtml: () => [{ tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: CSP }, injectTo: 'head' }],
+  }
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), contentSecurityPolicy()],
   // Relative asset paths, so the build works under the GitHub Pages project-site path.
   base: './',
   test: {

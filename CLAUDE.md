@@ -20,7 +20,7 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 - Sessions: JSON files on disk via the File System Access API (autosave to the open file); Download / Open fallback on browsers without it; IndexedDB copy for crash recovery. `schemaVersion` on every file
 - Art: card and dice art bundled as WebP, generated from the source images by `npm run assets`
 - Deployment: GitHub Pages at `bkvaughan/rpg-oracle`, built and published by `.github/workflows/deploy.yml` on every push to `main`. Vite `base` is `./`
-- Security: Content-Security-Policy meta tag limiting `connect-src` to `https://api.anthropic.com`; no third-party scripts; fonts self-hosted
+- Security: Content-Security-Policy meta tag, injected at build time by the plugin in `vite.config.ts`, limiting `connect-src` to `https://api.anthropic.com`; no third-party scripts; fonts self-hosted. The e2e tests fail on any CSP violation, so a new external resource needs a policy change
 
 ### Architecture rules
 
