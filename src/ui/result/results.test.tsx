@@ -5,6 +5,7 @@ import ActivityResult from './ActivityResult.tsx'
 import BonesResult from './BonesResult.tsx'
 import ReactionResult from './ReactionResult.tsx'
 import FortuneResult from './FortuneResult.tsx'
+import Interpretation from './Interpretation.tsx'
 import SignsResult from './SignsResult.tsx'
 
 describe('SignsResult', () => {
@@ -94,5 +95,23 @@ describe('FortuneResult', () => {
     render(<FortuneResult face="Misfortune" />)
     expect(screen.getByRole('img', { name: 'Fortune die: Misfortune (skull)' })).toBeInTheDocument()
     expect(screen.getByText(/counterstrikes for standard damage/)).toBeInTheDocument()
+  })
+})
+
+describe('Interpretation', () => {
+  test('closing the result cancels a running request', async () => {
+    const user = userEvent.setup()
+    let signal: AbortSignal | undefined
+    const onInterpret = vi.fn((s: AbortSignal) => {
+      signal = s
+      return new Promise<void>(() => {})
+    })
+    const { unmount } = render(
+      <Interpretation reading={null} hasKey onInterpret={onInterpret} onPinFact={() => {}} onFollowUp={() => {}} />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Interpret' }))
+    expect(signal?.aborted).toBe(false)
+    unmount()
+    expect(signal?.aborted).toBe(true)
   })
 })

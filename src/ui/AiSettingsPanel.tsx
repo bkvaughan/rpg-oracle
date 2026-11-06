@@ -5,19 +5,19 @@ import { AI_MODELS, type AiModel, type AiSettings } from '../ai/settings.ts'
 
 interface Props {
   settings: AiSettings
-  onSave: (settings: AiSettings) => void
+  /** Returns false if the browser wouldn't store the settings. */
+  onSave: (settings: AiSettings) => boolean
   onForget: () => void
 }
 
 export default function AiSettingsPanel({ settings, onSave, onForget }: Props) {
   const [apiKey, setApiKey] = useState(settings.apiKey)
   const [model, setModel] = useState<AiModel>(settings.model)
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved] = useState<'stored' | 'visit-only' | null>(null)
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    onSave({ apiKey: apiKey.trim(), model })
-    setSaved(true)
+    setSaved(onSave({ apiKey: apiKey.trim(), model }) ? 'stored' : 'visit-only')
   }
 
   return (
@@ -34,7 +34,7 @@ export default function AiSettingsPanel({ settings, onSave, onForget }: Props) {
             <input
               type="password"
               value={apiKey}
-              onChange={(e) => (setApiKey(e.target.value), setSaved(false))}
+              onChange={(e) => (setApiKey(e.target.value), setSaved(null))}
               autoComplete="off"
               spellCheck={false}
               placeholder="sk-ant-…"
@@ -42,7 +42,7 @@ export default function AiSettingsPanel({ settings, onSave, onForget }: Props) {
           </label>
           <label className="field">
             <span className="label">Model</span>
-            <select value={model} onChange={(e) => (setModel(e.target.value as AiModel), setSaved(false))}>
+            <select value={model} onChange={(e) => (setModel(e.target.value as AiModel), setSaved(null))}>
               {AI_MODELS.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.label}: {m.note}
@@ -59,14 +59,14 @@ export default function AiSettingsPanel({ settings, onSave, onForget }: Props) {
             <button
               type="button"
               className="btn btn-small btn-danger"
-              onClick={() => (setApiKey(''), setSaved(false), onForget())}
+              onClick={() => (setApiKey(''), setSaved(null), onForget())}
             >
               Forget key
             </button>
           )}
           {saved && (
             <span className="secondary" role="status">
-              Saved.
+              {saved === 'stored' ? 'Saved.' : "Kept for this visit only: this browser won't store it."}
             </span>
           )}
         </div>

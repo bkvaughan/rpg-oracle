@@ -112,24 +112,33 @@ export function downloadSession(session: Session): void {
   link.href = url
   link.download = suggestedFileName(session)
   link.click()
-  URL.revokeObjectURL(url)
+  // Revoking straight after click() can cancel the download in Safari, so give it time to start.
+  setTimeout(() => URL.revokeObjectURL(url), REVOKE_DELAY_MS)
 }
+
+const REVOKE_DELAY_MS = 60_000
 
 /**
  * Debounced autosave: bursts of changes become one write. `flush` writes any pending
- * change immediately (e.g. before closing the file).
+ * change immediately (e.g. before closing the file) and resolves once every earlier write
+ * has finished. Writes run one at a time, in order, so an older write can never land after
+ * a newer one.
  */
 export function createAutosaver(write: (session: Session) => Promise<void>, delayMs = 500) {
   let pending: Session | null = null
   let timer: ReturnType<typeof setTimeout> | null = null
+  let queue: Promise<void> = Promise.resolve()
 
-  const flush = async () => {
+  const flush = (): Promise<void> => {
     if (timer) clearTimeout(timer)
     timer = null
-    if (!pending) return
-    const session = pending
-    pending = null
-    await write(session)
+    if (pending) {
+      const session = pending
+      pending = null
+      // A failed write must not block the ones after it; the caller reports its own errors.
+      queue = queue.then(() => write(session)).catch(() => {})
+    }
+    return queue
   }
 
   return {

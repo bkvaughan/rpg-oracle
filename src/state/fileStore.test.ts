@@ -81,8 +81,12 @@ describe('writing and reading', () => {
       expect(this.download).toBe('the-barrow-lord.json')
       expect(this.href).toBe('blob:session')
     })
+    vi.useFakeTimers()
     downloadSession(sampleSession())
     expect(click).toHaveBeenCalledOnce()
+    // Revoked later, not straight after the click, so Safari can start the download.
+    expect(revokeObjectURL).not.toHaveBeenCalled()
+    vi.runAllTimers()
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:session')
   })
 })
@@ -114,5 +118,37 @@ describe('createAutosaver', () => {
     expect(write).toHaveBeenCalledOnce()
     await vi.advanceTimersByTimeAsync(1000)
     expect(write).toHaveBeenCalledOnce()
+  })
+
+  test('writes run one at a time, in order, and flush waits for a write already running', async () => {
+    const order: string[] = []
+    let finishFirst = () => {}
+    const write = vi.fn(async (s: { name: string }) => {
+      order.push(`start ${s.name}`)
+      if (s.name === 'A') await new Promise<void>((resolve) => (finishFirst = resolve))
+      order.push(`end ${s.name}`)
+    })
+    const saver = createAutosaver(write)
+    const a = { ...sampleSession(), name: 'A' }
+    const b = { ...sampleSession(), name: 'B' }
+    saver.schedule(a)
+    const first = saver.flush()
+    saver.schedule(b)
+    const second = saver.flush()
+    await Promise.resolve()
+    expect(order).toEqual(['start A'])
+    finishFirst()
+    await Promise.all([first, second])
+    expect(order).toEqual(['start A', 'end A', 'start B', 'end B'])
+  })
+
+  test('a failed write does not block the next one', async () => {
+    const write = vi.fn().mockRejectedValueOnce(new Error('disk full')).mockResolvedValue(undefined)
+    const saver = createAutosaver(write)
+    saver.schedule(sampleSession())
+    await saver.flush()
+    saver.schedule(sampleSession())
+    await saver.flush()
+    expect(write).toHaveBeenCalledTimes(2)
   })
 })

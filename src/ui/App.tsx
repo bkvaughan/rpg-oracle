@@ -74,14 +74,20 @@ export default function App() {
         </section>
 
         {store.recovered && (
-          <RecoveryBanner session={store.recovered} onRestore={store.restoreRecovered} onDiscard={store.discardRecovered} />
+          <RecoveryBanner
+            session={store.recovered}
+            confirmReplace={store.hasContent}
+            onRestore={store.restoreRecovered} onDiscard={store.discardRecovered} />
         )}
 
         <div className="stack">
           <SessionBar store={store} />
           <AiSettingsPanel
             settings={aiSettings}
-            onSave={(s) => (saveSettings(s), setAiSettings(s))}
+            onSave={(s) => {
+              setAiSettings(s)
+              return saveSettings(s)
+            }}
             onForget={() => (forgetSettings(), setAiSettings(loadSettings()))}
           />
           <div ref={askRef}>

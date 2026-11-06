@@ -64,3 +64,14 @@ test('deleting a journal entry asks for confirmation first', async () => {
   await user.click(within(journal).getByRole('button', { name: 'Delete' }))
   expect(within(journal).getByText('Nothing asked yet.')).toBeInTheDocument()
 })
+
+test('Open asks before discarding unsaved changes', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await user.type(screen.getByLabelText('New fact'), 'The barrow lord hunts at night')
+  await user.click(screen.getByRole('button', { name: 'Pin' }))
+  await user.click(screen.getByRole('button', { name: 'Open…' }))
+  expect(screen.getByText(/Discard unsaved changes\?/)).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name: 'Keep' }))
+  expect(screen.getByLabelText('Fact 1')).toHaveValue('The barrow lord hunts at night')
+})

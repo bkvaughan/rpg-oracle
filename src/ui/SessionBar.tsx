@@ -25,12 +25,14 @@ function statusText(store: SessionStore): string {
 }
 
 export default function SessionBar({ store }: { store: SessionStore }) {
-  const { session, dispatch, file, canAutosave, hasUnsavedChanges } = store
+  const { session, dispatch, file, canAutosave, wouldDiscard } = store
   const fileInput = useRef<HTMLInputElement>(null)
-  const [confirmNew, setConfirmNew] = useState(false)
+  // New and Open both replace the session, so both ask first when that would lose work.
+  const [confirming, setConfirming] = useState<'new' | 'open' | null>(null)
 
   const openFile = () => (canAutosave ? void store.open() : fileInput.current?.click())
-  const newClicked = () => (hasUnsavedChanges ? setConfirmNew(true) : void store.startNew())
+  const run = (action: 'new' | 'open') => (action === 'new' ? void store.startNew() : openFile())
+  const clicked = (action: 'new' | 'open') => (wouldDiscard ? setConfirming(action) : run(action))
 
   return (
     <section className="panel session-bar" aria-label="Session">
@@ -49,24 +51,33 @@ export default function SessionBar({ store }: { store: SessionStore }) {
       </div>
 
       <div className="session-actions">
-        {confirmNew ? (
+        {confirming ? (
           <span className="confirm">
             Discard unsaved changes?{' '}
-            <button type="button" className="btn btn-small btn-danger" onClick={() => (setConfirmNew(false), void store.startNew())}>
+            <button
+              type="button"
+              className="btn btn-small btn-danger"
+              onClick={() => {
+                setConfirming(null)
+                run(confirming)
+              }}
+            >
               Discard
             </button>{' '}
-            <button type="button" className="btn btn-small" onClick={() => setConfirmNew(false)}>
+            <button type="button" className="btn btn-small" onClick={() => setConfirming(null)}>
               Keep
             </button>
           </span>
         ) : (
-          <button type="button" className="btn btn-small" onClick={newClicked}>
-            New
-          </button>
+          <>
+            <button type="button" className="btn btn-small" onClick={() => clicked('new')}>
+              New
+            </button>
+            <button type="button" className="btn btn-small" onClick={() => clicked('open')}>
+              Open…
+            </button>
+          </>
         )}
-        <button type="button" className="btn btn-small" onClick={openFile}>
-          Open…
-        </button>
         <button type="button" className="btn btn-small" onClick={() => void store.save()}>
           {canAutosave ? 'Save' : 'Download'}
         </button>

@@ -34,10 +34,20 @@ export function loadSettings(): AiSettings {
   return { apiKey: '', model: DEFAULT_MODEL }
 }
 
-export function saveSettings(settings: AiSettings): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+/** False when this browser won't store it (e.g. some private windows); the key then lasts for this visit only. */
+export function saveSettings(settings: AiSettings): boolean {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+    return true
+  } catch {
+    return false
+  }
 }
 
 export function forgetSettings(): void {
-  localStorage.removeItem(STORAGE_KEY)
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // Nothing was stored.
+  }
 }

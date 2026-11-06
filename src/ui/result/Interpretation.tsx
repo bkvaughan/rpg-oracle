@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AiError } from '../../ai/errors.ts'
 import type { FollowUp, Reading } from '../../ai/schema.ts'
 import ReadingView from './ReadingView.tsx'
@@ -17,6 +17,10 @@ export default function Interpretation({ reading, hasKey, onInterpret, onPinFact
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const controller = useRef<AbortController | null>(null)
+
+  // Leaving this result (e.g. selecting another journal entry) cancels the request, so it
+  // can't still be running, unseen and billed, when the player comes back and asks again.
+  useEffect(() => () => controller.current?.abort(), [])
 
   const run = async () => {
     controller.current = new AbortController()

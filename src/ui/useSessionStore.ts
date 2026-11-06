@@ -44,7 +44,22 @@ export function useSessionStore() {
 
   // The session as last loaded or written; anything else is an unsaved change.
   const persisted = useRef<Session>(session)
+  // The session as of the last render, so an autosave can tell whether a newer change exists.
+  const latest = useRef<Session>(session)
   const handleRef = useRef<FileSystemFileHandle | null>(null)
+  // True until the startup check for a crash copy is done, and while a recovery offer waits
+  // for an answer: the crash copy is left alone then, so the session it holds can't be lost.
+  const holdRecovery = useRef(true)
+
+  const backup = useCallback((s: Session, savedToFile: boolean) => {
+    if (!holdRecovery.current) quietly(saveRecovery({ session: s, savedToFile }))
+  }, [])
+
+  /** Ends the hold on the crash copy, backing up the current session if it has unsaved changes. */
+  const releaseRecovery = useCallback(() => {
+    holdRecovery.current = false
+    if (latest.current !== persisted.current) backup(latest.current, false)
+  }, [backup])
 
   // Created once. Its write callback reads handleRef when an autosave fires, never during
   // render, so the React Compiler's refs warning here is a false positive.
@@ -57,8 +72,10 @@ export function useSessionStore() {
       try {
         await writeToHandle(handle, s)
         persisted.current = s
-        setFile((f) => ({ ...f, status: 'saved' }))
-        quietly(saveRecovery({ session: s, savedToFile: true }))
+        // A change made while this write ran is still waiting for its own write.
+        const newest = latest.current === s
+        setFile((f) => ({ ...f, status: newest ? 'saved' : 'unsaved' }))
+        if (newest) backup(s, true)
       } catch (e) {
         setFile((f) => ({ ...f, status: 'error', error: message(e) }))
       }
@@ -68,17 +85,22 @@ export function useSessionStore() {
   // Offer an unsaved session left behind by a crash or a closed tab.
   useEffect(() => {
     loadRecovery()
-      .then((record) => setRecovered(recoveryOffer(record, null)))
-      .catch(() => {})
-  }, [])
+      .then((record) => recoveryOffer(record, null))
+      .catch(() => null)
+      .then((offer) => {
+        setRecovered(offer)
+        if (!offer) releaseRecovery()
+      })
+  }, [releaseRecovery])
 
   // Every change goes to the recovery copy at once and to the open file shortly after.
   useEffect(() => {
+    latest.current = session
     if (session === persisted.current) return
-    quietly(saveRecovery({ session, savedToFile: false }))
+    backup(session, false)
     setFile((f) => ({ ...f, status: 'unsaved' }))
     if (handleRef.current) autosaver.schedule(session)
-  }, [session, autosaver])
+  }, [session, autosaver, backup])
 
   useEffect(() => {
     const flush = () => void autosaver.flush()
@@ -91,11 +113,14 @@ export function useSessionStore() {
     handleRef.current = opened.handle
     dispatch({ type: 'load', session: opened.session })
     setFile({ handle: opened.handle, fileName: opened.fileName, status: 'saved', error: null })
+    let offer: Session | null = null
     try {
-      setRecovered(recoveryOffer(await loadRecovery(), opened.session))
+      offer = recoveryOffer(await loadRecovery(), opened.session)
     } catch {
-      setRecovered(null)
+      // No IndexedDB: nothing to offer.
     }
+    setRecovered(offer)
+    holdRecovery.current = offer !== null
   }, [])
 
   const run = useCallback(async (task: () => Promise<void>) => {
@@ -126,8 +151,8 @@ export function useSessionStore() {
     persisted.current = saved
     handleRef.current = handle
     setFile({ handle, fileName, status: 'saved', error: null })
-    quietly(saveRecovery({ session: saved, savedToFile: true }))
-  }, [])
+    backup(saved, true)
+  }, [backup])
 
   const saveAs = useCallback(
     () =>
@@ -164,31 +189,43 @@ export function useSessionStore() {
         dispatch({ type: 'load', session: fresh })
         setFile(INITIAL_FILE)
         setRecovered(null)
-        await clearRecovery()
+        holdRecovery.current = false
+        // A crash copy that can't be cleared (no IndexedDB) has nothing in it to offer later.
+        await clearRecovery().catch(() => {})
       }),
     [run, autosaver],
   )
 
   /** Restores the recovery copy as unsaved changes (autosaved if a file is open). */
   const restoreRecovered = useCallback(() => {
+    holdRecovery.current = false
     if (recovered) dispatch({ type: 'load', session: recovered })
     setRecovered(null)
   }, [recovered])
 
   const discardRecovered = useCallback(() => {
     setRecovered(null)
-    if (!handleRef.current) quietly(clearRecovery())
-  }, [])
+    if (latest.current !== persisted.current) releaseRecovery()
+    else {
+      holdRecovery.current = false
+      // The open file (if any) is now the truth; with no file there is nothing to keep.
+      if (handleRef.current) backup(persisted.current, true)
+      else quietly(clearRecovery())
+    }
+  }, [releaseRecovery, backup])
 
   const hasContent = session.journal.length + session.facts.length > 0
   const hasUnsavedChanges = hasContent && (file.status === 'unsaved' || file.status === 'error' || file.status === 'saving')
+  // New and Open replace the session and the crash copy, so they confirm first.
+  const wouldDiscard = hasUnsavedChanges || recovered !== null
 
   return {
     session,
     dispatch: dispatch as (action: Action) => void,
     file,
     canAutosave,
-    hasUnsavedChanges,
+    hasContent,
+    wouldDiscard,
     recovered,
     open,
     openFallback,

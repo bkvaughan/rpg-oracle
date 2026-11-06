@@ -14,7 +14,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 7: done and approved, committed and pushed
 - Part 8: done; live at https://bkvaughan.github.io/rpg-oracle/ (deploy run for `5eb4187` succeeded 2026-11-05; smoke-tested: page, CSP, card and dice art, fonts, no console errors). Remaining: Brandon's live checks (Chrome autosave, Safari download fallback, a real Interpret)
 - Part 9 (Activity Die, plus all dice faces from the official templates): done, approved, committed and pushed
-- Part 10 (Activity & Reaction): done, approved, committed and pushed
+- Part 10 (Activity & Reaction): done, approved, committed and pushed.
+- Part 11 (code review fixes): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -196,6 +197,24 @@ Brandon asked for the Reaction table (Tales of Argosa p.66), then decided to rol
 Notes: removed `src/engine/activity.ts` (the standalone roll is no longer offered). Follow-up (Brandon): renamed to **Activity & Reaction**, Activity section first with its die, then Reaction with both dice as plain white d6 with black pips. The journal line and the AI prompt list the activity first. 131 unit/component tests; e2e and axe pass across 3 repeated runs.
 
 Not included: each monster's own Reac ranges from its stat block. Those vary per creature and the balanced chart is the book's general fallback; the 2d6 total is shown so it can be read against them.
+
+---
+
+## Part 11: Code review fixes
+
+A full critical code pass (2026-11-05) found ways a player can lose work in the save and recovery wiring, plus smaller issues.
+
+- [x] Recovery: while the recovery banner is waiting for an answer, nothing overwrites the crash copy; Discard then backs up the current session. Restore asks for an inline confirm when the current session has entries or facts
+- [x] Open (picker and fallback) asks the same inline confirm as New when there are unsaved changes or a recovery offer pending
+- [x] Autosave: writes run one at a time in order, and the status only says Saved (and the crash copy is only marked saved) when the newest change has been written
+- [x] Download fallback: revoke the object URL after a delay, not straight after `click()` (Safari can cancel the download)
+- [x] Interpret: abort the request when its result view closes, so a second click can't send a duplicate paid call
+- [x] New: a crash copy that can't be cleared (no IndexedDB) is not reported as a save error
+- [x] AI settings: a key that can't be stored (private window) is kept for the visit and the panel says so, instead of throwing
+- [x] Reaction dice: the first die's label says it is the Activity Die; e2e checks both dice are visible; stray blank line in `oracle.css`
+- [x] Tests for each fix
+
+Notes: new `src/ui/useSessionStore.test.tsx` (recovery hold, Discard, Restore, banner confirm) and `src/ai/settings.test.ts`; autosave ordering, delayed revoke, Open confirm and Interpret abort tests added to existing files. Checked that the recovery-hold test fails without the fix. 142 unit/component tests; e2e and axe pass.
 
 ---
 
