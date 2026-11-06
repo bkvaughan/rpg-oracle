@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { CREATURE_TEXT, type Creature } from '../data/activity.ts'
 import type { Likelihood } from '../engine/bones.ts'
 import type { AskRequest, Tool } from './ask.ts'
 
@@ -6,7 +7,17 @@ const TOOLS: { id: Tool; name: string; hint: string; action: string }[] = [
   { id: 'signs', name: 'Read the Signs', hint: 'Open questions: who, what, why', action: 'Draw two cards' },
   { id: 'bones', name: 'Consult the Bones', hint: 'Yes or no questions', action: 'Cast the Bones' },
   { id: 'fortune', name: 'Fortune die', hint: 'A twist alone, or Lone Wolf hits', action: 'Roll the Fortune die' },
+  { id: 'activity', name: 'Activity Die', hint: 'What an encountered creature is doing', action: 'Roll the Activity Die' },
 ]
+
+const CREATURES: Creature[] = ['intelligent', 'other']
+
+const PLACEHOLDER: Record<Tool, string> = {
+  signs: "What's going on at this ruin?",
+  bones: 'Is there a sentry keeping watch?',
+  fortune: 'Optional: what the twist is for',
+  activity: 'Optional: who you came across, e.g. the goblins at the ford',
+}
 
 const LIKELIHOODS: { id: Likelihood; name: string }[] = [
   { id: 'even', name: 'Even' },
@@ -24,15 +35,17 @@ export default function AskPanel({ onAsk, initial }: Props) {
   const [question, setQuestion] = useState(initial?.question ?? '')
   const [tool, setTool] = useState<Tool>(initial?.tool ?? 'signs')
   const [likelihood, setLikelihood] = useState<Likelihood>(initial?.likelihood ?? 'even')
+  const [creature, setCreature] = useState<Creature>(initial?.creature ?? 'intelligent')
 
-  const needsQuestion = tool !== 'fortune'
+  // Dice that describe the scene rather than answer a question can be rolled without one.
+  const needsQuestion = tool === 'signs' || tool === 'bones'
   const canAsk = !needsQuestion || question.trim() !== ''
   const current = TOOLS.find((t) => t.id === tool)!
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
     if (!canAsk) return
-    onAsk({ tool, likelihood, question })
+    onAsk({ tool, likelihood, creature, question })
     setQuestion('')
   }
 
@@ -44,7 +57,7 @@ export default function AskPanel({ onAsk, initial }: Props) {
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder={tool === 'bones' ? 'Is there a sentry keeping watch?' : "What's going on at this ruin?"}
+          placeholder={PLACEHOLDER[tool]}
           autoComplete="off"
         />
       </label>
@@ -73,6 +86,18 @@ export default function AskPanel({ onAsk, initial }: Props) {
                 onChange={() => setLikelihood(l.id)}
               />
               <span className="choice-name">{l.name}</span>
+            </label>
+          ))}
+        </fieldset>
+      )}
+
+      {tool === 'activity' && (
+        <fieldset className="choices choices-inline choices-two">
+          <legend className="label">Creature</legend>
+          {CREATURES.map((c) => (
+            <label key={c} className={`choice${creature === c ? ' selected' : ''}`}>
+              <input type="radio" name="creature" value={c} checked={creature === c} onChange={() => setCreature(c)} />
+              <span className="choice-name">{CREATURE_TEXT[c]}</span>
             </label>
           ))}
         </fieldset>

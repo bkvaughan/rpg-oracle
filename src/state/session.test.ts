@@ -19,6 +19,13 @@ describe('session model', () => {
     expect(sessionSchema.safeParse(s).success).toBe(false)
   })
 
+  test('an Activity Die entry is valid; an impossible roll is not', () => {
+    const s = sampleSession()
+    const entry = { id: 'a', at: s.createdAt, question: '', reading: null, result: { tool: 'activity', roll: 3, creature: 'other' } }
+    expect(sessionSchema.safeParse({ ...s, journal: [entry] }).success).toBe(true)
+    expect(sessionSchema.safeParse({ ...s, journal: [{ ...entry, result: { ...entry.result, roll: 7 } }] }).success).toBe(false)
+  })
+
   test('the Bones answer is derived from the final dice, not stored', () => {
     const entry = sampleSession().journal[1]
     if (entry.result.tool !== 'bones') throw new Error('expected a bones entry')

@@ -23,6 +23,10 @@ describe('describeResult', () => {
     ).toBe('Consult the Bones (even): Double No (greater), Fortune')
   })
 
+  test('Activity Die', () => {
+    expect(describeResult({ tool: 'activity', roll: 5, creature: 'intelligent' })).toBe('Activity Die (intelligent creature): 5 Traveling')
+  })
+
   test('Fortune die', () => {
     expect(describeResult({ tool: 'fortune', face: 'Misfortune' })).toBe('Fortune die: Misfortune')
   })

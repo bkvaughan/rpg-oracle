@@ -628,3 +628,32 @@ select {
 .suggested.pinned {
   color: var(--ink-dim);
 }
+
+/* ───────────── Activity Die ───────────── */
+.choices-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.die-activity {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--mist) 80%, #6f8f8a), var(--mist) 60%, #1b2d2d);
+}
+.die-activity img {
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.5));
+}
+.activity-status {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 9vw, 3.75rem);
+  line-height: 1;
+  margin: 0.25rem 0 0.75rem;
+  color: #ece6d8;
+  text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 45%, transparent), 0 2px 0 rgb(0 0 0 / 0.8);
+  animation: ink-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
+}
+.activity-roll {
+  color: var(--accent);
+}
+.activity-result p {
+  margin: 0 0 0.6rem;
+}
+.activity-alt {
+  font-size: 0.95rem;
+}

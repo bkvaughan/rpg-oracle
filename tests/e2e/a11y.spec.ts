@@ -68,6 +68,10 @@ async function everyView(page: Page) {
   await page.getByRole('region', { name: 'Journal' }).getByRole('button', { name: /^Delete/ }).first().click()
   await expectNoViolations(page, 'Fortune result, facts, delete confirmation')
 
+  await page.locator('label.choice', { hasText: 'Activity Die' }).click()
+  await page.getByRole('button', { name: 'Roll the Activity Die' }).click()
+  await expectNoViolations(page, 'Activity Die result')
+
   await page.reload()
   await expect(page.getByRole('alert')).toBeVisible()
   await expectNoViolations(page, 'recovery banner')

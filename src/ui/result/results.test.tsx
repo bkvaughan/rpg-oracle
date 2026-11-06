@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
+import ActivityResult from './ActivityResult.tsx'
 import BonesResult from './BonesResult.tsx'
 import FortuneResult from './FortuneResult.tsx'
 import SignsResult from './SignsResult.tsx'
@@ -60,6 +61,16 @@ describe('BonesResult', () => {
     expect(screen.getByRole('img', { name: 'Hammer of Judgment: Yes' })).toBeInTheDocument()
     expect(screen.getByText('Yes', { selector: '.bones-answer' })).toBeInTheDocument()
     expect(screen.getByText('No twist.')).toBeInTheDocument()
+  })
+})
+
+describe('ActivityResult', () => {
+  test('shows the roll and status, the chosen creature type first, and the other type too', () => {
+    render(<ActivityResult result={{ tool: 'activity', roll: 1, creature: 'other' }} />)
+    expect(screen.getByRole('img', { name: 'Activity Die: 1, Threat' })).toBeInTheDocument()
+    expect(screen.getByText('Other creature', { selector: '.label' })).toBeInTheDocument()
+    expect(screen.getByText(/^Ambushing, fighting, caught by a trap/)).toBeInTheDocument()
+    expect(screen.getByText(/^Intelligent creature: Ambushing, fighting someone/)).toBeInTheDocument()
   })
 })
 

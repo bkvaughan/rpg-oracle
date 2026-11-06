@@ -31,6 +31,17 @@ test('the ask button waits for a question, except for the Fortune die', async ()
   expect(screen.getByRole('button', { name: 'Roll the Fortune die' })).toBeEnabled()
 })
 
+test('the Activity Die needs no question and records the creature type', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(screen.getByLabelText(/Activity Die/))
+  await user.click(screen.getByLabelText('Other creature'))
+  await user.click(screen.getByRole('button', { name: 'Roll the Activity Die' }))
+  expect(screen.getByRole('img', { name: /^Activity Die: \d, / })).toBeInTheDocument()
+  const journal = screen.getByRole('region', { name: 'Journal' })
+  expect(within(journal).getByText(/^Activity Die \(other creature\): \d \w+$/)).toBeInTheDocument()
+})
+
 test('facts can be pinned and removed', async () => {
   const user = userEvent.setup()
   render(<App />)

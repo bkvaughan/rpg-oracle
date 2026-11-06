@@ -34,7 +34,7 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 ```
 rpg-oracle/
   CLAUDE.md  PLAN.md  ORACLE_SPEC.md
-  data/               source art: cards/*.png (gitignored, 47 MB), dice/*.webp
+  data/               source art: cards/*.png (gitignored, 47 MB), dice/templates/ (official die nets, the source of every die face)
   reference/          bones.py (reference roller) and the dice contact sheet
   scripts/            build-assets (source images -> public/ WebP)
   public/             generated card and dice WebP served by the site
@@ -67,7 +67,7 @@ Unit tests sit next to the code they test (`foo.ts` and `foo.test.ts`).
 4. When hitting issues, find the root cause with evidence before fixing
 5. Every oracle rule has a unit test; the Bones probabilities are tested against the spec's table
 6. If the rules are unclear, stop and ask Brandon. Do not invent a ruling; record the answer in ORACLE_SPEC.md
-7. UI text uses the book's terms exactly (Read the Signs, Consult the Bones, Hammer of Judgment, Twins of Fate, Fortune die)
+7. UI text uses the book's terms exactly (Read the Signs, Consult the Bones, Hammer of Judgment, Twins of Fate, Fortune die, Activity Die)
 
 ## Design Rules
 

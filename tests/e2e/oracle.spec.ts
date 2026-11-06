@@ -54,6 +54,17 @@ test('Consult the Bones with a likelihood, then reselect an older entry', async 
   await expect(page.getByRole('article').getByRole('heading', { name: 'Is the dead lord stirring?' })).toBeVisible()
 })
 
+test('Activity Die for an encountered creature', async ({ page }) => {
+  await page.goto('/')
+  await page.locator('label.choice', { hasText: 'Activity Die' }).click()
+  await page.getByLabel('Your question').fill('The goblins at the ford')
+  await page.getByRole('button', { name: 'Roll the Activity Die' }).click()
+  const result = page.getByRole('article')
+  await expect(result.getByText('Activity Die', { exact: true })).toBeVisible()
+  await expect(result.getByRole('img', { name: /^Activity Die: [1-6], (Threat|Socialising|Eating|Working|Traveling|Resting)$/ })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Journal' }).getByText(/Activity Die \(intelligent creature\)/)).toBeVisible()
+})
+
 test('unsaved work survives a reload through the recovery copy', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('New fact').fill('The barrow lord hunts at night')

@@ -40,7 +40,19 @@ export const fortuneResultSchema = z.object({
   face: fortuneFace,
 })
 
-export const oracleResultSchema = z.discriminatedUnion('tool', [signsResultSchema, bonesResultSchema, fortuneResultSchema])
+export const activityResultSchema = z.object({
+  tool: z.literal('activity'),
+  roll: z.literal([1, 2, 3, 4, 5, 6]),
+  creature: z.enum(['intelligent', 'other']),
+})
+
+// New tools are added as new union members, so older session files keep loading.
+export const oracleResultSchema = z.discriminatedUnion('tool', [
+  signsResultSchema,
+  bonesResultSchema,
+  fortuneResultSchema,
+  activityResultSchema,
+])
 
 export const entrySchema = z.object({
   id: z.string().min(1),
@@ -72,6 +84,7 @@ export const sessionSchema = z.object({
 export type OracleResult = z.infer<typeof oracleResultSchema>
 export type SignsResult = z.infer<typeof signsResultSchema>
 export type BonesEntryResult = z.infer<typeof bonesResultSchema>
+export type ActivityResult = z.infer<typeof activityResultSchema>
 export type JournalEntry = z.infer<typeof entrySchema>
 export type Fact = z.infer<typeof factSchema>
 export type Session = z.infer<typeof sessionSchema>

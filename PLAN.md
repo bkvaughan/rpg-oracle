@@ -12,7 +12,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 5: done and approved, committed and pushed
 - Part 6: done and approved, committed and pushed
 - Part 7: done and approved, committed and pushed
-- Part 8: done and approved; Pages enabled by Brandon, committed and pushed. Remaining: Brandon's live checks (Chrome autosave, Safari download fallback, a real Interpret)
+- Part 8: done; live at https://bkvaughan.github.io/rpg-oracle/ (deploy run for `5eb4187` succeeded 2026-11-05; smoke-tested: page, CSP, card and dice art, fonts, no console errors). Remaining: Brandon's live checks (Chrome autosave, Safari download fallback, a real Interpret)
+- Part 9 (Activity Die, plus all dice faces from the official templates): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -155,6 +156,26 @@ Notes:
 - [x] README: what it is, BYOK note, session files, credits and links to the official deck, dice and book (wording follows the licence decision)
 
 **Success criteria:** the live Pages URL works end-to-end in Chrome (file autosave) and Safari (download fallback).
+
+---
+
+## Part 9: Activity Die
+
+Brandon asked for the Activity Die (Tales of Argosa p.66): a d6 the GM rolls, usually alongside a Reaction check, to see what an encountered creature is doing. There are six results (1 Threat, 2 Socialising, 3 Eating, 4 Working, 5 Traveling, 6 Resting), each with example activities for intelligent creatures and for other creatures. The Exploring and travel tables call for it ("Roll for Reaction and Activity").
+
+- [x] `ORACLE_SPEC.md`: an Activity Die section with the table (examples in our own words, page reference)
+- [x] `src/data/activity.ts`: the six results with both example lists, our wording, citing p.66
+- [x] Engine: `rollActivity(rng)` (1d6 via the secure RNG)
+- [x] Session: a new `activity` result (`roll`, `creature: 'intelligent' | 'other'`). It's an added union member, so existing session files still load and the schema version stays 1
+- [x] Ask form: a fourth oracle, **Activity Die**, with an Intelligent / Other creature choice. The question is optional (e.g. "The goblins at the ford")
+- [x] Result view: an Activity die face with our own icon, the status name, and the chosen column's examples (the other column shown smaller)
+- [x] Journal line and AI prompt: describe the roll; the system prompt explains the Activity Die so readings can use it
+- [x] Tests: data, engine, ask, schema, describeResult, prompt, component, e2e flow, axe on the new view
+
+Notes:
+- Source: printed p.66 (PDF page 68), checked against the extracted text. The book's companion Reaction table (2d6, balanced) sits beside it and is not included.
+- Die faces from the official Activity Die template Brandon provided (replacing the first-draft hand-drawn SVGs): `npm run assets` cuts the six faces out of the net in `data/dice/templates/activity-die.png`. Shown on a teal die body (`--mist`) to set it apart from the Bones. At Brandon's request, every die now comes from the official templates (`data/dice/templates/`): the asset script cuts each face out of its die net in the die's glyph colour, replacing the faces copied from the dddice set. The old dddice files in `data/dice/*.webp` and `public/dice/blank.webp` are no longer used.
+- 122 unit/component tests; e2e and axe pass across 5 repeated runs.
 
 ---
 

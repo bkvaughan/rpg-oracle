@@ -1,3 +1,4 @@
+import { activityFor, CREATURE_TEXT } from '../data/activity.ts'
 import { CARDS, TIME_ICON_NAMES } from '../data/deck.ts'
 import { bonesOutcome, type OracleResult, type Session } from './session.ts'
 
@@ -27,6 +28,8 @@ export function describeResult(result: OracleResult): string {
     }
     case 'fortune':
       return `Fortune die: ${result.face}`
+    case 'activity':
+      return `Activity Die (${CREATURE_TEXT[result.creature].toLowerCase()}): ${result.roll} ${activityFor(result.roll).status}`
   }
 }
 

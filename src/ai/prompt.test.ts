@@ -49,6 +49,18 @@ describe('buildUserPrompt', () => {
     expect(history).not.toContain('Is there a sentry?')
   })
 
+  test('gives the Activity result, the creature type and the matching examples', () => {
+    const entry = { ...bonesEntry('a'), question: 'The goblins at the ford', result: { tool: 'activity' as const, roll: 3 as const, creature: 'intelligent' as const } }
+    const prompt = buildUserPrompt(entry, { ...sampleSession(), journal: [entry] })
+    expect(prompt).toContain('Tool: the Activity Die, for an intelligent creature.')
+    expect(prompt).toContain('Result (settled): 3 Eating.')
+    expect(prompt).toContain('Example activities: Eating, cooking or preparing food')
+  })
+
+  test('the system prompt explains the Activity Die', () => {
+    expect(SYSTEM_PROMPT).toContain('1 Threat, 2 Socialising, 3 Eating, 4 Working, 5 Traveling, 6 Resting')
+  })
+
   test('copes with an empty session and no question', () => {
     const entry = { ...bonesEntry('b'), question: '' }
     const prompt = buildUserPrompt(entry, { ...sampleSession(), pc: { name: '', class: '', level: 1 }, location: { hex: '', site: '', room: '' }, facts: [], journal: [entry] })

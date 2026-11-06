@@ -1,3 +1,4 @@
+import { activityFor } from '../data/activity.ts'
 import { CARDS, TIME_ICON_NAMES, type Card } from '../data/deck.ts'
 import { bonesOutcome, type JournalEntry, type Session } from '../state/session.ts'
 import { promptContext } from '../state/promptContext.ts'
@@ -23,6 +24,8 @@ Consult the Bones answers yes/no questions. The answer comes with a strength:
 The Fortune die adds a separate twist that need not relate to the question: Fortune is an extra benefit or advantage for the PCs; Misfortune is an extra complication, setback or disadvantage; Nil is no twist. The twist can be small, and sometimes has no practical effect.
 
 The Fortune die can also be rolled alone. Under the Lone Wolf rule, when a solo PC is hit, Fortune means the attack is parried or negated, Misfortune means the PC counterstrikes for standard damage, and Nil has no effect. Otherwise treat it as a twist on the current scene.
+
+The Activity Die is a d6 rolled when the PCs come across a creature, often alongside a Reaction check, to show what it is doing at that moment: 1 Threat, 2 Socialising, 3 Eating, 4 Working, 5 Traveling, 6 Resting. You are given the result, whether the creature is intelligent, and example activities. Pick or invent one specific, visible activity that fits the creature and the scene, and say what the PCs see or hear.
 
 # How to answer
 
@@ -81,6 +84,15 @@ function describeForAi(entry: JournalEntry): string {
     }
     case 'fortune':
       return `Tool: the Fortune die alone.\nResult (settled): ${result.face}.`
+    case 'activity': {
+      const activity = activityFor(result.roll)
+      const examples = result.creature === 'intelligent' ? activity.intelligent : activity.other
+      return [
+        `Tool: the Activity Die, for ${result.creature === 'intelligent' ? 'an intelligent creature' : 'a non-intelligent creature (a beast or monster)'}.`,
+        `Result (settled): ${result.roll} ${activity.status}.`,
+        `Example activities: ${examples}`,
+      ].join('\n')
+    }
   }
 }
 
