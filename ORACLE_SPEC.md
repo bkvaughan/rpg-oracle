@@ -31,7 +31,6 @@ public/
   dice/*.webp             dice faces cut from the templates by `npm run assets`
 reference/
   bones.py                working Python roller for the Bones (port this)
-  bones_faces.png         contact sheet of the dice faces
 ```
 
 ---
@@ -232,7 +231,7 @@ Face layout confirmed from the official dddice set linked in the book. All are d
 | **Twin of Fate** #2 | 2 × Yes, 2 × No, 2 × Nil (blank) | Identical to #1 |
 | **Fortune** | 2 × Fortune (sun), 2 × Misfortune (skull), 2 × Nil | Adds a twist, independent of yes/no |
 
-Glyphs on the physical dice: Yes is a rune shaped like ᛘ/Ψ, No is a rune shaped like ᚢ/ᚱ, Fortune is a sun, and Misfortune is a skull. The face images are cut from the official die templates in `data/dice/templates/` (provided by Brandon) by `npm run assets`, into `public/dice/` (`judgment-yes`, `judgment-no`, `fate-yes`, `fate-no`, `fortune-sun`, `misfortune-skull`; transparent WebP; blank faces need no image). The Judgment glyphs are white, for the red die; the Fate glyphs are dark, for the bone die; the sun is gold and the skull white, for the black Fortune die. The earlier dddice face images in `data/dice/*.webp` and the contact sheet in `reference/bones_faces.png` are no longer used by the site.
+Glyphs on the physical dice: Yes is a rune shaped like ᛘ/Ψ, No is a rune shaped like ᚢ/ᚱ, Fortune is a sun, and Misfortune is a skull. The face images are cut from the official die templates in `data/dice/templates/` (provided by Brandon) by `npm run assets`, into `public/dice/` (`judgment-yes`, `judgment-no`, `fate-yes`, `fate-no`, `fortune-sun`, `misfortune-skull`; transparent WebP; blank faces need no image). The Judgment glyphs are white, for the red die; the Fate glyphs are dark, for the bone die; the sun is gold and the skull white, for the black Fortune die.
 
 ### Resolution algorithm (p.212)
 Roll all four dice, then:

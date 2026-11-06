@@ -35,7 +35,7 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 rpg-oracle/
   CLAUDE.md  PLAN.md  ORACLE_SPEC.md
   data/               source art: cards/*.png (gitignored, 47 MB), dice/templates/ (official die nets, the source of every die face)
-  reference/          bones.py (reference roller) and the dice contact sheet
+  reference/          bones.py (reference roller)
   scripts/            build-assets (source images -> public/ WebP)
   public/             generated card and dice WebP served by the site
   src/

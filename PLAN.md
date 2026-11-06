@@ -63,7 +63,7 @@ Notes: the Vite template now ships TypeScript 7 (`~7.0.2`), Vite 8 and Vitest 5.
 
 ## Part 3: Asset pipeline
 
-- [x] `scripts/build-assets.ts` (using `sharp`): convert `data/cards/NN.png` to `public/cards/NN.webp` at 400 px wide, plus `NN@2x.webp` at the full 771 px source width (rather than upscaling to 800) for high-DPI screens. Copy `data/dice/*.webp` to `public/dice/`
+- [x] `scripts/build-assets.ts` (using `sharp`): convert `data/cards/NN.png` to `public/cards/NN.webp` at 400 px wide, plus `NN@2x.webp` at the full 771 px source width (rather than upscaling to 800) for high-DPI screens. Copy `data/dice/*.webp` to `public/dice/` (superseded in Part 9: faces are now cut from the official templates)
 - [x] Commit only the generated WebP files. Keep the 47 MB of source PNGs out of git (gitignored, kept locally) so the repo stays small
 - [x] Move `deck_of_signs.json` into `src/data/` as a typed import (`src/data/deck.ts`), validated with zod in a test (50 cards, ids 1–50 in order, valid time icons and directions, distributions, time text matches icon, the book's example cards). Image existence is checked in `scripts/assets.test.ts`
 - [x] Test: all 50 cards (1x and 2x) and 7 dice faces exist, and the 1x card set is under 3 MB (actual: 2.1 MB at 1x, 4.5 MB at 2x; a reading loads only two cards)
@@ -174,7 +174,7 @@ Brandon asked for the Activity Die (Tales of Argosa p.66): a d6 the GM rolls, us
 
 Notes:
 - Source: printed p.66 (PDF page 68), checked against the extracted text. The book's companion Reaction table (2d6, balanced) sits beside it and is not included.
-- Die faces from the official Activity Die template Brandon provided (replacing the first-draft hand-drawn SVGs): `npm run assets` cuts the six faces out of the net in `data/dice/templates/activity-die.png`. Shown on a teal die body (`--mist`) to set it apart from the Bones. At Brandon's request, every die now comes from the official templates (`data/dice/templates/`): the asset script cuts each face out of its die net in the die's glyph colour, replacing the faces copied from the dddice set. The old dddice files in `data/dice/*.webp` and `public/dice/blank.webp` are no longer used.
+- Die faces from the official Activity Die template Brandon provided (replacing the first-draft hand-drawn SVGs): `npm run assets` cuts the six faces out of the net in `data/dice/templates/activity-die.png`. Shown on a teal die body (`--mist`) to set it apart from the Bones. At Brandon's request, every die now comes from the official templates (`data/dice/templates/`): the asset script cuts each face out of its die net in the die's glyph colour, replacing the faces copied from the dddice set. The old dddice face files and the dice contact sheet were deleted at Brandon's request.
 - 122 unit/component tests; e2e and axe pass across 5 repeated runs.
 
 ---
