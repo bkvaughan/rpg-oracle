@@ -73,6 +73,11 @@ export const entrySchema = z.object({
   question: z.string(),
   result: oracleResultSchema,
   reading: storedReadingSchema.nullable(),
+  // Added after v1 shipped; the defaults let older files load without a schema bump.
+  /** What happened in play after this answer, in the player's words. */
+  note: z.string().default(''),
+  /** The player adopted the reading's alternate instead of its ruling. */
+  useAlternate: z.boolean().default(false),
 })
 
 export const factSchema = z.object({

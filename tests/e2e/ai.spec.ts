@@ -19,11 +19,13 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
   const problems = watchForViolations(page)
   let body: Record<string, unknown> | null = null
   let key: string | null = null
+  let posts = 0
   await page.route('https://api.anthropic.com/**', async (route) => {
     const request = route.request()
     // The browser sends a CORS preflight first; answer it and record only the real call.
     if (request.method() === 'POST') {
       body = request.postDataJSON()
+      posts++
       key = await request.headerValue('authorization')
     }
     await route.fulfill({
@@ -59,6 +61,19 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
 
   await page.getByRole('button', { name: /Is there still gold in the barrow\?/ }).click()
   await expect(page.getByLabel('Your question')).toHaveValue('Is there still gold in the barrow?')
+
+  // The player adopts the alternate and notes what happened; the next request carries both.
+  await page.getByRole('button', { name: 'Use this reading' }).click()
+  await page.getByLabel('What happened').fill('Thuel found dragon bones in the crypt')
+  await page.getByLabel('What happened').blur()
+  await expect(page.getByRole('region', { name: 'Journal' })).toContainText('Thuel found dragon bones in the crypt')
+  await page.getByRole('button', { name: 'Cast the Bones' }).click()
+  await page.getByRole('button', { name: 'Interpret' }).click()
+  await expect(page.getByLabel('What happened')).toHaveValue('')
+  await expect.poll(() => posts).toBe(2)
+  const history = JSON.stringify(body)
+  expect(history).toContain(`Ruling: ${reading.alternate}`)
+  expect(history).toContain('What happened: Thuel found dragon bones in the crypt')
   // The lazily loaded SDK chunk and the API call are both allowed by the policy.
   expect(problems).toEqual([])
 })

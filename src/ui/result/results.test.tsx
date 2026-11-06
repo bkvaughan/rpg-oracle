@@ -6,6 +6,8 @@ import BonesResult from './BonesResult.tsx'
 import ReactionResult from './ReactionResult.tsx'
 import FortuneResult from './FortuneResult.tsx'
 import Interpretation from './Interpretation.tsx'
+import ReadingView from './ReadingView.tsx'
+import ResultView from './ResultView.tsx'
 import SignsResult from './SignsResult.tsx'
 
 describe('SignsResult', () => {
@@ -107,11 +109,79 @@ describe('Interpretation', () => {
       return new Promise<void>(() => {})
     })
     const { unmount } = render(
-      <Interpretation reading={null} hasKey onInterpret={onInterpret} onPinFact={() => {}} onFollowUp={() => {}} />,
+      <Interpretation reading={null} useAlternate={false} onChooseReading={() => {}} hasKey onInterpret={onInterpret} onPinFact={() => {}} onFollowUp={() => {}} />,
     )
     await user.click(screen.getByRole('button', { name: 'Interpret' }))
     expect(signal?.aborted).toBe(false)
     unmount()
     expect(signal?.aborted).toBe(true)
+  })
+})
+
+describe('ReadingView', () => {
+  const reading = {
+    ruling: 'A sentry, but she is distracted.',
+    why: 'Single Yes with Fortune.',
+    alternate: 'No sentry; a scarecrow in a helm.',
+    time: null,
+    direction: null,
+    follow_ups: [],
+    new_facts: [],
+  }
+  const view = (useAlternate: boolean, onChooseReading = vi.fn()) => (
+    <ReadingView reading={reading} useAlternate={useAlternate} onChooseReading={onChooseReading} onPinFact={() => {}} onFollowUp={() => {}} />
+  )
+
+  test('the alternate can be adopted, and then becomes the main reading', async () => {
+    const onChooseReading = vi.fn()
+    const { container, rerender } = render(view(false, onChooseReading))
+    expect(container.querySelector('.reading-ruling')).toHaveTextContent(reading.ruling)
+    await userEvent.click(screen.getByRole('button', { name: 'Use this reading' }))
+    expect(onChooseReading).toHaveBeenCalledWith(true)
+
+    rerender(view(true, onChooseReading))
+    expect(container.querySelector('.reading-ruling')).toHaveTextContent(reading.alternate)
+    await userEvent.click(screen.getByRole('button', { name: 'Use the first reading' }))
+    expect(onChooseReading).toHaveBeenLastCalledWith(false)
+  })
+
+  test('no choice is offered without an alternate', () => {
+    render(<ReadingView reading={{ ...reading, alternate: null }} useAlternate={false} onChooseReading={() => {}} onPinFact={() => {}} onFollowUp={() => {}} />)
+    expect(screen.queryByRole('button', { name: 'Use this reading' })).not.toBeInTheDocument()
+  })
+})
+
+describe('ResultView note', () => {
+  test('saves what happened on blur, only when it changed', async () => {
+    const user = userEvent.setup()
+    const onSaveNote = vi.fn()
+    const entry = {
+      id: 'e',
+      at: '2026-11-06T20:00:00.000Z',
+      question: 'Is there a sentry?',
+      result: { tool: 'fortune' as const, face: 'Fortune' as const },
+      reading: null,
+      note: '',
+      useAlternate: false,
+    }
+    render(
+      <ResultView
+        entry={entry}
+        onRollHour={() => {}}
+        onSaveNote={onSaveNote}
+        onChooseReading={() => {}}
+        hasKey={false}
+        onInterpret={async () => {}}
+        onPinFact={() => {}}
+        onFollowUp={() => {}}
+      />,
+    )
+    const box = screen.getByLabelText('What happened')
+    await user.click(box)
+    await user.tab()
+    expect(onSaveNote).not.toHaveBeenCalled()
+    await user.type(box, 'She raised the alarm')
+    await user.tab()
+    expect(onSaveNote).toHaveBeenCalledWith('She raised the alarm')
   })
 })

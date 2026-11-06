@@ -12,7 +12,7 @@ async function expectNoViolations(page: Page, view: string) {
 const reading = {
   ruling: 'A sentry, but she is distracted.',
   why: 'Single Yes with Fortune.',
-  alternate: null,
+  alternate: 'No sentry; a scarecrow in a helm.',
   time: null,
   direction: null,
   follow_ups: [{ question: 'Is she armed?', tool: 'bones', likelihood: 'likely-yes' }],
@@ -61,6 +61,10 @@ async function everyView(page: Page) {
   await page.getByRole('button', { name: 'Interpret' }).click()
   await expect(page.getByText(reading.ruling)).toBeVisible()
   await expectNoViolations(page, 'AI reading')
+  await page.getByRole('button', { name: 'Use this reading' }).click()
+  await page.getByLabel('What happened').fill('Thuel crept past the scarecrow')
+  await page.getByLabel('What happened').blur()
+  await expectNoViolations(page, 'alternate chosen, note written')
 
   await page.locator('.suggested').getByRole('button', { name: 'Pin', exact: true }).click()
   await page.locator('label.choice', { hasText: 'Fortune die' }).click()

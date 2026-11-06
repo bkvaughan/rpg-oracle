@@ -18,7 +18,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 11 (code review fixes): done, approved, committed and pushed
 - Part 8 remaining check: real Interprets run live by Brandon, working (2026-11-06)
 - Part 12 (Activity & Reaction follow-ups): done, approved, committed and pushed (deploy for `a88a449` succeeded 2026-11-06)
-- Part 12 reverted (2026-11-06): Brandon tried Reaction follow-ups in play and they didn't feel right
+- Part 12 reverted (2026-11-06): Brandon tried Reaction follow-ups in play and they didn't feel right; committed and pushed (deploy for `833f76e` succeeded)
+- Part 13 (play notes, choosing the alternate, tighter layout): done, approved, committed (not pushed)
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -241,6 +242,20 @@ Brandon tried Reaction follow-ups in play (2026-11-06) and they didn't feel righ
 
 - [x] Revert the Part 12 spec, schema, prompt, UI and tests
 - [x] Session files saved with a Reaction follow-up still load; `storedReadingSchema` drops those follow-ups (unit test)
+
+---
+
+## Part 13: Play notes, choosing the alternate, tighter layout
+
+Brandon asked how the site could be improved (2026-11-06) and picked these three: there's nowhere to write what happened in play, the alternate reading can't be adopted, and the page scrolls too much. He chose to keep one column, tightened.
+
+- [x] Play notes: `note` on each entry (default `''`, so old files load at schema version 1), a `setEntryNote` action, a "What happened" box on the result (saved on blur), shown in the journal, and sent to the AI as established play
+- [x] Choose the alternate: `useAlternate` on each entry (default false), a `chooseReading` action (Interpret again resets it), a "Use this reading" button, and later prompts get the chosen reading via `chosenRuling()`
+- [x] Tighter one column: smaller hero, compact ask form, smaller card art and dice, one line per journal entry, and the result scrolls into view after Ask or selecting an entry
+- [x] `ORACLE_SPEC.md`: notes and the chosen reading in "What the AI receives"
+- [x] Tests: schema defaults, reducer actions, prompt context and prompt text, note and alternate components, e2e request body carries the note and the chosen alternate; axe
+
+Notes: the journal shows one line per field (question and time, result, note), each truncated, rather than one line per entry, since the half-width column can't fit a whole entry. The oracle choices sit two by two on a phone. The desktop page with one result is about 250px shorter; the hero, oracle choices, card art (max 22rem for the pair) and compass are all smaller. The e2e test checks that the second Interpret request carries the chosen alternate and the note. 153 unit/component tests; e2e and axe pass. `sessions/testing-responses.json` loads with the defaults.
 
 ---
 

@@ -41,6 +41,13 @@ describe('session model', () => {
     expect(parsed.journal[0].reading!.follow_ups).toEqual(reading.follow_ups)
   })
 
+  test('an entry saved before notes and the alternate choice loads with the defaults', () => {
+    const s = sampleSession()
+    const { note: _note, useAlternate: _alt, ...old } = s.journal[0]
+    const parsed = sessionSchema.parse({ ...s, journal: [old] })
+    expect(parsed.journal[0]).toMatchObject({ note: '', useAlternate: false })
+  })
+
   test('the Bones answer is derived from the final dice, not stored', () => {
     const entry = sampleSession().journal[1]
     if (entry.result.tool !== 'bones') throw new Error('expected a bones entry')

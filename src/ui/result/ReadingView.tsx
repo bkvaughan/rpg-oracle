@@ -2,7 +2,8 @@ import { useState } from 'react'
 import type { FollowUp, Reading } from '../../ai/schema.ts'
 
 // The AI's interpretation of a result. Suggested facts are only pinned when the player
-// accepts them (optionally edited); follow-ups prefill the ask form.
+// accepts them (optionally edited); follow-ups prefill the ask form. The player can adopt
+// the alternate instead, and later prompts then receive it as the ruling.
 
 const TOOL_TEXT = { signs: 'Signs', bones: 'Bones' }
 const LIKELIHOOD_TEXT = { even: 'even', 'likely-yes': 'likely Yes', 'likely-no': 'likely No' }
@@ -38,24 +39,35 @@ function SuggestedFact({ text, onPin }: { text: string; onPin: (text: string) =>
 
 interface Props {
   reading: Reading
+  useAlternate: boolean
+  onChooseReading: (useAlternate: boolean) => void
   onPinFact: (text: string) => void
   onFollowUp: (followUp: FollowUp) => void
 }
 
-export default function ReadingView({ reading, onPinFact, onFollowUp }: Props) {
+export default function ReadingView({ reading, useAlternate, onChooseReading, onPinFact, onFollowUp }: Props) {
+  const alternate = useAlternate && reading.alternate ? reading.alternate : null
+  // The why explains the first reading, so it stays beside that reading wherever it is shown.
+  const why = (
+    <p className={alternate ? 'secondary' : undefined}>
+      <span className="label">Why </span>
+      {reading.why}
+    </p>
+  )
   return (
     <section className="reading" aria-label="Interpretation">
-      <p className="reading-ruling">{reading.ruling}</p>
-      <p>
-        <span className="label">Why </span>
-        {reading.why}
-      </p>
+      <p className="reading-ruling">{alternate ?? reading.ruling}</p>
+      {!alternate && why}
       {reading.alternate && (
-        <p>
+        <p className={alternate ? 'secondary' : undefined}>
           <span className="label">Or </span>
-          {reading.alternate}
+          {alternate ? reading.ruling : reading.alternate}{' '}
+          <button type="button" className="btn btn-small" onClick={() => onChooseReading(!alternate)}>
+            {alternate ? 'Use the first reading' : 'Use this reading'}
+          </button>
         </p>
       )}
+      {alternate && why}
       {reading.time && (
         <p>
           <span className="label">When </span>

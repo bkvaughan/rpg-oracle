@@ -14,6 +14,12 @@ import ResultView from './result/ResultView.tsx'
 import SessionBar from './SessionBar.tsx'
 import { now, useSessionStore } from './useSessionStore.ts'
 
+// Smooth scrolling is motion, so it stops under prefers-reduced-motion like the rest.
+function scrollToTop(el: HTMLElement | null) {
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  el?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
+}
+
 export default function App() {
   const store = useSessionStore()
   const { session, dispatch } = store
@@ -22,14 +28,21 @@ export default function App() {
   // A follow-up remounts the ask form with its question, tool and likelihood filled in.
   const [prefill, setPrefill] = useState<{ request: Partial<AskRequest>; n: number }>({ request: {}, n: 0 })
   const askRef = useRef<HTMLDivElement>(null)
+  const resultRef = useRef<HTMLDivElement>(null)
 
   const selected = session.journal.find((e) => e.id === selectedId) ?? session.journal.at(-1) ?? null
+
+  // Show the chosen result: wait a frame so the new entry has rendered before scrolling.
+  const selectEntry = (id: string) => {
+    setSelectedId(id)
+    requestAnimationFrame(() => scrollToTop(resultRef.current))
+  }
 
   const onAsk = (request: AskRequest) => {
     const at = now()
     const entry = ask(request, secureRng, at, crypto.randomUUID())
     dispatch({ type: 'addEntry', entry, at })
-    setSelectedId(entry.id)
+    selectEntry(entry.id)
   }
 
   const onRollHour = () => {
@@ -52,7 +65,7 @@ export default function App() {
 
   const onFollowUp = (f: FollowUp) => {
     setPrefill((p) => ({ request: { question: f.question, tool: f.tool, likelihood: f.likelihood ?? 'even' }, n: p.n + 1 }))
-    askRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    scrollToTop(askRef.current)
     askRef.current?.querySelector('input')?.focus({ preventScroll: true })
   }
 
@@ -94,12 +107,14 @@ export default function App() {
             <AskPanel key={prefill.n} initial={prefill.request} onAsk={onAsk} />
           </div>
 
-          <div aria-live="polite">
+          <div aria-live="polite" ref={resultRef} className="result-anchor">
             {selected && (
               <ResultView
                 key={selected.id}
                 entry={selected}
                 onRollHour={onRollHour}
+                onSaveNote={(note) => dispatch({ type: 'setEntryNote', entryId: selected.id, note, at: now() })}
+                onChooseReading={(useAlternate) => dispatch({ type: 'chooseReading', entryId: selected.id, useAlternate, at: now() })}
                 hasKey={aiSettings.apiKey !== ''}
                 onInterpret={onInterpret}
                 onPinFact={(text) => pinFact(text, 'ai')}
@@ -112,7 +127,7 @@ export default function App() {
             <Journal
               entries={session.journal}
               selectedId={selected?.id ?? null}
-              onSelect={setSelectedId}
+              onSelect={selectEntry}
               onDelete={(id) => dispatch({ type: 'deleteEntry', entryId: id, at: now() })}
             />
             <FactsPanel

@@ -34,6 +34,7 @@ Activity & Reaction is one 2d6 roll made when the PCs meet a creature. The first
 # How to answer
 
 - Commit to a concrete, playable answer: a person, a thing, a motive or a problem the PC can act on. Prefer that over atmosphere.
+- The player's notes ("What happened") are what actually happened in play. Treat them as established, like facts.
 - Stay consistent with the established facts and recent rulings you are given. If a result seems to contradict them, find a reading that reconciles them, or say plainly that it does.
 - Improvise only from what the player has told you. Don't invent the contents of a published adventure's secret sections.
 - Keep to dark sword-and-sorcery: grim, mortal, strange, with sorcery that costs. Use the player's names for people and places.
@@ -121,12 +122,13 @@ export function buildUserPrompt(entry: JournalEntry, session: Session): string {
   const sections = [
     `# Question\n${entry.question || '(No question: interpret the result for the current scene.)'}`,
     `# Result\n${describeForAi(entry)}`,
+    ...(entry.note.trim() ? [`# What happened (player's note)\n${entry.note.trim()}`] : []),
     `# Session\nPC: ${pc || 'not given'}\nLocation: ${where || 'not given'}`,
     `# Established facts\n${ctx.facts.length ? ctx.facts.map((f) => `- ${f}`).join('\n') : 'None yet.'}`,
     `# Recent questions (oldest first)\n${
       ctx.recent.length
         ? (ctx.omitted ? `(${ctx.omitted} earlier questions not shown)\n` : '') +
-          ctx.recent.map((r) => `- ${r.question || '(no question)'}: ${r.result}${r.ruling ? `. Ruling: ${r.ruling}` : ''}`).join('\n')
+          ctx.recent.map((r) => `- ${r.question || '(no question)'}: ${r.result}${r.ruling ? `. Ruling: ${r.ruling}` : ''}${r.note.trim() ? `. What happened: ${r.note.trim()}` : ''}`).join('\n')
         : 'None yet.'
     }`,
   ]

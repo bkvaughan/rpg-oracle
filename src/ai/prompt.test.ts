@@ -49,6 +49,20 @@ describe('buildUserPrompt', () => {
     expect(history).not.toContain('Is there a sentry?')
   })
 
+  test('gives the player\'s notes: in the history, and for the entry itself', () => {
+    const session = sampleSession()
+    session.journal[0] = { ...session.journal[0], note: 'Thuel climbed the wall' }
+    const entry = { ...session.journal[1], note: 'She fled into the crypt' }
+    const prompt = buildUserPrompt(entry, session)
+    expect(prompt).toContain("# What happened (player's note)\nShe fled into the crypt")
+    expect(prompt.split('# Recent questions')[1]).toContain('. What happened: Thuel climbed the wall')
+    expect(buildUserPrompt(session.journal[1], session)).not.toContain("player's note")
+  })
+
+  test('the system prompt treats player notes as established', () => {
+    expect(SYSTEM_PROMPT).toContain('notes ("What happened") are what actually happened in play')
+  })
+
   test('gives the Activity result, the creature type and the matching examples', () => {
     const entry = { ...bonesEntry('a'), question: 'The goblins at the ford', result: { tool: 'activity' as const, roll: 3 as const, creature: 'intelligent' as const } }
     const prompt = buildUserPrompt(entry, { ...sampleSession(), journal: [entry] })

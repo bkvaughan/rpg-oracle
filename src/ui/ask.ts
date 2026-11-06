@@ -17,7 +17,7 @@ export interface AskRequest {
 
 /** Runs the chosen oracle with the given RNG and wraps the result as a journal entry. */
 export function ask(request: AskRequest, rng: Rng, at: string, id: string): JournalEntry {
-  return { id, at, question: request.question.trim(), result: runOracle(request, rng), reading: null }
+  return { id, at, question: request.question.trim(), result: runOracle(request, rng), reading: null, note: '', useAlternate: false }
 }
 
 function runOracle({ tool, likelihood, creature }: AskRequest, rng: Rng): OracleResult {

@@ -19,6 +19,8 @@ export const bonesEntry = (id: string, question = 'Is there a sentry?'): Journal
     final: { judgment: 'Yes', fate: ['Nil', 'Nil'], fortune: 'Nil' },
   },
   reading: null,
+  note: '',
+  useAlternate: false,
 })
 
 export const signsEntry = (id: string): JournalEntry => ({
@@ -27,6 +29,8 @@ export const signsEntry = (id: string): JournalEntry => ({
   question: "What's going on at this ruin?",
   result: { tool: 'signs', cardIds: [3, 41], hour: null },
   reading: null,
+  note: '',
+  useAlternate: false,
 })
 
 export const reading: Reading = {

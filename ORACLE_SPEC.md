@@ -414,6 +414,7 @@ The AI should be told the outcome as a fact ("Double No, Fortune"), with the raw
   - Deck: both cards with all four words, the time icon, the direction, and the card's one-line `art` description (in `deck_of_signs.json`).
   - Bones: the cast, any reroll, the final answer and magnitude, and the Fortune result.
 - **Session context**: PC name, class, and level; current location (hex, site, room); a short journal of recent questions, answers, and established facts. Cap this (for example, the last 20 entries plus a pinned "facts" list) so prompts stay small.
+- **Play notes and the chosen reading** (decision, Brandon, 2026-11-06). Each entry can carry the player's note on what happened in play. Notes are sent with the recent entries, and with the entry being interpreted, and the AI treats them as established. If the player adopted a reading's alternate, later prompts receive the alternate as that entry's ruling.
 - Optionally, the relevant **book procedure** that triggered the question (e.g. "Exploring a hex → Small Ruin → Read the Signs").
 
 ### What the AI returns (both tools)

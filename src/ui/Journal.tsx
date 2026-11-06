@@ -28,6 +28,7 @@ export default function Journal({ entries, selectedId, onSelect, onDelete }: Pro
               <button type="button" className="journal-entry" onClick={() => onSelect(e.id)} aria-current={e.id === selectedId}>
                 <span className="journal-question">{e.question || 'No question'}</span>
                 <span className="journal-result">{describeResult(e.result)}</span>
+                {e.note && <span className="journal-note">{e.note}</span>}
                 <time className="journal-time" dateTime={e.at}>
                   {new Date(e.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                 </time>

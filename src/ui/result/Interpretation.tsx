@@ -7,13 +7,15 @@ import ReadingView from './ReadingView.tsx'
 
 interface Props {
   reading: Reading | null
+  useAlternate: boolean
+  onChooseReading: (useAlternate: boolean) => void
   hasKey: boolean
   onInterpret: (signal: AbortSignal) => Promise<void>
   onPinFact: (text: string) => void
   onFollowUp: (followUp: FollowUp) => void
 }
 
-export default function Interpretation({ reading, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
+export default function Interpretation({ reading, useAlternate, onChooseReading, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const controller = useRef<AbortController | null>(null)
@@ -38,7 +40,15 @@ export default function Interpretation({ reading, hasKey, onInterpret, onPinFact
 
   return (
     <div className="interpretation">
-      {reading && <ReadingView reading={reading} onPinFact={onPinFact} onFollowUp={onFollowUp} />}
+      {reading && (
+        <ReadingView
+          reading={reading}
+          useAlternate={useAlternate}
+          onChooseReading={onChooseReading}
+          onPinFact={onPinFact}
+          onFollowUp={onFollowUp}
+        />
+      )}
       <div className="session-actions">
         {busy ? (
           <>
