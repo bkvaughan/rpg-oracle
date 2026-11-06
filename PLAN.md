@@ -8,7 +8,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 2: done and approved, committed and pushed to `origin/main`
 - Design: adopted the Torchlit Chronicles look from `../personal-blog` (2026-11-05). Approved, committed and pushed
 - Part 3: done and approved, committed and pushed
-- Part 4: in progress
+- Part 4: done and approved, committed and pushed
+- Part 5: in progress
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -67,12 +68,14 @@ Notes: the Vite template now ships TypeScript 7 (`~7.0.2`), Vite 8 and Vitest 5.
 
 ## Part 4: Oracle engine (pure TypeScript, no UI)
 
-- [ ] `src/engine/rng.ts`: a secure RNG built on `crypto.getRandomValues`, with rejection sampling so dice aren't biased. Injectable, with a seeded version for tests. `Math.random` is never used
-- [ ] `src/engine/signs.ts`: draw 2 distinct cards from a fresh 50-card deck. The first card drawn is primary for time and direction, and the second card's are shown too. `rollHour(timeIcon)` returns a 1d6-hour offset
-- [ ] `src/engine/bones.ts`: port `reference/bones.py` as-is, with `cast`, `resolve` and `consult(likelihood)` returning the first cast, the reroll and the final result. Add `rollFortune()` for Lone Wolf
-- [ ] Tests: enumerating every cast reproduces the spec probability table to 0.1%. Both book worked examples (p.212 and Part 4) resolve as stated. Reroll rules (Judgment first, one reroll only, never Fortune). Deck draws are never duplicates. A chi-square sanity check on the RNG
+- [x] `src/engine/rng.ts`: a secure RNG built on `crypto.getRandomValues`, with rejection sampling so dice aren't biased. Injectable, with a seeded version for tests. `Math.random` is never used
+- [x] `src/engine/signs.ts`: draw 2 distinct cards from a fresh 50-card deck. The first card drawn is primary for time and direction, and the second card's are shown too. `rollHour(timeIcon)` returns a 1d6-hour offset
+- [x] `src/engine/bones.ts`: port `reference/bones.py` as-is, with `cast`, `resolve` and `consult(likelihood)` returning the first cast, the reroll and the final result. Add `rollFortune()` for Lone Wolf
+- [x] Tests: enumerating every cast reproduces the spec probability table to 0.1%. Both book worked examples (p.212 and Part 4) resolve as stated. Reroll rules (Judgment first, one reroll only, never Fortune). Deck draws are never duplicates. A chi-square sanity check on the RNG
 
 **Success criteria:** the engine matches the spec exactly and is covered by tests.
+
+Notes: `Rng` is `(n) => integer in [0, n)`, so modules ask for the range they need. Rerolls are structured (`{ die, from, to }`) for the UI rather than the Python version's text strings. `scriptedRng` lets tests choose exact dice faces, and the probability test enumerates all 1,296 Judgment × Twin × Twin × reroll sequences. 42 tests in total.
 
 ---
 
