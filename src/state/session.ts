@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { readingSchema } from '../ai/schema.ts'
+import { storedReadingSchema } from '../ai/schema.ts'
 import { resolve, type BonesResult } from '../engine/bones.ts'
 
 // A session is one play-through's journal: who the PC is, where they are, every question
@@ -72,7 +72,7 @@ export const entrySchema = z.object({
   at: z.iso.datetime(),
   question: z.string(),
   result: oracleResultSchema,
-  reading: readingSchema.nullable(),
+  reading: storedReadingSchema.nullable(),
 })
 
 export const factSchema = z.object({

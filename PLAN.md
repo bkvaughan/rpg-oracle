@@ -16,6 +16,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 9 (Activity Die, plus all dice faces from the official templates): done, approved, committed and pushed
 - Part 10 (Activity & Reaction): done, approved, committed and pushed
 - Part 11 (code review fixes): done, approved, committed and pushed
+- Part 8 remaining check: real Interprets run live by Brandon, working (2026-11-06)
+- Part 12 (Activity & Reaction follow-ups): done, approved, committed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -215,6 +217,20 @@ A full critical code pass (2026-11-05) found ways a player can lose work in the 
 - [x] Tests for each fix
 
 Notes: new `src/ui/useSessionStore.test.tsx` (recovery hold, Discard, Restore, banner confirm) and `src/ai/settings.test.ts`; autosave ordering, delayed revoke, Open confirm and Interpret abort tests added to existing files. Checked that the recovery-hold test fails without the fix. 142 unit/component tests; e2e and axe pass.
+
+---
+
+## Part 12: Activity & Reaction follow-ups
+
+Brandon asked whether readings should suggest the other tools as follow-ups too. Decided (2026-11-06): a reading can suggest **Activity & Reaction** when it introduces a creature whose attitude is unknown. The **Fortune die** is not a follow-up tool. It answers no question, and the AI suggesting when to roll for a twist would have it decide when randomness happens.
+
+- [x] `ORACLE_SPEC.md`: the reading contract and AI call sections allow `tool: "reaction"` with a nullable `creature` (`intelligent` / `other`), meaningful only for Reaction, the way `likelihood` is only for the Bones; add the interpretation guideline for when to suggest it
+- [x] `src/ai/schema.ts`: `followUpSchema.tool` adds `'reaction'`; add nullable `creature`. Widening the enum keeps existing session files loading, so the schema version stays 1
+- [x] `src/ai/prompt.ts`: the follow_ups instruction covers Reaction (only for a creature or person the reading introduces whose attitude is unknown; set `creature`), with null `likelihood` and null `creature` where they don't apply
+- [x] Follow-up button label shows "Activity & Reaction, intelligent/other creature"; clicking it prefills the ask form with the Reaction tool and the creature choice
+- [x] Tests: schema (old readings without `creature` still load), prompt, ReadingView label, App prefill, e2e follow-up click into Reaction
+
+Notes: `followUpSchema` (sent to the API) keeps `creature` required, since structured outputs need every field; `storedReadingSchema` (session files) defaults a missing `creature` to null so older files load. Follow-up button names have no space before the bracket in the accessibility tree, so tests match them with a regex. 146 unit/component tests; e2e and axe pass.
 
 ---
 

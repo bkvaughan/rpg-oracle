@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { sampleSession, T0 } from './fixtures.ts'
+import { reading, sampleSession, T0 } from './fixtures.ts'
 import { bonesOutcome, newSession, sessionSchema } from './session.ts'
 
 describe('session model', () => {
@@ -31,6 +31,20 @@ describe('session model', () => {
     const entry = { id: 'r', at: s.createdAt, question: '', reading: null, result: { tool: 'reaction', dice: [3, 2], creature: 'intelligent' } }
     expect(sessionSchema.safeParse({ ...s, journal: [entry] }).success).toBe(true)
     expect(sessionSchema.safeParse({ ...s, journal: [{ ...entry, result: { ...entry.result, dice: [0, 7] } }] }).success).toBe(false)
+  })
+
+  test('a reading saved before follow-ups had a creature still loads, with creature null', () => {
+    const s = sampleSession()
+    const old = { ...reading, follow_ups: [{ question: 'Is she armed?', tool: 'bones', likelihood: 'likely-yes' }] }
+    const parsed = sessionSchema.parse({ ...s, journal: [{ ...s.journal[0], reading: old }] })
+    expect(parsed.journal[0].reading!.follow_ups[0].creature).toBeNull()
+  })
+
+  test('a reading can suggest an Activity & Reaction follow-up', () => {
+    const s = sampleSession()
+    const followUp = { question: 'How does the hermit react?', tool: 'reaction', likelihood: null, creature: 'intelligent' }
+    const withReaction = { ...reading, follow_ups: [followUp] }
+    expect(sessionSchema.safeParse({ ...s, journal: [{ ...s.journal[0], reading: withReaction }] }).success).toBe(true)
   })
 
   test('the Bones answer is derived from the final dice, not stored', () => {

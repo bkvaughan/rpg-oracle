@@ -54,6 +54,22 @@ test('a reading is shown, facts are pinned on request, and follow-ups prefill th
   expect(screen.getByRole('button', { name: 'Interpret again' })).toBeInTheDocument()
 })
 
+test('an Activity & Reaction follow-up is labelled and prefills the tool and creature', async () => {
+  localStorage.setItem('rpg-oracle-ai-settings', JSON.stringify({ apiKey: 'k', model: 'claude-opus-5-5' }))
+  const followUp = { question: 'How does the wolf react?', tool: 'reaction' as const, likelihood: null, creature: 'other' as const }
+  interpret.mockResolvedValue({ ...reading, follow_ups: [followUp] })
+  const user = userEvent.setup()
+  render(<App />)
+  await castBones(user)
+  await user.click(screen.getByRole('button', { name: 'Interpret' }))
+
+  await screen.findByText(reading.ruling)
+  await user.click(screen.getByRole('button', { name: /How does the wolf react\?.*\(Activity & Reaction, Other creature\)/ }))
+  expect(screen.getByLabelText(/Activity & Reaction/)).toBeChecked()
+  expect(screen.getByLabelText('Other creature')).toBeChecked()
+  expect(screen.getByLabelText('Your question')).toHaveValue('How does the wolf react?')
+})
+
 test('an API error is shown and the button comes back', async () => {
   localStorage.setItem('rpg-oracle-ai-settings', JSON.stringify({ apiKey: 'k', model: 'claude-opus-5-5' }))
   const { AiError } = await import('../ai/errors.ts')

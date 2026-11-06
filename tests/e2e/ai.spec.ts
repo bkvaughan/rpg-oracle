@@ -9,7 +9,10 @@ const reading = {
   alternate: 'A literal dragon skeleton.',
   time: 'Late Night',
   direction: 'SW: where the robbers fled',
-  follow_ups: [{ question: 'Is there still gold in the barrow?', tool: 'bones', likelihood: 'likely-yes' }],
+  follow_ups: [
+    { question: 'Is there still gold in the barrow?', tool: 'bones', likelihood: 'likely-yes', creature: null },
+    { question: 'How does the barrow lord react to the PC?', tool: 'reaction', likelihood: null, creature: 'intelligent' },
+  ],
   new_facts: ['A dead lord hoards in the ruin'],
 }
 
@@ -59,6 +62,9 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
 
   await page.getByRole('button', { name: /Is there still gold in the barrow\?/ }).click()
   await expect(page.getByLabel('Your question')).toHaveValue('Is there still gold in the barrow?')
+  await page.getByRole('button', { name: /How does the barrow lord react/ }).click()
+  await expect(page.getByLabel(/Activity & Reaction/)).toBeChecked()
+  await expect(page.getByLabel('Intelligent creature')).toBeChecked()
   // The lazily loaded SDK chunk and the API call are both allowed by the policy.
   expect(problems).toEqual([])
 })

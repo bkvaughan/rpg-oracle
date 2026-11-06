@@ -51,7 +51,10 @@ export default function App() {
   }
 
   const onFollowUp = (f: FollowUp) => {
-    setPrefill((p) => ({ request: { question: f.question, tool: f.tool, likelihood: f.likelihood ?? 'even' }, n: p.n + 1 }))
+    setPrefill((p) => ({
+      request: { question: f.question, tool: f.tool, likelihood: f.likelihood ?? 'even', creature: f.creature ?? 'intelligent' },
+      n: p.n + 1,
+    }))
     askRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     askRef.current?.querySelector('input')?.focus({ preventScroll: true })
   }
