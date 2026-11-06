@@ -21,7 +21,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 12 reverted (2026-11-06): Brandon tried Reaction follow-ups in play and they didn't feel right; committed and pushed (deploy for `833f76e` succeeded)
 - Part 13 (play notes, choosing the alternate, tighter layout): done, approved, committed and pushed (deploy for `1caf652` succeeded 2026-11-06)
 - Part 14 (remove the PC and location): done, approved, committed (not pushed).
-- Part 15 (interpret automatically): done, approved, committed (not pushed) A "don't repeat recent cards" option was built and reverted before commit at Brandon's request
+- Part 15 (interpret automatically): built and committed, then reverted at Brandon's request (2026-11-06: worse in use than it sounded). Interpret stays a button A "don't repeat recent cards" option was built and reverted before commit at Brandon's request
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -269,19 +269,6 @@ Brandon (2026-11-06): the site is just a source of answers. He tried a "don't re
 - [x] The AI prompt no longer has a Session section
 - [x] `ORACLE_SPEC.md` "What the AI receives" updated
 - [x] Tests: an old file with the fields loads without them; prompt, context, reducer and file tests updated
-
----
-
-## Part 15: Interpret automatically
-
-Brandon (2026-11-06): fold the interpretation in seamlessly. With a key saved, call the AI for every new result instead of waiting for a click.
-
-- [x] `Interpretation.tsx`: `autoStart` runs the request on mount, busy from the first render; a cancelled request that settles late no longer clears a newer one's busy state (React's dev double mount does this)
-- [x] `App.tsx`: only the entry just asked is marked fresh, so selecting an older entry or saving a key never calls the AI. The Interpret button stays for older entries, retries, cancels and Interpret again
-- [x] `ORACLE_SPEC.md` "The AI call": when it runs
-- [x] Tests: App AI tests (auto call once, no call without a key or on saving one, none on selecting an older entry, error shown with retry); e2e asks twice and sees two requests with no clicks
-
-Notes: `useEffectEvent` starts the request; one oxlint `set-state-in-effect` warning is suppressed with a comment, since state is only set after the request settles.
 
 ---
 

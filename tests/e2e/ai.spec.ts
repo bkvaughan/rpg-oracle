@@ -15,7 +15,7 @@ const reading = {
 
 // Intercepts the browser's call to the Anthropic API: proves the SDK request is made from the
 // page with the player's key and the expected body, without spending real money.
-test('a new result calls the Anthropic API with the saved key and shows the reading', async ({ page }) => {
+test('Interpret calls the Anthropic API with the saved key and shows the reading', async ({ page }) => {
   const problems = watchForViolations(page)
   let body: Record<string, unknown> | null = null
   let key: string | null = null
@@ -50,8 +50,8 @@ test('a new result calls the Anthropic API with the saved key and shows the read
   await page.locator('.ai-settings').getByRole('button', { name: 'Save' }).click()
 
   await page.getByLabel('Your question').fill("What's going on at this ruin?")
-  // With a key saved, a new result is interpreted without a click.
   await page.getByRole('button', { name: 'Draw two cards' }).click()
+  await page.getByRole('button', { name: 'Interpret' }).click()
 
   await expect(page.getByText(reading.ruling)).toBeVisible()
   // SDK 1.x with API version 2026-10-21 sends the key as a bearer token.
@@ -68,9 +68,9 @@ test('a new result calls the Anthropic API with the saved key and shows the read
   await page.getByLabel('What happened').blur()
   await expect(page.getByRole('region', { name: 'Journal' })).toContainText('Thuel found dragon bones in the crypt')
   await page.getByRole('button', { name: 'Cast the Bones' }).click()
+  await page.getByRole('button', { name: 'Interpret' }).click()
   await expect(page.getByLabel('What happened')).toHaveValue('')
   await expect.poll(() => posts).toBe(2)
-  await expect(page.getByText(reading.ruling)).toBeVisible()
   const history = JSON.stringify(body)
   expect(history).toContain(`Ruling: ${reading.alternate}`)
   expect(history).toContain('What happened: Thuel found dragon bones in the crypt')

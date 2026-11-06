@@ -31,7 +31,6 @@ function NoteField({ note, onSave }: { note: string; onSave: (note: string) => v
 interface Props {
   entry: JournalEntry
   onRollHour: () => void
-  autoInterpret?: boolean
   onSaveNote: (note: string) => void
   onChooseReading: (useAlternate: boolean) => void
   hasKey: boolean
@@ -40,7 +39,7 @@ interface Props {
   onFollowUp: (followUp: FollowUp) => void
 }
 
-export default function ResultView({ entry, onRollHour, autoInterpret = false, onSaveNote, onChooseReading, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
+export default function ResultView({ entry, onRollHour, onSaveNote, onChooseReading, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
   const { result } = entry
   return (
     <article className="panel result" aria-labelledby={`result-${entry.id}`}>
@@ -55,7 +54,6 @@ export default function ResultView({ entry, onRollHour, autoInterpret = false, o
       {result.tool === 'reaction' && <ReactionResult result={result} />}
       <Interpretation
         reading={entry.reading}
-        autoStart={autoInterpret && !entry.reading}
         useAlternate={entry.useAlternate}
         onChooseReading={onChooseReading}
         hasKey={hasKey}

@@ -448,10 +448,9 @@ Return this as structured JSON so the site can lay it out and log it, and keep e
 - **Refusals.** Opus and Sonnet requests opt into server-side fallbacks (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`), so a declined request is re-run on Anthropic's recommended fallback model. Haiku 5.5 has no server-side fallback. A final `stop_reason: "refusal"` is shown as a plain message.
 - **Structured output.** The reading schema above is defined once in zod (`src/ai/schema.ts`) and sent as the request's structured-output format (`betaZodOutputFormat`). `alternate`, `time`, `direction` and a follow-up's `likelihood` are nullable. Session files saved while Reaction follow-ups existed (2026-11-06) still load, with those follow-ups dropped. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
 - **Prompt caching.** The system prompt (interpretation guidelines, a worked example in our own words, and the 50-card list with art descriptions) is static, so it is sent as a cached block. Only the question, result and session context change per call, in the user message.
-- **Loading.** The SDK is most of the JavaScript, so `src/ai/client.ts` is loaded with `import()` the first time a result is interpreted.
+- **Loading.** The SDK is most of the JavaScript, so `src/ai/client.ts` is loaded with `import()` the first time the player clicks Interpret.
 - **Errors.** Mapped to plain messages: no key, key rejected, rate limited, model refused, invalid response, network, cancelled.
-- **Optional.** The oracle works fully without AI. The draw or roll happens and is saved first; interpretation follows it and never changes it.
-- **When it runs** (decision, Brandon, 2026-11-06). With a key saved, every new result is interpreted straight away, with no click. Selecting an older entry never calls the AI, and neither does saving a key. The Interpret button stays for older entries, retries after an error, a cancel, and "Interpret again". Without a key, nothing is sent.
+- **Optional.** The oracle works fully without AI. Interpretation is a button on a result, not a step in drawing or rolling. Interpreting every new result automatically was tried and dropped (Brandon, 2026-11-06: worse in use).
 
 ### Interpretation guidelines (for the system prompt)
 - Use at least two words across the two cards, as the book requires. Words can be literal or metaphorical (e.g. *Dragon* as "a hoarder").
