@@ -552,3 +552,79 @@ input::placeholder {
     grid-template-columns: 1fr;
   }
 }
+
+/* ───────────── AI ───────────── */
+select {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: rgb(0 0 0 / 0.45);
+  border: 1px solid var(--line);
+  padding: 0.55rem 0.75rem;
+}
+.ai-settings summary {
+  cursor: pointer;
+}
+.ai-form > p {
+  margin: 1rem 0 0;
+}
+
+.interpretation {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+.interpreting {
+  font-style: italic;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.reading {
+  animation: fade-up 0.8s both;
+}
+.reading p {
+  margin: 0 0 0.6rem;
+}
+.reading .label {
+  margin-right: 0.35rem;
+}
+.reading h3 {
+  font-weight: 400;
+  margin: 1.1rem 0 0.5rem;
+}
+.reading-ruling {
+  font-size: 1.25rem;
+  line-height: 1.55;
+  color: #ece6d8;
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--accent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 9%, transparent), transparent);
+}
+.follow-ups,
+.suggested-facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.follow-up {
+  text-align: left;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  font-size: 1rem;
+}
+.suggested {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.suggested.pinned {
+  color: var(--ink-dim);
+}

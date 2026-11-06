@@ -11,7 +11,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 4: done and approved, committed and pushed
 - Part 5: done and approved, committed and pushed
 - Part 6: done and approved, committed and pushed
-- Part 7: in progress
+- Part 7: done and approved, committed and pushed
+- Part 8: in progress
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -126,14 +127,22 @@ Notes:
 
 ## Part 7: AI interpretation layer
 
-- [ ] Load the `claude-api` skill before writing this part
-- [ ] `src/ai/settings.ts`: BYOK key and model picker (Claude Opus 5.5, Sonnet 5.5, Haiku 5.5; default Sonnet 5.5 for speed), stored only in the browser, with a "forget key" button
-- [ ] `src/ai/schema.ts`: zod schema for the Part 3 reading (`ruling`, `why`, `alternate`, `time`, `direction`, `follow_ups[]`, `new_facts[]`), sent to the API as a structured output
-- [ ] `src/ai/prompt.ts`: a system prompt built from the spec's interpretation guidelines and the book's example voice, sent as a cached block. The user message carries the question, the result stated as fact plus the raw dice, and `promptContext`
-- [ ] `src/ai/client.ts`: the only network module, with typed errors (no key, auth, rate limit, refusal, invalid, network, cancelled), as in mythras
-- [ ] UI: an "Interpret" button (the oracle works without AI), the reading laid out by section, `new_facts` shown as suggestions the player accepts or edits before they're pinned, and follow-up buttons that prefill question, tool and likelihood
-- [ ] Guard: the AI only interprets. The result is passed in and never asked for
-- [ ] Tests: prompt-building snapshots, schema validation, error mapping (mocked SDK)
+- [x] Load the `claude-api` skill before writing this part
+- [x] `src/ai/settings.ts`: BYOK key and model picker (Claude Opus 5.5, Sonnet 5.5, Haiku 5.5), stored only in the browser, with a "forget key" button. The default is **Opus 5.5**, changed from the planned Sonnet 5.5 to follow the Claude API guidance; it's one click in AI settings to switch
+- [x] `src/ai/schema.ts`: zod schema for the Part 3 reading (`ruling`, `why`, `alternate`, `time`, `direction`, `follow_ups[]`, `new_facts[]`), sent to the API as a structured output
+- [x] `src/ai/prompt.ts`: a system prompt built from the spec's interpretation guidelines and the book's example voice, sent as a cached block. The user message carries the question, the result stated as fact plus the raw dice, and `promptContext`
+- [x] `src/ai/client.ts`: the only network module, with typed errors (no key, auth, rate limit, refusal, invalid, network, cancelled), as in mythras
+- [x] UI: an "Interpret" button (the oracle works without AI), the reading laid out by section, `new_facts` shown as suggestions the player accepts or edits before they're pinned, and follow-up buttons that prefill question, tool and likelihood
+- [x] Guard: the AI only interprets. The result is passed in and never asked for
+- [x] Tests: prompt-building snapshots, schema validation, error mapping (mocked SDK)
+
+Notes:
+- Request: `client.beta.messages.create` with `output_config: { effort: 'medium', format: betaZodOutputFormat(readingSchema) }`, the system prompt as a cached block, and `fallbacks: 'default'` with beta `server-side-fallback-2026-07-01` for Opus and Sonnet (Haiku 5.5 has none). The thinking parameter is left out, because it's adaptive by default. Refusal and max_tokens stop reasons are handled before the text is parsed, and the response is validated again with zod.
+- The SDK (1.6.0, API version 2026-10-21) sends the key as `Authorization: Bearer`.
+- The system prompt holds the spec's interpretation guidelines, a worked example in our own words (no book prose), and all 50 cards with their art descriptions. The user message holds the question, the settled result with the raw dice, the PC, location, facts, and the last 20 earlier entries with their rulings (the current entry is excluded).
+- UI: an AI settings panel (key, model, Save, Forget key), plus Interpret / Interpret again with Cancel on each result. Suggested facts can be edited, then pinned or dismissed. Follow-ups prefill the ask form and scroll to it.
+- Performance: `AiError` lives in `src/ai/errors.ts` and the client is loaded with `import()`. The initial JS is 367 KB (112 KB gzipped); the SDK chunk (84 KB gzipped) loads on the first Interpret.
+- Tests: 112 unit/component tests. The browser test intercepts `api.anthropic.com` to check the real request (key, model, fallbacks, effort, question) without spending money. The real API has not been called with a live key yet; Brandon to try one.
 
 ---
 

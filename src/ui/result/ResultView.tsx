@@ -1,6 +1,8 @@
+import type { FollowUp } from '../../ai/schema.ts'
 import type { JournalEntry } from '../../state/session.ts'
 import BonesResult from './BonesResult.tsx'
 import FortuneResult from './FortuneResult.tsx'
+import Interpretation from './Interpretation.tsx'
 import SignsResult from './SignsResult.tsx'
 
 const TOOL_NAME = { signs: 'Read the Signs', bones: 'Consult the Bones', fortune: 'Fortune die' }
@@ -8,9 +10,13 @@ const TOOL_NAME = { signs: 'Read the Signs', bones: 'Consult the Bones', fortune
 interface Props {
   entry: JournalEntry
   onRollHour: () => void
+  hasKey: boolean
+  onInterpret: (signal: AbortSignal) => Promise<void>
+  onPinFact: (text: string) => void
+  onFollowUp: (followUp: FollowUp) => void
 }
 
-export default function ResultView({ entry, onRollHour }: Props) {
+export default function ResultView({ entry, onRollHour, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
   const { result } = entry
   return (
     <article className="panel result" aria-labelledby={`result-${entry.id}`}>
@@ -21,6 +27,7 @@ export default function ResultView({ entry, onRollHour }: Props) {
       {result.tool === 'signs' && <SignsResult result={result} onRollHour={onRollHour} />}
       {result.tool === 'bones' && <BonesResult result={result} />}
       {result.tool === 'fortune' && <FortuneResult face={result.face} />}
+      <Interpretation reading={entry.reading} hasKey={hasKey} onInterpret={onInterpret} onPinFact={onPinFact} onFollowUp={onFollowUp} />
     </article>
   )
 }

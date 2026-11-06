@@ -394,9 +394,11 @@ Return this as structured JSON so the site can lay it out and log it, and keep e
 
 ### The AI call
 - **Access.** Bring-your-own-key: the player's Anthropic API key is stored only in their browser and used for direct calls from the page. The static site never holds a key. All network access lives in one module (`src/ai/client.ts`) so a server proxy can replace it later.
-- **Models.** Player-selectable: Claude Sonnet 5.5 (`claude-sonnet-5-5`, default: fast and capable), Claude Opus 5.5 (`claude-opus-5-5`, richest readings), Claude Haiku 5.5 (`claude-haiku-5-5`, cheapest).
-- **Structured output.** The reading schema above is defined once in zod and sent as the request's structured-output format. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
-- **Prompt caching.** The system prompt (interpretation guidelines, the book's example voice, the card list) is static, so it is sent as a cached block. Only the question, result, and session context change per call.
+- **Models.** Player-selectable: Claude Opus 5.5 (`claude-opus-5-5`, default: richest readings), Claude Sonnet 5.5 (`claude-sonnet-5-5`, faster and cheaper), Claude Haiku 5.5 (`claude-haiku-5-5`, fastest and cheapest). Thinking is adaptive by default on all three; requests set `output_config.effort: "medium"`, since a reading is a short creative judgement.
+- **Refusals.** Opus and Sonnet requests opt into server-side fallbacks (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`), so a declined request is re-run on Anthropic's recommended fallback model. Haiku 5.5 has no server-side fallback. A final `stop_reason: "refusal"` is shown as a plain message.
+- **Structured output.** The reading schema above is defined once in zod (`src/ai/schema.ts`) and sent as the request's structured-output format (`betaZodOutputFormat`). `alternate`, `time`, `direction` and a follow-up's `likelihood` are nullable. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
+- **Prompt caching.** The system prompt (interpretation guidelines, a worked example in our own words, and the 50-card list with art descriptions) is static, so it is sent as a cached block. Only the question, result and session context change per call, in the user message.
+- **Loading.** The SDK is most of the JavaScript, so `src/ai/client.ts` is loaded with `import()` the first time the player clicks Interpret.
 - **Errors.** Mapped to plain messages: no key, key rejected, rate limited, model refused, invalid response, network, cancelled.
 - **Optional.** The oracle works fully without AI. Interpretation is a button on a result, not a step in drawing or rolling.
 

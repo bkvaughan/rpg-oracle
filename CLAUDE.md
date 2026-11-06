@@ -16,7 +16,7 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 - oxlint (Vite React TypeScript template default) and `tsc -b` for typechecking
 - Plain CSS with custom properties. No UI component library. Visual design follows `../personal-blog` (Torchlit Chronicles); see Design Rules
 - zod for the card data, session files and AI responses
-- AI: bring-your-own-key. The Anthropic SDK runs in the browser with the player's own key, stored only in their browser. All network access goes through `src/ai/client.ts`
+- AI: bring-your-own-key. The Anthropic SDK runs in the browser with the player's own key, stored only in their browser. All network access goes through `src/ai/client.ts`, which the UI loads with `import()` so the SDK stays out of the initial bundle. Default model Claude Opus 5.5; see ORACLE_SPEC.md "The AI call". Load the `claude-api` skill before changing AI code
 - Sessions: JSON files on disk via the File System Access API (autosave to the open file); Download / Open fallback on browsers without it; IndexedDB copy for crash recovery. `schemaVersion` on every file
 - Art: card and dice art bundled as WebP, generated from the source images by `npm run assets`
 - Deployment: GitHub Pages at `bkvaughan/rpg-oracle`, built and published by `.github/workflows/deploy.yml` on every push to `main`. Vite `base` is `./`
@@ -42,7 +42,7 @@ rpg-oracle/
     data/             deck_of_signs.json and deck.ts (typed, zod-validated card data)
     engine/           rng, signs, bones
     state/            Session type, reducer, file store (disk), recovery (IndexedDB), prompt context
-    ai/               schema (reading contract), settings, prompt, client
+    ai/               schema (reading contract), settings (BYOK), prompt, client (SDK; lazy-loaded), errors
     styles/           global.css (ported from personal-blog: tokens, atmosphere, panels); oracle.css (forms, results, dice, journal)
     ui/               App and panels; result/ (Signs, Bones, Fortune, dice, compass); useSessionStore (file + recovery wiring); ask.ts; atmosphere.ts (decorative)
   tests/e2e/          Playwright tests

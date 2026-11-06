@@ -8,8 +8,9 @@ const ANGLE = Object.fromEntries(DIRECTIONS.map((d, i) => [d, i * 45])) as Recor
 function Arrow({ direction, className }: { direction: Direction; className: string }) {
   return (
     <g transform={`rotate(${ANGLE[direction]} 60 60)`} className={className}>
-      <line x1="60" y1="60" x2="60" y2="22" />
-      <path d="M60 14 L54 26 L66 26 Z" />
+      {/* Stops short of the N/E/S/W letters (radius 41) so they stay readable. */}
+      <line x1="60" y1="60" x2="60" y2="35" />
+      <path d="M60 27 L54 38 L66 38 Z" />
     </g>
   )
 }

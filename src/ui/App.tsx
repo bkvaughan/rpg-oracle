@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import type { FollowUp } from '../ai/schema.ts'
+import { forgetSettings, loadSettings, saveSettings, type AiSettings } from '../ai/settings.ts'
 import { secureRng } from '../engine/rng.ts'
 import { rollHour } from '../engine/signs.ts'
 import { CARDS } from '../data/deck.ts'
 import { ask, type AskRequest } from './ask.ts'
+import AiSettingsPanel from './AiSettingsPanel.tsx'
 import AskPanel from './AskPanel.tsx'
 import FactsPanel from './FactsPanel.tsx'
 import Journal from './Journal.tsx'
@@ -15,6 +18,10 @@ export default function App() {
   const store = useSessionStore()
   const { session, dispatch } = store
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [aiSettings, setAiSettings] = useState<AiSettings>(loadSettings)
+  // A follow-up remounts the ask form with its question, tool and likelihood filled in.
+  const [prefill, setPrefill] = useState<{ request: Partial<AskRequest>; n: number }>({ request: {}, n: 0 })
+  const askRef = useRef<HTMLDivElement>(null)
 
   const selected = session.journal.find((e) => e.id === selectedId) ?? session.journal.at(-1) ?? null
 
@@ -29,6 +36,24 @@ export default function App() {
     if (selected?.result.tool !== 'signs') return
     const primary = CARDS[selected.result.cardIds[0] - 1]
     dispatch({ type: 'setEntryHour', entryId: selected.id, hour: rollHour(primary.time_icon, secureRng), at: now() })
+  }
+
+  const onInterpret = async (signal: AbortSignal) => {
+    if (!selected) return
+    const { interpret } = await import('../ai/client.ts')
+    const reading = await interpret(selected, session, { apiKey: aiSettings.apiKey, model: aiSettings.model, signal })
+    dispatch({ type: 'attachReading', entryId: selected.id, reading, at: now() })
+  }
+
+  const pinFact = (text: string, source: 'player' | 'ai') => {
+    const at = now()
+    dispatch({ type: 'addFact', fact: { id: crypto.randomUUID(), text, source, at }, at })
+  }
+
+  const onFollowUp = (f: FollowUp) => {
+    setPrefill((p) => ({ request: { question: f.question, tool: f.tool, likelihood: f.likelihood ?? 'even' }, n: p.n + 1 }))
+    askRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    askRef.current?.querySelector('input')?.focus({ preventScroll: true })
   }
 
   return (
@@ -55,9 +80,28 @@ export default function App() {
 
         <div className="stack">
           <SessionBar store={store} />
-          <AskPanel onAsk={onAsk} />
+          <AiSettingsPanel
+            settings={aiSettings}
+            onSave={(s) => (saveSettings(s), setAiSettings(s))}
+            onForget={() => (forgetSettings(), setAiSettings(loadSettings()))}
+          />
+          <div ref={askRef}>
+            <AskPanel key={prefill.n} initial={prefill.request} onAsk={onAsk} />
+          </div>
 
-          <div aria-live="polite">{selected && <ResultView key={selected.id} entry={selected} onRollHour={onRollHour} />}</div>
+          <div aria-live="polite">
+            {selected && (
+              <ResultView
+                key={selected.id}
+                entry={selected}
+                onRollHour={onRollHour}
+                hasKey={aiSettings.apiKey !== ''}
+                onInterpret={onInterpret}
+                onPinFact={(text) => pinFact(text, 'ai')}
+                onFollowUp={onFollowUp}
+              />
+            )}
+          </div>
 
           <div className="columns">
             <Journal
@@ -68,10 +112,7 @@ export default function App() {
             />
             <FactsPanel
               facts={session.facts}
-              onAdd={(text) => {
-                const at = now()
-                dispatch({ type: 'addFact', fact: { id: crypto.randomUUID(), text, source: 'player', at }, at })
-              }}
+              onAdd={(text) => pinFact(text, 'player')}
               onEdit={(id, text) => dispatch({ type: 'editFact', factId: id, text, at: now() })}
               onRemove={(id) => dispatch({ type: 'removeFact', factId: id, at: now() })}
             />
