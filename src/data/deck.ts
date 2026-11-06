@@ -7,6 +7,13 @@ import raw from './deck_of_signs.json'
 export const TIME_ICONS = ['light-sun', 'dark-sun', 'light-moon', 'dark-moon'] as const
 export const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const
 
+export const TIME_ICON_NAMES: Record<(typeof TIME_ICONS)[number], string> = {
+  'light-sun': 'Light Sun',
+  'dark-sun': 'Dark Sun',
+  'light-moon': 'Light Moon',
+  'dark-moon': 'Dark Moon',
+}
+
 export const cardSchema = z.object({
   id: z.number().int().min(1).max(50),
   noun: z.string().min(1),

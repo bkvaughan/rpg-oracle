@@ -1,0 +1,71 @@
+import { expect, test } from '@playwright/test'
+
+test.use({ reducedMotion: 'reduce' })
+
+test('loads the app', async ({ page }) => {
+  await page.goto('/')
+  await expect(page).toHaveTitle('RPG Oracle')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('RPG Oracle')
+})
+
+test('ask, draw, and the journal records it', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel('Your question').fill("What's going on at this ruin?")
+  await page.getByRole('button', { name: 'Draw two cards' }).click()
+
+  const result = page.getByRole('article')
+  await expect(result.getByRole('heading', { name: "What's going on at this ruin?" })).toBeVisible()
+  await expect(result.locator('.sign-card img')).toHaveCount(2)
+  // The art actually loads from public/ in the production build.
+  const loaded = await result.locator('.sign-card img').evaluateAll((imgs) => imgs.every((i) => (i as HTMLImageElement).naturalWidth > 0))
+  expect(loaded).toBe(true)
+
+  await result.getByRole('button', { name: 'Roll exact hour' }).click()
+  await expect(result.getByText(/Exact hour:/)).toBeVisible()
+
+  const journal = page.getByRole('region', { name: 'Journal' })
+  await expect(journal.getByText(/Read the Signs: .*exact hour/)).toBeVisible()
+})
+
+test('Consult the Bones with a likelihood, then reselect an older entry', async ({ page }) => {
+  await page.goto('/')
+  await page.locator('label.choice', { hasText: 'Consult the Bones' }).click()
+  await page.locator('label.choice', { hasText: 'Likely No' }).click()
+  await page.getByLabel('Your question').fill('Is the dead lord stirring?')
+  await page.getByRole('button', { name: 'Cast the Bones' }).click()
+  await expect(page.getByRole('article').getByText('Likely No')).toBeVisible()
+  await expect(page.locator('.bones-answer')).toHaveText(/(Double |Triple )?(Yes|No)/)
+
+  await page.locator('label.choice', { hasText: 'Fortune die' }).click()
+  await page.getByRole('button', { name: 'Roll the Fortune die' }).click()
+  await expect(page.getByRole('article').getByText('Fortune die', { exact: true })).toBeVisible()
+
+  await page.getByRole('region', { name: 'Journal' }).getByRole('button', { name: /^Is the dead lord stirring/ }).click()
+  await expect(page.getByRole('article').getByRole('heading', { name: 'Is the dead lord stirring?' })).toBeVisible()
+})
+
+test('unsaved work survives a reload through the recovery copy', async ({ page }) => {
+  await page.goto('/')
+  await page.getByLabel('New fact').fill('The barrow lord hunts at night')
+  await page.getByRole('button', { name: 'Pin', exact: true }).click()
+  // The recovery copy is written asynchronously; wait for it before reloading.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          new Promise<number>((resolve) => {
+            const open = indexedDB.open('rpg-oracle', 1)
+            open.onsuccess = () => {
+              const get = open.result.transaction('recovery').objectStore('recovery').get('current')
+              get.onsuccess = () => resolve(get.result?.session.facts.length ?? 0)
+            }
+          }),
+      ),
+    )
+    .toBe(1)
+  await page.reload()
+  const banner = page.getByRole('alert')
+  await expect(banner).toContainText('Found unsaved changes')
+  await banner.getByRole('button', { name: 'Restore' }).click()
+  await expect(page.getByLabel('Fact 1', { exact: true })).toHaveValue('The barrow lord hunts at night')
+})

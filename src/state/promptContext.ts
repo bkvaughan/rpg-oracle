@@ -1,4 +1,4 @@
-import { CARDS } from '../data/deck.ts'
+import { CARDS, TIME_ICON_NAMES } from '../data/deck.ts'
 import { bonesOutcome, type OracleResult, type Session } from './session.ts'
 
 // The slice of a session sent with each AI request (ORACLE_SPEC.md Part 3): the PC, where
@@ -6,7 +6,6 @@ import { bonesOutcome, type OracleResult, type Session } from './session.ts'
 
 export const RECENT_LIMIT = 20
 
-const TIME_NAMES = { 'light-sun': 'Light Sun', 'dark-sun': 'Dark Sun', 'light-moon': 'Light Moon', 'dark-moon': 'Dark Moon' }
 const REROLL_DIE = { judgment: 'Judgment', fate1: 'first Twin', fate2: 'second Twin' }
 
 /** One line describing an oracle result, for the AI prompt and the journal. */
@@ -15,7 +14,7 @@ export function describeResult(result: OracleResult): string {
     case 'signs': {
       const cards = result.cardIds.map((id) => {
         const c = CARDS[id - 1]
-        return `${c.noun} · ${c.verb} · ${c.adjective} · ${c.mood} (${TIME_NAMES[c.time_icon]}, ${c.direction})`
+        return `${c.noun} · ${c.verb} · ${c.adjective} · ${c.mood} (${TIME_ICON_NAMES[c.time_icon]}, ${c.direction})`
       })
       const hour = result.hour ? `; exact hour ${result.hour.label}` : ''
       return `Read the Signs: ${cards.join(' / ')}${hour}`

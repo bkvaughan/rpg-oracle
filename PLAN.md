@@ -10,7 +10,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 3: done and approved, committed and pushed
 - Part 4: done and approved, committed and pushed
 - Part 5: done and approved, committed and pushed
-- Part 6: in progress
+- Part 6: done and approved, committed and pushed
+- Part 7: in progress
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -104,13 +105,22 @@ Notes:
 ## Part 6: Design direction and UI
 
 - [x] Visual direction: the Torchlit Chronicles design from `../personal-blog`, recorded under Design Rules in CLAUDE.md. Tokens, fonts, atmosphere layers, header, footer and hero were ported into the shell ahead of Part 3
-- [ ] App shell: session bar (file name, save state, PC, location), question box, tool picker (**Read the Signs** / **Consult the Bones** with Even, Likely Yes and Likely No / **Fortune die**)
-- [ ] Signs result: both cards' art and the four words, the time icon and period, a compass showing primary and secondary direction, and a "roll exact hour" button
-- [ ] Bones result: dice faces for the first cast, any reroll shown as "Judgment No → Yes", the final answer with its strength (Double or Triple), and the Fortune twist
-- [ ] Journal view and an editor for the facts list
-- [ ] Keyboard-usable and screen-reader-labelled (e.g. dice results as text). Works on phones
+- [x] App shell: session bar (file name, save state, PC, location), question box, tool picker (**Read the Signs** / **Consult the Bones** with Even, Likely Yes and Likely No / **Fortune die**)
+- [x] Signs result: both cards' art and the four words, the time icon and period, a compass showing primary and secondary direction, and a "roll exact hour" button
+- [x] Bones result: dice faces for the first cast, any reroll shown as "Judgment No → Yes", the final answer with its strength (Double or Triple), and the Fortune twist
+- [x] Journal view and an editor for the facts list
+- [x] Keyboard-usable and screen-reader-labelled (e.g. dice results as text). Works on phones
 
 **Tests:** component tests for each result view. e2e: ask → draw → journal entry appears.
+
+Notes:
+- Files: `src/ui/App.tsx`, `AskPanel`, `SessionBar`, `Journal`, `FactsPanel`, `RecoveryBanner`, `result/*` (Signs, Bones, Fortune, Die, Compass, TimeIcon). `ask.ts` turns a request into a journal entry. `useSessionStore.ts` ties the session to the file and the recovery copy. Styles are in `src/styles/oracle.css`, on the Torchlit tokens.
+- Saving: Chromium shows Save (picks a file the first time, then autosaves) and Save as. Other browsers show Open (a file input) and Download, and the status line shows when changes haven't been downloaded yet.
+- No browser dialogs: New with unsaved changes and journal deletes both use inline Discard/Keep and Delete/Keep confirmations.
+- Added `setEntryHour` to the reducer for "Roll exact hour".
+- Card and dice reveals use the blog's fade and ink animations plus a card turn and a dice tumble. All of them stop under reduced motion.
+- `tsconfig.node.json` now includes the DOM lib for Playwright tests. Added `@testing-library/user-event`.
+- Tests: 86 unit/component tests. 5 e2e tests (load; Signs, hour and journal; Bones, likelihood, Fortune die and reselecting an entry; recovery after reload; axe with no violations), stable across 15 repeated runs.
 
 ---
 

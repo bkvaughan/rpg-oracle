@@ -1,0 +1,26 @@
+import type { JournalEntry } from '../../state/session.ts'
+import BonesResult from './BonesResult.tsx'
+import FortuneResult from './FortuneResult.tsx'
+import SignsResult from './SignsResult.tsx'
+
+const TOOL_NAME = { signs: 'Read the Signs', bones: 'Consult the Bones', fortune: 'Fortune die' }
+
+interface Props {
+  entry: JournalEntry
+  onRollHour: () => void
+}
+
+export default function ResultView({ entry, onRollHour }: Props) {
+  const { result } = entry
+  return (
+    <article className="panel result" aria-labelledby={`result-${entry.id}`}>
+      <p className="eyebrow">{TOOL_NAME[result.tool]}</p>
+      <h2 id={`result-${entry.id}`} className="result-question">
+        {entry.question || <span className="secondary">No question asked</span>}
+      </h2>
+      {result.tool === 'signs' && <SignsResult result={result} onRollHour={onRollHour} />}
+      {result.tool === 'bones' && <BonesResult result={result} />}
+      {result.tool === 'fortune' && <FortuneResult face={result.face} />}
+    </article>
+  )
+}

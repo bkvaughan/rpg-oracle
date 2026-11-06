@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { bonesEntry, reading, sampleSession, T0, T1 } from './fixtures.ts'
+import { bonesEntry, reading, sampleSession, signsEntry, T0, T1 } from './fixtures.ts'
 import { sessionReducer } from './reducer.ts'
 import { newSession } from './session.ts'
 
@@ -33,6 +33,17 @@ describe('sessionReducer', () => {
     ])
     s = sessionReducer(s, { type: 'deleteEntry', entryId: 'e1', at: T1 })
     expect(s.journal.map((e) => e.id)).toEqual(['e2'])
+  })
+
+  test('setEntryHour records the exact hour on a Signs entry only', () => {
+    let s = newSession(T0, 'x')
+    s = sessionReducer(s, { type: 'addEntry', entry: signsEntry('s1'), at: T1 })
+    s = sessionReducer(s, { type: 'addEntry', entry: bonesEntry('b1'), at: T1 })
+    const hour = { roll: 3, hour: 3, label: '3am' }
+    s = sessionReducer(s, { type: 'setEntryHour', entryId: 's1', hour, at: T1 })
+    s = sessionReducer(s, { type: 'setEntryHour', entryId: 'b1', hour, at: T1 })
+    expect(s.journal[0].result).toMatchObject({ tool: 'signs', hour })
+    expect(s.journal[1].result).toEqual(bonesEntry('b1').result)
   })
 
   test('facts are added, edited, and removed', () => {

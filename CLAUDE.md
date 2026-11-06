@@ -43,8 +43,8 @@ rpg-oracle/
     engine/           rng, signs, bones
     state/            Session type, reducer, file store (disk), recovery (IndexedDB), prompt context
     ai/               schema (reading contract), settings, prompt, client
-    styles/           global.css: design tokens, atmosphere, panels (ported from personal-blog)
-    ui/               React components; atmosphere.ts (decorative background effects)
+    styles/           global.css (ported from personal-blog: tokens, atmosphere, panels); oracle.css (forms, results, dice, journal)
+    ui/               App and panels; result/ (Signs, Bones, Fortune, dice, compass); useSessionStore (file + recovery wiring); ask.ts; atmosphere.ts (decorative)
   tests/e2e/          Playwright tests
 ```
 
@@ -77,6 +77,7 @@ The look follows Brandon's blog, Torchlit Chronicles (`../personal-blog`), adopt
 - Fonts (self-hosted via @fontsource): Pirata One for display (`.display`), IM Fell English SC for labels (`.label`, `.eyebrow`), Alegreya for body
 - Decoration lives in the background layers (`.atmo-*` in `index.html`, outside React, started by `startAtmosphere()` in `main.tsx`). Readable content always sits on a solid `.panel` with bracket corners
 - All motion stops under `prefers-reduced-motion`
+- No browser dialogs (`alert`/`confirm`): destructive actions use inline confirm buttons
 - Oracle-specific: the parchment card art sits on dark panels; the Hammer of Judgment uses `--blood` red; result reveals use the existing `fade-up` / `ink-in` animations
 - No Tales of Argosa logo or trade dress
 

@@ -6,6 +6,7 @@ import '@fontsource/alegreya/400.css'
 import '@fontsource/alegreya/400-italic.css'
 import '@fontsource/alegreya/700.css'
 import './styles/global.css'
+import './styles/oracle.css'
 import { startAtmosphere } from './ui/atmosphere.ts'
 import App from './ui/App.tsx'
 
