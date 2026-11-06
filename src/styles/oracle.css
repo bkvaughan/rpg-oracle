@@ -667,15 +667,18 @@ select {
   height: 80%;
   fill: #1c1b1d;
 }
-.reaction-activity {
+.reaction-part + .reaction-part {
   margin-top: 1.25rem;
-  padding-top: 1rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--line);
 }
 .reaction-result h3 {
   font-weight: 400;
-  margin: 0 0 0.25rem;
+  margin: 0;
 }
-.reaction-activity .activity-status {
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
+.pips-activity {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--mist) 80%, #6f8f8a), var(--mist) 60%, #1b2d2d);
+}
+.pips-activity svg {
+  fill: #ece6d8;
 }

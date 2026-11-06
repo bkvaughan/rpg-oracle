@@ -9,9 +9,9 @@ const TOOLS: { id: Tool; name: string; hint: string; action: string }[] = [
   { id: 'fortune', name: 'Fortune die', hint: 'A twist alone, or Lone Wolf hits', action: 'Roll the Fortune die' },
   {
     id: 'reaction',
-    name: 'Reaction & Activity',
-    hint: "A creature you meet: how it reacts and what it's doing",
-    action: 'Roll Reaction & Activity',
+    name: 'Activity & Reaction',
+    hint: "A creature you meet: what it's doing and how it reacts",
+    action: 'Roll Activity & Reaction',
   },
 ]
 

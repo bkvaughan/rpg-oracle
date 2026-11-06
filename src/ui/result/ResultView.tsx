@@ -7,7 +7,7 @@ import ReactionResult from './ReactionResult.tsx'
 import Interpretation from './Interpretation.tsx'
 import SignsResult from './SignsResult.tsx'
 
-const TOOL_NAME = { signs: 'Read the Signs', bones: 'Consult the Bones', fortune: 'Fortune die', activity: 'Activity Die', reaction: 'Reaction & Activity' }
+const TOOL_NAME = { signs: 'Read the Signs', bones: 'Consult the Bones', fortune: 'Fortune die', activity: 'Activity Die', reaction: 'Activity & Reaction' }
 
 interface Props {
   entry: JournalEntry

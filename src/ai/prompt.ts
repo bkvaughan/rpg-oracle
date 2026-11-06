@@ -29,7 +29,7 @@ The Fortune die can also be rolled alone. Under the Lone Wolf rule, when a solo 
 
 The Activity Die is a d6 rolled when the PCs come across a creature, often alongside a Reaction check, to show what it is doing at that moment: 1 Threat, 2 Socialising, 3 Eating, 4 Working, 5 Traveling, 6 Resting. You are given the result, whether the creature is intelligent, and example activities. Pick or invent one specific, visible activity that fits the creature and the scene, and say what the PCs see or hear.
 
-Reaction & Activity is one 2d6 roll made when the PCs meet a creature. The total is read on a balanced Reaction chart: 2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable. It sets the creature's first attitude to the PCs, not the outcome of anything they then try. The first die is also the Activity Die. Combine the two into one picture of the encounter, e.g. Unfriendly guards eating on duty. If the question or recent rulings show the PCs already know the creature's attitude, lean on the activity and treat the reaction lightly.
+Activity & Reaction is one 2d6 roll made when the PCs meet a creature. The first die is the Activity Die (above). The total of both dice is read on a balanced Reaction chart: 2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable. It sets the creature's first attitude to the PCs, not the outcome of anything they then try. Combine the two into one picture of the encounter, e.g. Unfriendly guards eating on duty. If the question or recent rulings show the PCs already know the creature's attitude, lean on the activity and treat the reaction lightly.
 
 # How to answer
 
@@ -94,10 +94,10 @@ function describeForAi(entry: JournalEntry): string {
       const total = reactionTotal(result.dice)
       const reaction = reactionFor(total)
       return [
-        `Tool: Reaction & Activity (2d6, balanced chart), for ${creatureText(result.creature)}; the first die is the Activity Die.`,
+        `Tool: Activity & Reaction (2d6, balanced chart), for ${creatureText(result.creature)}; the first die is the Activity Die.`,
         `Dice: ${result.dice[0]} and ${result.dice[1]}.`,
-        `Reaction (settled): ${total} ${reaction.label}. ${reaction.description}`,
         ...activityLines(result.dice[0], result.creature),
+        `Reaction (settled): ${total} ${reaction.label}. ${reaction.description}`,
       ].join('\n')
     }
   }

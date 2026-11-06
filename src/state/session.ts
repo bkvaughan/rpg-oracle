@@ -40,7 +40,7 @@ export const fortuneResultSchema = z.object({
   face: fortuneFace,
 })
 
-// A standalone Activity Die roll. No longer offered (Reaction & Activity replaced it), but
+// A standalone Activity Die roll. No longer offered (Activity & Reaction replaced it), but
 // kept so sessions saved with one still load and display.
 export const activityResultSchema = z.object({
   tool: z.literal('activity'),
@@ -50,7 +50,7 @@ export const activityResultSchema = z.object({
 
 const d6 = z.literal([1, 2, 3, 4, 5, 6])
 
-// Reaction & Activity (p.66): 2d6 for Reaction, with the first die read as the Activity
+// Activity & Reaction (p.66): 2d6 for Reaction, with the first die read as the Activity
 // Die, as in the book's gate-guard example. The Activity roll is dice[0], not stored twice.
 export const reactionResultSchema = z.object({
   tool: z.literal('reaction'),

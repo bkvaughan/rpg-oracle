@@ -27,9 +27,9 @@ describe('describeResult', () => {
     expect(describeResult({ tool: 'activity', roll: 5, creature: 'intelligent' })).toBe('Activity Die (intelligent creature): 5 Traveling')
   })
 
-  test('Reaction & Activity reads the total and the first die', () => {
+  test('Activity & Reaction reads the total and the first die', () => {
     expect(describeResult({ tool: 'reaction', dice: [3, 2], creature: 'intelligent' })).toBe(
-      'Reaction & Activity (intelligent creature): 5 Unfriendly; 3 Eating',
+      'Activity & Reaction (intelligent creature): 3 Eating; 5 Unfriendly',
     )
   })
 

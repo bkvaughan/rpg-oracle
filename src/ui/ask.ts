@@ -10,7 +10,7 @@ export type Tool = 'signs' | 'bones' | 'fortune' | 'reaction'
 export interface AskRequest {
   tool: Tool
   likelihood: Likelihood
-  /** Reaction & Activity only: which column of the Activity table applies. */
+  /** Activity & Reaction only: which column of the Activity table applies. */
   creature: Creature
   question: string
 }

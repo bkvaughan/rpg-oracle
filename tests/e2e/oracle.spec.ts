@@ -54,16 +54,16 @@ test('Consult the Bones with a likelihood, then reselect an older entry', async 
   await expect(page.getByRole('article').getByRole('heading', { name: 'Is the dead lord stirring?' })).toBeVisible()
 })
 
-test('Reaction & Activity for an encountered creature', async ({ page }) => {
+test('Activity & Reaction for an encountered creature', async ({ page }) => {
   await page.goto('/')
-  await page.locator('label.choice', { hasText: 'Reaction & Activity' }).click()
+  await page.locator('label.choice', { hasText: 'Activity & Reaction' }).click()
   await page.getByLabel('Your question').fill('The guards at the gate')
-  await page.getByRole('button', { name: 'Roll Reaction & Activity' }).click()
+  await page.getByRole('button', { name: 'Roll Activity & Reaction' }).click()
   const result = page.getByRole('article')
   await expect(result.locator('.reaction-status')).toHaveText(/^\d+ (Hostile|Unfriendly|Neutral|Fairly friendly|Affable)$/)
   await expect(result.getByRole('img', { name: /^Activity Die: [1-6], (Threat|Socialising|Eating|Working|Traveling|Resting)$/ })).toBeVisible()
   await expect(result.getByRole('img', { name: /^d6: [1-6]$/ })).toBeVisible()
-  await expect(page.getByRole('region', { name: 'Journal' }).getByText(/Reaction & Activity \(intelligent creature\)/)).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Journal' }).getByText(/Activity & Reaction \(intelligent creature\)/)).toBeVisible()
 })
 
 test('unsaved work survives a reload through the recovery copy', async ({ page }) => {

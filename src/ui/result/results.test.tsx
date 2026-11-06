@@ -82,7 +82,10 @@ describe('ReactionResult', () => {
     expect(screen.getByRole('img', { name: 'Activity Die: 3, Eating' })).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'd6: 2' })).toBeInTheDocument()
     expect(document.querySelector('.reaction-status')).toHaveTextContent('5 Unfriendly')
-    expect(screen.getByText('Activity (the 3 on the Activity Die)')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Activity Die as a d6: 3' })).toBeInTheDocument()
+    // Activity comes first, Reaction underneath.
+    const parts = screen.getAllByRole('region').map((r) => r.getAttribute('aria-label'))
+    expect(parts).toEqual(['Activity', 'Reaction'])
     expect(screen.getByText(/^Eating, cooking or preparing food/)).toBeInTheDocument()
   })
 })

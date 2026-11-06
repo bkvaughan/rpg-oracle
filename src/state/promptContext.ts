@@ -35,7 +35,7 @@ export function describeResult(result: OracleResult): string {
     case 'reaction': {
       const total = reactionTotal(result.dice)
       const roll = result.dice[0]
-      return `Reaction & Activity (${CREATURE_TEXT[result.creature].toLowerCase()}): ${total} ${reactionFor(total).label}; ${roll} ${activityFor(roll).status}`
+      return `Activity & Reaction (${CREATURE_TEXT[result.creature].toLowerCase()}): ${roll} ${activityFor(roll).status}; ${total} ${reactionFor(total).label}`
     }
   }
 }

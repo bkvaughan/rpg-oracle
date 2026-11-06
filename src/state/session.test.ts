@@ -26,7 +26,7 @@ describe('session model', () => {
     expect(sessionSchema.safeParse({ ...s, journal: [{ ...entry, result: { ...entry.result, roll: 7 } }] }).success).toBe(false)
   })
 
-  test('a Reaction & Activity entry is valid; impossible dice are not', () => {
+  test('a Activity & Reaction entry is valid; impossible dice are not', () => {
     const s = sampleSession()
     const entry = { id: 'r', at: s.createdAt, question: '', reading: null, result: { tool: 'reaction', dice: [3, 2], creature: 'intelligent' } }
     expect(sessionSchema.safeParse({ ...s, journal: [entry] }).success).toBe(true)

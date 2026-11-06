@@ -14,7 +14,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 7: done and approved, committed and pushed
 - Part 8: done; live at https://bkvaughan.github.io/rpg-oracle/ (deploy run for `5eb4187` succeeded 2026-11-05; smoke-tested: page, CSP, card and dice art, fonts, no console errors). Remaining: Brandon's live checks (Chrome autosave, Safari download fallback, a real Interpret)
 - Part 9 (Activity Die, plus all dice faces from the official templates): done, approved, committed and pushed
-- Part 10 (Reaction & Activity): done, approved, committed and pushed
+- Part 10 (Activity & Reaction): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -180,7 +180,7 @@ Notes:
 
 ---
 
-## Part 10: Reaction & Activity
+## Part 10: Activity & Reaction
 
 Brandon asked for the Reaction table (Tales of Argosa p.66), then decided to roll it together with the Activity Die as one oracle, as the book does. When the PCs meet a creature the GM rolls 2d6 for its reaction on a balanced chart (2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable); the book's gate-guard example (p.67) reads the leftmost die as the Activity Die.
 
@@ -193,7 +193,7 @@ Brandon asked for the Reaction table (Tales of Argosa p.66), then decided to rol
 - [x] Journal line and AI prompt
 - [x] Tests across data, engine, schema, ask, describeResult, prompt, components, e2e and axe
 
-Notes: removed `src/engine/activity.ts` (the standalone roll is no longer offered). 131 unit/component tests; e2e and axe pass across 3 repeated runs.
+Notes: removed `src/engine/activity.ts` (the standalone roll is no longer offered). Follow-up (Brandon): renamed to **Activity & Reaction**, Activity section first with its die, then Reaction with both dice as numbered pip dice (the first in teal, as it is the Activity Die). The journal line and the AI prompt list the activity first. 131 unit/component tests; e2e and axe pass across 3 repeated runs.
 
 Not included: each monster's own Reac ranges from its stat block. Those vary per creature and the balanced chart is the book's general fallback; the 2d6 total is shown so it can be read against them.
 

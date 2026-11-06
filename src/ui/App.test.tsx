@@ -31,16 +31,16 @@ test('the ask button waits for a question, except for the Fortune die', async ()
   expect(screen.getByRole('button', { name: 'Roll the Fortune die' })).toBeEnabled()
 })
 
-test('Reaction & Activity needs no question and records the reaction, activity and creature', async () => {
+test('Activity & Reaction needs no question and records the reaction, activity and creature', async () => {
   const user = userEvent.setup()
   render(<App />)
-  await user.click(screen.getByLabelText(/Reaction & Activity/))
+  await user.click(screen.getByLabelText(/Activity & Reaction/))
   await user.click(screen.getByLabelText('Other creature'))
-  await user.click(screen.getByRole('button', { name: 'Roll Reaction & Activity' }))
+  await user.click(screen.getByRole('button', { name: 'Roll Activity & Reaction' }))
   expect(screen.getByRole('img', { name: /^Activity Die: \d, / })).toBeInTheDocument()
   expect(screen.getByRole('img', { name: /^d6: \d$/ })).toBeInTheDocument()
   const journal = screen.getByRole('region', { name: 'Journal' })
-  expect(within(journal).getByText(/^Reaction & Activity \(other creature\): \d+ [A-Za-z ]+; \d \w+$/)).toBeInTheDocument()
+  expect(within(journal).getByText(/^Activity & Reaction \(other creature\): \d \w+; \d+ [A-Za-z ]+$/)).toBeInTheDocument()
 })
 
 test('facts can be pinned and removed', async () => {
