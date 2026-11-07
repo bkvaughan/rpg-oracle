@@ -21,7 +21,7 @@ export default function AiSettingsPanel({ settings, onSave, onForget }: Props) {
   }
 
   return (
-    <details className="panel ai-settings" open={!settings.apiKey || undefined}>
+    <details className="ai-settings" open={!settings.apiKey || undefined}>
       <summary className="label">AI settings {settings.apiKey ? '· key saved' : '· no key yet'}</summary>
       <form onSubmit={submit} className="ai-form">
         <p className="secondary">

@@ -32,14 +32,13 @@ interface Props {
   entry: JournalEntry
   onRollHour: () => void
   onSaveNote: (note: string) => void
-  onChooseReading: (useAlternate: boolean) => void
   hasKey: boolean
   onInterpret: (signal: AbortSignal) => Promise<void>
   onPinFact: (text: string) => void
   onFollowUp: (followUp: FollowUp) => void
 }
 
-export default function ResultView({ entry, onRollHour, onSaveNote, onChooseReading, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
+export default function ResultView({ entry, onRollHour, onSaveNote, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
   const { result } = entry
   return (
     <article className="panel result" aria-labelledby={`result-${entry.id}`}>
@@ -54,8 +53,6 @@ export default function ResultView({ entry, onRollHour, onSaveNote, onChooseRead
       {result.tool === 'reaction' && <ReactionResult result={result} />}
       <Interpretation
         reading={entry.reading}
-        useAlternate={entry.useAlternate}
-        onChooseReading={onChooseReading}
         hasKey={hasKey}
         onInterpret={onInterpret}
         onPinFact={onPinFact}

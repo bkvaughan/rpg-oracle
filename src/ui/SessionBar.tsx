@@ -35,20 +35,11 @@ export default function SessionBar({ store }: { store: SessionStore }) {
   const clicked = (action: 'new' | 'open') => (wouldDiscard ? setConfirming(action) : run(action))
 
   return (
-    <section className="panel session-bar" aria-label="Session">
-      <div className="session-head">
-        <label className="field session-name">
-          <span className="label">Session</span>
-          <input
-            type="text"
-            value={session.name}
-            onChange={(e) => dispatch({ type: 'rename', name: e.target.value, at: now() })}
-          />
-        </label>
-        <p className={`save-status status-${file.status}`} role="status">
-          {statusText(store)}
-        </p>
-      </div>
+    <section className="session-bar" aria-label="Session">
+      <label className="session-name">
+        <span className="label">Session</span>
+        <input type="text" value={session.name} onChange={(e) => dispatch({ type: 'rename', name: e.target.value, at: now() })} />
+      </label>
 
       <div className="session-actions">
         {confirming ? (
@@ -98,6 +89,9 @@ export default function SessionBar({ store }: { store: SessionStore }) {
           }}
         />
       </div>
+      <p className={`save-status status-${file.status}`} role="status">
+        {statusText(store)}
+      </p>
 
     </section>
   )

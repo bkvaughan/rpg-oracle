@@ -101,6 +101,41 @@ describe('FortuneResult', () => {
 })
 
 describe('Interpretation', () => {
+  test('Escape cancels a running request, quietly', async () => {
+    const user = userEvent.setup()
+    const { AiError } = await import('../../ai/errors.ts')
+    const onInterpret = (signal: AbortSignal) =>
+      new Promise<void>((_, reject) => signal.addEventListener('abort', () => reject(new AiError('cancelled', 'Cancelled.'))))
+    render(
+      <Interpretation reading={null} hasKey onInterpret={onInterpret} onPinFact={() => {}} onFollowUp={() => {}} />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Interpret' }))
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveAttribute('aria-keyshortcuts', 'Escape')
+    await user.keyboard('{Escape}')
+    expect(await screen.findByRole('button', { name: 'Interpret' })).toBeEnabled()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  test('re-interpreting keeps the old reading visible but dimmed, with a way to cancel', async () => {
+    const user = userEvent.setup()
+    const reading = { ruling: 'A sentry.', why: 'Yes.', follow_ups: [], new_facts: [] }
+    const { container } = render(
+      <Interpretation
+        reading={reading}
+        hasKey
+        onInterpret={() => new Promise<void>(() => {})}
+        onPinFact={() => {}}
+        onFollowUp={() => {}}
+      />,
+    )
+    expect(container.querySelector('.reading-stale')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Interpret again' }))
+    expect(screen.getByRole('status')).toHaveTextContent('The oracle considers')
+    expect(container.querySelector('.interpretation')).toHaveAttribute('aria-busy', 'true')
+    expect(container.querySelector('.reading-stale')).toHaveTextContent('A sentry.')
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+  })
+
   test('closing the result cancels a running request', async () => {
     const user = userEvent.setup()
     let signal: AbortSignal | undefined
@@ -109,7 +144,7 @@ describe('Interpretation', () => {
       return new Promise<void>(() => {})
     })
     const { unmount } = render(
-      <Interpretation reading={null} useAlternate={false} onChooseReading={() => {}} hasKey onInterpret={onInterpret} onPinFact={() => {}} onFollowUp={() => {}} />,
+      <Interpretation reading={null} hasKey onInterpret={onInterpret} onPinFact={() => {}} onFollowUp={() => {}} />,
     )
     await user.click(screen.getByRole('button', { name: 'Interpret' }))
     expect(signal?.aborted).toBe(false)
@@ -119,35 +154,13 @@ describe('Interpretation', () => {
 })
 
 describe('ReadingView', () => {
-  const reading = {
-    ruling: 'A sentry, but she is distracted.',
-    why: 'Single Yes with Fortune.',
-    alternate: 'No sentry; a scarecrow in a helm.',
-    time: null,
-    direction: null,
-    follow_ups: [],
-    new_facts: [],
-  }
-  const view = (useAlternate: boolean, onChooseReading = vi.fn()) => (
-    <ReadingView reading={reading} useAlternate={useAlternate} onChooseReading={onChooseReading} onPinFact={() => {}} onFollowUp={() => {}} />
-  )
-
-  test('the alternate can be adopted, and then becomes the main reading', async () => {
-    const onChooseReading = vi.fn()
-    const { container, rerender } = render(view(false, onChooseReading))
+  test('shows the ruling and why, with no alternate, time or direction', () => {
+    const reading = { ruling: 'A sentry, but she is distracted.', why: 'Single Yes with Fortune.', follow_ups: [], new_facts: [] }
+    const { container } = render(<ReadingView reading={reading} onPinFact={() => {}} onFollowUp={() => {}} />)
     expect(container.querySelector('.reading-ruling')).toHaveTextContent(reading.ruling)
-    await userEvent.click(screen.getByRole('button', { name: 'Use this reading' }))
-    expect(onChooseReading).toHaveBeenCalledWith(true)
-
-    rerender(view(true, onChooseReading))
-    expect(container.querySelector('.reading-ruling')).toHaveTextContent(reading.alternate)
-    await userEvent.click(screen.getByRole('button', { name: 'Use the first reading' }))
-    expect(onChooseReading).toHaveBeenLastCalledWith(false)
-  })
-
-  test('no choice is offered without an alternate', () => {
-    render(<ReadingView reading={{ ...reading, alternate: null }} useAlternate={false} onChooseReading={() => {}} onPinFact={() => {}} onFollowUp={() => {}} />)
-    expect(screen.queryByRole('button', { name: 'Use this reading' })).not.toBeInTheDocument()
+    expect(screen.getByText(reading.why)).toBeInTheDocument()
+    for (const label of ['Or', 'When', 'Where']) expect(screen.queryByText(label)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Use this reading/ })).not.toBeInTheDocument()
   })
 })
 
@@ -162,14 +175,12 @@ describe('ResultView note', () => {
       result: { tool: 'fortune' as const, face: 'Fortune' as const },
       reading: null,
       note: '',
-      useAlternate: false,
     }
     render(
       <ResultView
         entry={entry}
         onRollHour={() => {}}
         onSaveNote={onSaveNote}
-        onChooseReading={() => {}}
         hasKey={false}
         onInterpret={async () => {}}
         onPinFact={() => {}}

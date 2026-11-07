@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { describeResult } from '../state/promptContext.ts'
 import type { JournalEntry } from '../state/session.ts'
 
-// Every question asked this session, newest first. Selecting one shows it in full above.
+// Every question asked this session, newest first: the result, the ruling (if interpreted)
+// and the player's note. Selecting one shows it in full above.
 
 interface Props {
   entries: JournalEntry[]
@@ -28,6 +29,7 @@ export default function Journal({ entries, selectedId, onSelect, onDelete }: Pro
               <button type="button" className="journal-entry" onClick={() => onSelect(e.id)} aria-current={e.id === selectedId}>
                 <span className="journal-question">{e.question || 'No question'}</span>
                 <span className="journal-result">{describeResult(e.result)}</span>
+                {e.reading && <span className="journal-ruling">{e.reading.ruling}</span>}
                 {e.note && <span className="journal-note">{e.note}</span>}
                 <time className="journal-time" dateTime={e.at}>
                   {new Date(e.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}

@@ -36,7 +36,9 @@ test('a reading is shown, facts are pinned on request, and follow-ups prefill th
   await castBones(user)
   await user.click(screen.getByRole('button', { name: 'Interpret' }))
 
-  expect(await screen.findByText(reading.ruling)).toBeInTheDocument()
+  expect(await screen.findByText(reading.ruling, { selector: '.reading-ruling' })).toBeInTheDocument()
+  // The journal shows the answer, so a session can be scanned without opening each entry.
+  expect(within(screen.getByRole('region', { name: 'Journal' })).getByText(reading.ruling)).toHaveClass('journal-ruling')
   expect(interpret.mock.calls[0][2]).toMatchObject({ apiKey: 'sk-ant-test', model: 'claude-sonnet-5-5' })
 
   // Suggested facts are not pinned until accepted.
@@ -63,5 +65,17 @@ test('an API error is shown and the button comes back', async () => {
   await castBones(user)
   await user.click(screen.getByRole('button', { name: 'Interpret' }))
   expect(await screen.findByText('The API key was rejected. Check it in AI settings.')).toHaveAttribute('role', 'alert')
-  expect(screen.getByRole('button', { name: 'Interpret' })).toBeEnabled()
+  expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled()
+})
+
+test('Forget key clears the key from this browser and disables Interpret', async () => {
+  localStorage.setItem('rpg-oracle-ai-settings', JSON.stringify({ apiKey: 'sk-ant-test', model: 'claude-opus-5-5' }))
+  const user = userEvent.setup()
+  render(<App />)
+  await castBones(user)
+  await user.click(screen.getByText(/^AI settings/))
+  await user.click(screen.getByRole('button', { name: 'Forget key' }))
+  expect(screen.getByText(/^AI settings/)).toHaveTextContent('no key yet')
+  expect(screen.getByRole('button', { name: 'Interpret' })).toBeDisabled()
+  expect(JSON.parse(localStorage.getItem('rpg-oracle-ai-settings') ?? '{"apiKey":""}').apiKey).toBe('')
 })

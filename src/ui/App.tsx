@@ -1,13 +1,15 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FollowUp } from '../ai/schema.ts'
 import { forgetSettings, loadSettings, saveSettings, type AiSettings } from '../ai/settings.ts'
 import { secureRng } from '../engine/rng.ts'
 import { rollHour } from '../engine/signs.ts'
 import { CARDS } from '../data/deck.ts'
 import { ask, type AskRequest } from './ask.ts'
+import { isTypingTarget } from './keys.ts'
 import AiSettingsPanel from './AiSettingsPanel.tsx'
 import AskPanel from './AskPanel.tsx'
 import FactsPanel from './FactsPanel.tsx'
+import FirstSteps from './FirstSteps.tsx'
 import Journal from './Journal.tsx'
 import RecoveryBanner from './RecoveryBanner.tsx'
 import ResultView from './result/ResultView.tsx'
@@ -20,6 +22,12 @@ function scrollToTop(el: HTMLElement | null) {
   el?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
 }
 
+/** Brings the ask form into view and puts the cursor in the question. */
+function focusQuestion(ask: HTMLElement | null) {
+  scrollToTop(ask)
+  ask?.querySelector<HTMLInputElement>('input[type="text"]')?.focus({ preventScroll: true })
+}
+
 export default function App() {
   const store = useSessionStore()
   const { session, dispatch } = store
@@ -28,6 +36,17 @@ export default function App() {
   // A follow-up remounts the ask form with its question, tool and likelihood filled in.
   const [prefill, setPrefill] = useState<{ request: Partial<AskRequest>; n: number }>({ request: {}, n: 0 })
   const askRef = useRef<HTMLDivElement>(null)
+
+  // "/" jumps to the question from anywhere on the page, as on many search-first sites.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || isTypingTarget(e.target)) return
+      e.preventDefault()
+      focusQuestion(askRef.current)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
   const resultRef = useRef<HTMLDivElement>(null)
 
   const selected = session.journal.find((e) => e.id === selectedId) ?? session.journal.at(-1) ?? null
@@ -65,8 +84,7 @@ export default function App() {
 
   const onFollowUp = (f: FollowUp) => {
     setPrefill((p) => ({ request: { question: f.question, tool: f.tool, likelihood: f.likelihood ?? 'even' }, n: p.n + 1 }))
-    scrollToTop(askRef.current)
-    askRef.current?.querySelector('input')?.focus({ preventScroll: true })
+    focusQuestion(askRef.current)
   }
 
   return (
@@ -94,27 +112,30 @@ export default function App() {
         )}
 
         <div className="stack">
-          <SessionBar store={store} />
-          <AiSettingsPanel
+          {/* Session file and AI settings share one compact bar, so the ask form is near the top. */}
+          <div className="panel toolbar">
+            <SessionBar store={store} />
+            <AiSettingsPanel
             settings={aiSettings}
             onSave={(s) => {
               setAiSettings(s)
               return saveSettings(s)
             }}
             onForget={() => (forgetSettings(), setAiSettings(loadSettings()))}
-          />
+            />
+          </div>
           <div ref={askRef}>
             <AskPanel key={prefill.n} initial={prefill.request} onAsk={onAsk} />
           </div>
 
           <div aria-live="polite" ref={resultRef} className="result-anchor">
+            {!selected && <FirstSteps />}
             {selected && (
               <ResultView
                 key={selected.id}
                 entry={selected}
                 onRollHour={onRollHour}
                 onSaveNote={(note) => dispatch({ type: 'setEntryNote', entryId: selected.id, note, at: now() })}
-                onChooseReading={(useAlternate) => dispatch({ type: 'chooseReading', entryId: selected.id, useAlternate, at: now() })}
                 hasKey={aiSettings.apiKey !== ''}
                 onInterpret={onInterpret}
                 onPinFact={(text) => pinFact(text, 'ai')}

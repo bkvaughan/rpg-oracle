@@ -6,9 +6,6 @@ test.use({ reducedMotion: 'reduce' })
 const reading = {
   ruling: 'Applying Undead and Covetous, a dead lord hoards here.',
   why: 'The words point to a greedy corpse.',
-  alternate: 'A literal dragon skeleton.',
-  time: 'Late Night',
-  direction: 'SW: where the robbers fled',
   follow_ups: [{ question: 'Is there still gold in the barrow?', tool: 'bones', likelihood: 'likely-yes' }],
   new_facts: ['A dead lord hoards in the ruin'],
 }
@@ -53,7 +50,7 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
   await page.getByRole('button', { name: 'Draw two cards' }).click()
   await page.getByRole('button', { name: 'Interpret' }).click()
 
-  await expect(page.getByText(reading.ruling)).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Interpretation' }).getByText(reading.ruling)).toBeVisible()
   // SDK 1.x with API version 2026-10-21 sends the key as a bearer token.
   expect(key).toBe('Bearer sk-ant-e2e')
   expect(body).toMatchObject({ model: 'claude-opus-5-5', fallbacks: 'default', output_config: { effort: 'medium' } })
@@ -61,9 +58,21 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
 
   await page.getByRole('button', { name: /Is there still gold in the barrow\?/ }).click()
   await expect(page.getByLabel('Your question')).toHaveValue('Is there still gold in the barrow?')
+  // The journal shows the ruling for each interpreted entry.
+  await expect(page.getByRole('region', { name: 'Journal' })).toContainText(reading.ruling)
 
-  // The player adopts the alternate and notes what happened; the next request carries both.
-  await page.getByRole('button', { name: 'Use this reading' }).click()
+  // The reading shows no alternate, time or direction, and the structured output doesn't ask for them.
+  await expect(page.getByRole('button', { name: 'Use this reading' })).toHaveCount(0)
+  // `body` is set inside the route handler, so TypeScript can't see it isn't null here.
+  const sent = body as unknown as { output_config: { format: { schema: { properties: object } } } }
+  expect(Object.keys(sent.output_config.format.schema.properties)).toEqual([
+    'ruling',
+    'why',
+    'follow_ups',
+    'new_facts',
+  ])
+
+  // The player notes what happened; the next request carries the ruling and the note.
   await page.getByLabel('What happened').fill('Thuel found dragon bones in the crypt')
   await page.getByLabel('What happened').blur()
   await expect(page.getByRole('region', { name: 'Journal' })).toContainText('Thuel found dragon bones in the crypt')
@@ -72,7 +81,7 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
   await expect(page.getByLabel('What happened')).toHaveValue('')
   await expect.poll(() => posts).toBe(2)
   const history = JSON.stringify(body)
-  expect(history).toContain(`Ruling: ${reading.alternate}`)
+  expect(history).toContain(`Ruling: ${reading.ruling}`)
   expect(history).toContain('What happened: Thuel found dragon bones in the crypt')
   // The lazily loaded SDK chunk and the API call are both allowed by the policy.
   expect(problems).toEqual([])

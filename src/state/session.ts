@@ -67,7 +67,17 @@ export const oracleResultSchema = z.discriminatedUnion('tool', [
   reactionResultSchema,
 ])
 
-export const entrySchema = z.object({
+// Entries saved while readings offered an alternate (until 2026-11-06): if the player had
+// chosen it, it becomes the ruling, so their answer survives the field's removal.
+function adoptChosenAlternate(raw: unknown): unknown {
+  if (typeof raw !== 'object' || raw === null) return raw
+  const entry = raw as { useAlternate?: unknown; reading?: { alternate?: unknown } | null }
+  const alternate = entry.reading?.alternate
+  if (entry.useAlternate !== true || typeof alternate !== 'string') return raw
+  return { ...entry, reading: { ...entry.reading, ruling: alternate } }
+}
+
+export const entrySchema = z.preprocess(adoptChosenAlternate, z.object({
   id: z.string().min(1),
   at: z.iso.datetime(),
   question: z.string(),
@@ -76,9 +86,7 @@ export const entrySchema = z.object({
   // Added after v1 shipped; the defaults let older files load without a schema bump.
   /** What happened in play after this answer, in the player's words. */
   note: z.string().default(''),
-  /** The player adopted the reading's alternate instead of its ruling. */
-  useAlternate: z.boolean().default(false),
-})
+}))
 
 export const factSchema = z.object({
   id: z.string().min(1),

@@ -88,6 +88,7 @@ The look follows Brandon's blog, Torchlit Chronicles (`../personal-blog`), adopt
 - `npm run preview`: serve the production build on port 4173
 - `npm test`: unit and component tests (Vitest, jsdom; files `src/**/*.test.{ts,tsx}`)
   - One file: `npx vitest run src/engine/bones.test.ts`. One test by name: `npx vitest run -t "name"`. Watch: `npx vitest`
+- `npm run test:coverage`: the unit tests with v8 coverage of `src/` (report in the terminal)
 - `npm run test:e2e`: end-to-end tests (Playwright, Chromium only; builds and serves the production build itself). First run needs `npx playwright install chromium`
   - One file: `npx playwright test tests/e2e/smoke.spec.ts`. One test by name: `npx playwright test -g "name"`
 - `npm run lint`: oxlint (exits 0 on warnings; read its output)

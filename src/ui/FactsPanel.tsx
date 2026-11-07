@@ -42,7 +42,7 @@ export default function FactsPanel({ facts, onAdd, onEdit, onRemove }: Props) {
         ))}
       </ul>
       <form className="fact-add" onSubmit={add}>
-        <input aria-label="New fact" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="The barrow lord hunts at night" />
+        <input aria-label="New fact" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="e.g. The barrow lord hunts at night" />
         <button type="submit" className="btn btn-small" disabled={!draft.trim()}>
           Pin
         </button>

@@ -75,3 +75,39 @@ test('Open asks before discarding unsaved changes', async () => {
   await user.click(screen.getByRole('button', { name: 'Keep' }))
   expect(screen.getByLabelText('Fact 1')).toHaveValue('The barrow lord hunts at night')
 })
+
+test('the first visit explains the oracles, until the first question is asked', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  expect(screen.getByRole('region', { name: 'How to ask' })).toHaveTextContent(/Read the Signs.*p\.213/)
+  await user.click(screen.getByRole('radio', { name: /Fortune die/ }))
+  await user.click(screen.getByRole('button', { name: 'Roll the Fortune die' }))
+  expect(screen.queryByRole('region', { name: 'How to ask' })).not.toBeInTheDocument()
+})
+
+test('"/" jumps to the question, but types normally inside a text field', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  const question = screen.getByLabelText('Your question')
+  await user.click(screen.getByRole('radio', { name: /Consult the Bones/ }))
+  expect(question).not.toHaveFocus()
+  await user.keyboard('/')
+  expect(question).toHaveFocus()
+  expect(question).toHaveValue('')
+  await user.keyboard('a/b')
+  expect(question).toHaveValue('a/b')
+})
+
+test('rolling the exact hour and writing a note are kept on the entry and shown in the journal', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await user.type(screen.getByLabelText('Your question'), 'When does the lord rise?')
+  await user.click(screen.getByRole('button', { name: 'Draw two cards' }))
+  await user.click(screen.getByRole('button', { name: 'Roll exact hour' }))
+  expect(screen.getByText(/^Exact hour:/)).toHaveTextContent(/rolled [1-6] on 1d6/)
+  expect(within(screen.getByRole('region', { name: 'Journal' })).getByText(/; exact hour /)).toBeInTheDocument()
+
+  await user.type(screen.getByLabelText('What happened'), 'Thuel hid until dawn')
+  await user.tab()
+  expect(within(screen.getByRole('region', { name: 'Journal' })).getByText('Thuel hid until dawn')).toHaveClass('journal-note')
+})

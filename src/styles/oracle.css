@@ -44,6 +44,7 @@
 }
 
 input[type='text'],
+input[type='password'],
 input[type='number'],
 input:not([type]),
 textarea {
@@ -130,6 +131,15 @@ textarea::placeholder {
   padding: 0.25rem 0.55rem;
 }
 
+/* Touch screens: small buttons still get a finger-sized (44px) target. */
+@media (pointer: coarse) {
+  .btn-small,
+  .btn-quiet {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+}
+
 .confirm {
   display: inline-flex;
   flex-wrap: wrap;
@@ -138,15 +148,40 @@ textarea::placeholder {
 }
 
 /* ───────────── Session bar ───────────── */
-.session-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
+/* The top bar: session name, file actions and save status, then the AI settings disclosure. */
+.toolbar {
+  padding-block: 0.9rem;
+}
+.session-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem 1rem;
+}
+.session-bar .session-actions {
+  margin-top: 0;
 }
 .session-name {
-  flex: 1 1 16rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.session-name input {
+  padding-block: 0.35rem;
+}
+.session-bar .save-status {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+}
+.toolbar .ai-settings {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 40rem) {
+  .session-bar {
+    grid-template-columns: 1fr;
+  }
 }
 .save-status {
   margin: 0;
@@ -246,6 +281,25 @@ textarea::placeholder {
 }
 
 /* ───────────── Result ───────────── */
+.first-steps ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.first-steps p {
+  margin: 0;
+}
+kbd {
+  font-family: var(--font-label);
+  font-size: 0.9em;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 0.25rem;
+  color: var(--ink);
+}
+
 .result-anchor {
   /* Leaves a little air above the result when it is scrolled to the top. */
   scroll-margin-top: 1rem;
@@ -324,7 +378,16 @@ textarea::placeholder {
 }
 .sign-direction {
   display: grid;
-  justify-items: start;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 1rem;
+}
+/* The heading spans the row; the compass and its reading sit side by side beneath it. */
+.sign-direction h3 {
+  grid-column: 1 / -1;
+}
+.sign-direction p {
+  margin: 0;
 }
 
 /* Wide screens: time and direction sit beside the cards rather than below them. */
@@ -536,14 +599,20 @@ textarea::placeholder {
 /* One line per field; the selected entry is shown in full above. */
 .journal-question,
 .journal-result,
+.journal-ruling,
 .journal-note {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 .journal-result,
+.journal-ruling,
 .journal-note {
   grid-column: 1 / -1;
+}
+.journal-ruling {
+  font-size: 0.95rem;
+  color: var(--ink);
 }
 .journal-note {
   font-size: 0.92rem;
@@ -617,11 +686,29 @@ select {
 .ai-form > p {
   margin: 1rem 0 0;
 }
+/* Wide enough for the model names, which are long. */
+.ai-form .field-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
 
 .interpretation {
   margin-top: 1.75rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--line);
+}
+.interpretation-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.interpretation-bar ~ * {
+  margin-top: 1rem;
+}
+/* The previous reading stays visible but dimmed while a new one is on its way. */
+.reading-stale {
+  opacity: 0.45;
+  transition: opacity 0.3s;
 }
 .interpreting {
   font-style: italic;

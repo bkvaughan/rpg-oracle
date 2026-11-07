@@ -20,8 +20,11 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 12 (Activity & Reaction follow-ups): done, approved, committed and pushed (deploy for `a88a449` succeeded 2026-11-06)
 - Part 12 reverted (2026-11-06): Brandon tried Reaction follow-ups in play and they didn't feel right; committed and pushed (deploy for `833f76e` succeeded)
 - Part 13 (play notes, choosing the alternate, tighter layout): done, approved, committed and pushed (deploy for `1caf652` succeeded 2026-11-06)
-- Part 14 (remove the PC and location): done, approved, committed (not pushed).
-- Part 15 (interpret automatically): built and committed, then reverted at Brandon's request (2026-11-06: worse in use than it sounded). Interpret stays a button A "don't repeat recent cards" option was built and reverted before commit at Brandon's request
+- Part 14 (remove the PC and location): done, approved, committed and pushed. A "don't repeat recent cards" option was built and reverted before commit at Brandon's request
+- Part 15 (interpret automatically): built and committed, then reverted at Brandon's request (2026-11-06: worse in use than it sounded). Interpret stays a button
+- Signs time and direction beside the cards: committed and pushed with Parts 14-15 (deploy for `a99e6ba` succeeded 2026-11-06)
+- Part 16 (UI/UX pass, run as a 5-iteration loop): done, approved, committed and pushed
+- Part 17 (drop Or, When and Where from readings): done, approved, committed and pushed with Part 16
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -269,6 +272,52 @@ Brandon (2026-11-06): the site is just a source of answers. He tried a "don't re
 - [x] The AI prompt no longer has a Session section
 - [x] `ORACLE_SPEC.md` "What the AI receives" updated
 - [x] Tests: an old file with the fields loads without them; prompt, context, reducer and file tests updated
+
+---
+
+## Part 16: UI/UX pass
+
+Brandon asked (2026-11-06) for a significant UI/UX improvement, with thorough tests, run as a five-iteration loop. Scope follows his steer that the site stays a lean source of answers: layout, clarity and feedback, no new mechanics. Nothing is committed until he reviews it.
+
+Iteration 1
+- [x] Session and AI settings share one compact bar (one row on desktop), so the ask form starts about 230px higher
+- [x] The API key field gets the site's input style (password inputs were unstyled); model names are no longer cut off
+- [x] Interpretation controls sit above the reading; while re-interpreting, the old reading stays visible but dimmed, and the region is `aria-busy`
+- [x] Tests: component test for the re-interpret busy state; e2e and axe pass
+
+Iteration 2
+- [x] The journal shows each interpreted entry's answer (the chosen reading, one line), so a session can be scanned without opening entries
+- [x] The reading's When and Where share one row
+- [x] Coverage: `@vitest/coverage-v8` and `npm run test:coverage` (v8, `src/`, tests and fixtures excluded). Baseline 74% of lines
+- [x] Tests: `SessionBar.test.tsx` (every save status, rename, New/Open confirm with Keep and Discard, Save / Save as / Download, the fallback file picker), `Journal.test.tsx` (order, answer and note lines, selection, delete confirm), `FactsPanel.test.tsx` (blank fact removed on blur, remove button); e2e checks the journal shows the ruling and then the chosen alternate. SessionBar 48% -> 100% of lines; overall 77% (most of the rest is the decorative `atmosphere.ts`). 170 unit/component tests
+
+Iteration 3
+- [x] Keyboard: "/" jumps to the question from anywhere outside a text field (`src/ui/keys.ts`); Escape cancels a running interpretation (`aria-keyshortcuts` on Cancel)
+- [x] First visit: a short "How to ask" guide sits where the result goes until the first question, in our own words with page references, and mentions the "/" shortcut
+- [x] Tests: `keys.test.ts`; Escape cancel; App tests for the guide, "/", the exact hour and a note reaching the journal, choosing the alternate and its reset, Forget key; new e2e for the guide, "/" and Escape against a hanging API call. App.tsx 84% -> 98% of lines; overall 79%. 177 unit/component tests, 9 e2e
+
+Iteration 4
+- [x] Touch screens (`pointer: coarse`): small buttons get a 44px target (WCAG 2.5.5); before, the journal's delete was 30x29 and most small buttons 32px tall
+- [x] After a failed interpretation the button says "Try again"; the facts placeholder reads as an example ("e.g. ...")
+- [x] Tests: e2e on an emulated phone (touch, 390px) measures every visible button after a full reading; checked that it fails, listing eight buttons, without the new CSS. 10 e2e
+
+Iteration 5
+- [x] Review pass: a screenshot tour of a full session at desktop and phone widths
+- [x] Direction: the compass and its reading sit side by side, which shortens the phone layout
+- [x] All checks: 177 unit/component tests, 10 e2e (axe on every view at both widths, touch targets), typecheck, lint, build. Coverage 79% of lines (74% before Part 16); App.tsx 98%, SessionBar 100%
+
+Notes: uncommitted, for Brandon's review. Each iteration is a separable change if he wants to keep only some: the top bar, interpretation controls, journal answers, keyboard and first-visit guide, touch targets.
+
+---
+
+## Part 17: Drop Or, When and Where from readings
+
+Brandon (2026-11-06): remove the alternate, time and direction under the interpreted result. They are removed from the AI contract too, so responses are shorter; the cards already show time and direction.
+
+- [x] `readingSchema` loses `alternate`, `time` and `direction`; the system prompt drops those fields and its example, and the ruling ties in the primary card's time or direction when it matters
+- [x] "Use this reading" goes: `useAlternate`, `chooseReading` and `chosenRuling` are removed. Older files load; an alternate the player had chosen becomes that entry's ruling (`adoptChosenAlternate` in `session.ts`)
+- [x] `ORACLE_SPEC.md` reading contract and AI call updated
+- [x] Tests: old readings load with a chosen alternate kept as the ruling; ReadingView shows no Or/When/Where; the prompt asks for none of them; e2e checks the structured-output schema has only ruling, why, follow_ups and new_facts. `sessions/testing-responses.json` still loads
 
 ---
 

@@ -82,6 +82,13 @@ describe('buildUserPrompt', () => {
     expect(SYSTEM_PROMPT).toContain('2-3 Hostile, 4-5 Unfriendly, 6-8 Neutral, 9-10 Fairly friendly, 11-12 Affable')
   })
 
+  test('the system prompt asks for no alternate, time or direction fields, and has the ruling tie in time or direction', () => {
+    for (const field of ['- alternate:', '- time:', '- direction:', '\nalternate:', '\ntime:', '\ndirection:']) {
+      expect(SYSTEM_PROMPT).not.toContain(field)
+    }
+    expect(SYSTEM_PROMPT).toContain("tie in the primary card's time or direction when it matters")
+  })
+
   test('the system prompt explains the Activity Die', () => {
     expect(SYSTEM_PROMPT).toContain('1 Threat, 2 Socialising, 3 Eating, 4 Working, 5 Traveling, 6 Resting')
   })

@@ -414,15 +414,13 @@ The AI should be told the outcome as a fact ("Double No, Fortune"), with the raw
   - Deck: both cards with all four words, the time icon, the direction, and the card's one-line `art` description (in `deck_of_signs.json`).
   - Bones: the cast, any reroll, the final answer and magnitude, and the Fortune result.
 - **Session context**: a short journal of recent questions, answers, and established facts. The session no longer keeps the PC or location (decision, Brandon, 2026-11-06: the site is a source of answers, not a character sheet); older files that have them still load, and the fields are dropped. Cap this (for example, the last 20 entries plus a pinned "facts" list) so prompts stay small.
-- **Play notes and the chosen reading** (decision, Brandon, 2026-11-06). Each entry can carry the player's note on what happened in play. Notes are sent with the recent entries, and with the entry being interpreted, and the AI treats them as established. If the player adopted a reading's alternate, later prompts receive the alternate as that entry's ruling.
+- **Play notes** (decision, Brandon, 2026-11-06). Each entry can carry the player's note on what happened in play. Notes are sent with the recent entries, and with the entry being interpreted, and the AI treats them as established.
 - Optionally, the relevant **book procedure** that triggered the question (e.g. "Exploring a hex → Small Ruin → Read the Signs").
 
 ### What the AI returns (both tools)
-1. **The ruling.** One or two sentences in the book's voice that commit to a concrete, playable answer. For the deck, name the words used ("Applying Undead, Covetous, Gilded…").
+1. **The ruling.** One or two sentences in the book's voice that commit to a concrete, playable answer. For the deck, name the words used ("Applying Undead, Covetous, Gilded…"), and tie in the primary card's time or direction when it matters.
 2. **Why.** Briefly, how the words or dice support it. For the Bones, explain what Double or Triple changes and what the Fortune or Misfortune twist is.
-3. **An alternate reading.** One different take the player can choose instead (deck mainly; optional for the Bones).
-4. **Time and direction** when relevant (deck), tied to the fiction.
-5. **Follow-ups.** One to three questions to ask next, each tagged with a suggested tool and likelihood (e.g. "Bones, likely yes"). Follow-ups suggest only the Signs or the Bones: Activity & Reaction and the Fortune die are never suggested (decision, Brandon, 2026-11-06, after trying Reaction follow-ups in play).
+3. **Follow-ups.** One to three questions to ask next, each tagged with a suggested tool and likelihood (e.g. "Bones, likely yes"). Follow-ups suggest only the Signs or the Bones: Activity & Reaction and the Fortune die are never suggested (decision, Brandon, 2026-11-06, after trying Reaction follow-ups in play).
 
 Return this as structured JSON so the site can lay it out and log it, and keep each section short. A good shape:
 
@@ -430,9 +428,6 @@ Return this as structured JSON so the site can lay it out and log it, and keep e
 {
   "ruling": "…",
   "why": "…",
-  "alternate": "…",
-  "time": "Late Night (Midnight–6am)",
-  "direction": "SW: the trail of the fleeing grave robbers",
   "follow_ups": [
     {"question": "Is there still gold in the barrow?", "tool": "bones", "likelihood": "likely-yes"}
   ],
@@ -440,13 +435,15 @@ Return this as structured JSON so the site can lay it out and log it, and keep e
 }
 ```
 
+The reading used to also carry an alternate reading (which the player could adopt), and separate time and direction fields. Brandon dropped all three (2026-11-06) to keep the reading to the answer; the cards already show their time and direction. Session files saved with them still load: the fields are dropped, and an alternate the player had chosen becomes that entry's ruling.
+
 `new_facts` are shown as suggestions; the player accepts, edits, or discards each one before it is pinned.
 
 ### The AI call
 - **Access.** Bring-your-own-key: the player's Anthropic API key is stored only in their browser and used for direct calls from the page. The static site never holds a key. All network access lives in one module (`src/ai/client.ts`) so a server proxy can replace it later.
 - **Models.** Player-selectable: Claude Opus 5.5 (`claude-opus-5-5`, default: richest readings), Claude Sonnet 5.5 (`claude-sonnet-5-5`, faster and cheaper), Claude Haiku 5.5 (`claude-haiku-5-5`, fastest and cheapest). Thinking is adaptive by default on all three; requests set `output_config.effort: "medium"`, since a reading is a short creative judgement.
 - **Refusals.** Opus and Sonnet requests opt into server-side fallbacks (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`), so a declined request is re-run on Anthropic's recommended fallback model. Haiku 5.5 has no server-side fallback. A final `stop_reason: "refusal"` is shown as a plain message.
-- **Structured output.** The reading schema above is defined once in zod (`src/ai/schema.ts`) and sent as the request's structured-output format (`betaZodOutputFormat`). `alternate`, `time`, `direction` and a follow-up's `likelihood` are nullable. Session files saved while Reaction follow-ups existed (2026-11-06) still load, with those follow-ups dropped. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
+- **Structured output.** The reading schema above is defined once in zod (`src/ai/schema.ts`) and sent as the request's structured-output format (`betaZodOutputFormat`). A follow-up's `likelihood` is nullable. Session files saved while Reaction follow-ups existed (2026-11-06) still load, with those follow-ups dropped. The response is validated again on receipt; an invalid shape is an error, never shown half-parsed.
 - **Prompt caching.** The system prompt (interpretation guidelines, a worked example in our own words, and the 50-card list with art descriptions) is static, so it is sent as a cached block. Only the question, result and session context change per call, in the user message.
 - **Loading.** The SDK is most of the JavaScript, so `src/ai/client.ts` is loaded with `import()` the first time the player clicks Interpret.
 - **Errors.** Mapped to plain messages: no key, key rejected, rate limited, model refused, invalid response, network, cancelled.

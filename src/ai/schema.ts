@@ -13,9 +13,6 @@ export const followUpSchema = z.object({
 export const readingSchema = z.object({
   ruling: z.string(),
   why: z.string(),
-  alternate: z.string().nullable(),
-  time: z.string().nullable(),
-  direction: z.string().nullable(),
   follow_ups: z.array(followUpSchema),
   new_facts: z.array(z.string()),
 })

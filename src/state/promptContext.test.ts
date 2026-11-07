@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import { bonesEntry, reading, sampleSession } from './fixtures.ts'
-import { chosenRuling, describeResult, promptContext, RECENT_LIMIT } from './promptContext.ts'
+import { bonesEntry, sampleSession } from './fixtures.ts'
+import { describeResult, promptContext, RECENT_LIMIT } from './promptContext.ts'
 
 describe('describeResult', () => {
   test('Read the Signs lists both cards with time and direction', () => {
@@ -50,15 +50,6 @@ describe('promptContext', () => {
     const session = sampleSession()
     session.journal[0] = { ...session.journal[0], note: 'Thuel climbed the wall' }
     expect(promptContext(session).recent.map((r) => r.note)).toEqual(['Thuel climbed the wall', ''])
-  })
-
-  test('sends the alternate as the ruling when the player chose it', () => {
-    const entry = { ...bonesEntry('e'), reading: { ...reading, alternate: 'No sentry; a scarecrow.' } }
-    expect(chosenRuling(entry)).toBe(reading.ruling)
-    expect(chosenRuling({ ...entry, useAlternate: true })).toBe('No sentry; a scarecrow.')
-    // A reading without an alternate falls back to its ruling.
-    expect(chosenRuling({ ...bonesEntry('e'), reading, useAlternate: true })).toBe(reading.ruling)
-    expect(chosenRuling(bonesEntry('e'))).toBeNull()
   })
 
   test(`keeps only the last ${RECENT_LIMIT} entries but every fact`, () => {

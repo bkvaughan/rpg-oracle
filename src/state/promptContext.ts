@@ -2,7 +2,7 @@ import { activityFor, CREATURE_TEXT } from '../data/activity.ts'
 import { CARDS, TIME_ICON_NAMES } from '../data/deck.ts'
 import { reactionFor } from '../data/reaction.ts'
 import { reactionTotal } from '../engine/reaction.ts'
-import { bonesOutcome, type JournalEntry, type OracleResult, type Session } from './session.ts'
+import { bonesOutcome, type OracleResult, type Session } from './session.ts'
 
 // The slice of a session sent with each AI request (ORACLE_SPEC.md Part 3): every pinned
 // fact, and only the most recent journal entries, so prompts stay small.
@@ -40,12 +40,6 @@ export function describeResult(result: OracleResult): string {
   }
 }
 
-/** The reading the player went with: the alternate if they chose it, otherwise the ruling. */
-export function chosenRuling(entry: JournalEntry): string | null {
-  if (!entry.reading) return null
-  return entry.useAlternate && entry.reading.alternate ? entry.reading.alternate : entry.reading.ruling
-}
-
 export interface PromptContext {
   facts: string[]
   recent: { question: string; result: string; ruling: string | null; note: string }[]
@@ -57,7 +51,7 @@ export function promptContext(session: Session, limit = RECENT_LIMIT): PromptCon
   const recent = session.journal.slice(-limit)
   return {
     facts: session.facts.map((f) => f.text),
-    recent: recent.map((e) => ({ question: e.question, result: describeResult(e.result), ruling: chosenRuling(e), note: e.note })),
+    recent: recent.map((e) => ({ question: e.question, result: describeResult(e.result), ruling: e.reading?.ruling ?? null, note: e.note })),
     omitted: session.journal.length - recent.length,
   }
 }

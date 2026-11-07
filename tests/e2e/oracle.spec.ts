@@ -92,3 +92,29 @@ test('unsaved work survives a reload through the recovery copy', async ({ page }
   await banner.getByRole('button', { name: 'Restore' }).click()
   await expect(page.getByLabel('Fact 1', { exact: true })).toHaveValue('The barrow lord hunts at night')
 })
+
+test('keyboard: the first-visit guide, "/" to the question, Escape to cancel an interpretation', async ({ page }) => {
+  // The API call never answers, so the interpretation stays running until cancelled.
+  await page.route('https://api.anthropic.com/**', async (route) => {
+    if (route.request().method() === 'OPTIONS') {
+      return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*' } })
+    }
+  })
+  await page.goto('/')
+  await expect(page.getByRole('region', { name: 'How to ask' })).toBeVisible()
+  await page.getByLabel('Anthropic API key').fill('sk-ant-e2e')
+  await page.locator('.ai-settings').getByRole('button', { name: 'Save' }).click()
+
+  await page.locator('body').click({ position: { x: 5, y: 5 } })
+  await page.keyboard.press('/')
+  await expect(page.getByLabel('Your question')).toBeFocused()
+  await page.keyboard.type('What waits here?')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('region', { name: 'How to ask' })).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Interpret' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'The oracle considers' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('button', { name: 'Interpret' })).toBeEnabled()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+})

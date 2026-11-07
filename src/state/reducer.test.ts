@@ -35,16 +35,6 @@ describe('sessionReducer', () => {
     expect(s.journal.map((e) => e.note)).toEqual(['', 'She raised the alarm'])
   })
 
-  test('chooseReading adopts the alternate, and a new reading resets the choice', () => {
-    let s = newSession(T0, 'x')
-    s = sessionReducer(s, { type: 'addEntry', entry: bonesEntry('e1'), at: T1 })
-    s = sessionReducer(s, { type: 'attachReading', entryId: 'e1', reading, at: T1 })
-    s = sessionReducer(s, { type: 'chooseReading', entryId: 'e1', useAlternate: true, at: T1 })
-    expect(s.journal[0].useAlternate).toBe(true)
-    s = sessionReducer(s, { type: 'attachReading', entryId: 'e1', reading, at: T1 })
-    expect(s.journal[0].useAlternate).toBe(false)
-  })
-
   test('setEntryHour records the exact hour on a Signs entry only', () => {
     let s = newSession(T0, 'x')
     s = sessionReducer(s, { type: 'addEntry', entry: signsEntry('s1'), at: T1 })

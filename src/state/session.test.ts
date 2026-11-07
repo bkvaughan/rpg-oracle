@@ -41,11 +41,25 @@ describe('session model', () => {
     expect(parsed.journal[0].reading!.follow_ups).toEqual(reading.follow_ups)
   })
 
-  test('an entry saved before notes and the alternate choice loads with the defaults', () => {
+  test('an entry saved before notes loads with an empty note', () => {
     const s = sampleSession()
-    const { note: _note, useAlternate: _alt, ...old } = s.journal[0]
-    const parsed = sessionSchema.parse({ ...s, journal: [old] })
-    expect(parsed.journal[0]).toMatchObject({ note: '', useAlternate: false })
+    const { note: _note, ...old } = s.journal[0]
+    expect(sessionSchema.parse({ ...s, journal: [old] }).journal[0].note).toBe('')
+  })
+
+  test('a reading saved with an alternate, time and direction loads without them; a chosen alternate becomes the ruling', () => {
+    const s = sampleSession()
+    const old = { ...reading, alternate: 'No sentry; a scarecrow.', time: 'Late Night', direction: 'SW' }
+    const parsed = sessionSchema.parse({
+      ...s,
+      journal: [
+        { ...s.journal[0], reading: old, useAlternate: false },
+        { ...s.journal[1], reading: old, useAlternate: true },
+      ],
+    })
+    expect(parsed.journal[0].reading).toEqual(reading)
+    expect(parsed.journal[1].reading).toEqual({ ...reading, ruling: 'No sentry; a scarecrow.' })
+    expect(parsed.journal[1]).not.toHaveProperty('useAlternate')
   })
 
   test('a session saved with the old PC and location fields still loads, without them', () => {

@@ -20,7 +20,6 @@ export const bonesEntry = (id: string, question = 'Is there a sentry?'): Journal
   },
   reading: null,
   note: '',
-  useAlternate: false,
 })
 
 export const signsEntry = (id: string): JournalEntry => ({
@@ -30,15 +29,11 @@ export const signsEntry = (id: string): JournalEntry => ({
   result: { tool: 'signs', cardIds: [3, 41], hour: null },
   reading: null,
   note: '',
-  useAlternate: false,
 })
 
 export const reading: Reading = {
   ruling: 'A sentry, but she is distracted.',
   why: 'Single Yes with Fortune.',
-  alternate: null,
-  time: null,
-  direction: null,
   follow_ups: [{ question: 'Is she armed?', tool: 'bones', likelihood: 'likely-yes' }],
   new_facts: ['A sentry watches the ruin gate'],
 }
