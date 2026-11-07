@@ -10,4 +10,6 @@ test('says what the recovered session holds, so the player can judge it', () => 
   expect(screen.getByRole('alert')).toHaveTextContent(/The Barrow Lord from .*: 2 questions, 1 fact\./)
   rerender(<RecoveryBanner session={{ ...one, facts: [] }} confirmReplace={false} onRestore={() => {}} onDiscard={() => {}} />)
   expect(screen.getByRole('alert')).toHaveTextContent('1 question, 0 facts.')
+  rerender(<RecoveryBanner session={{ ...one, journal: [], facts: [], context: 'Thuel at the barrow' }} confirmReplace={false} onRestore={() => {}} onDiscard={() => {}} />)
+  expect(screen.getByRole('alert')).toHaveTextContent('0 questions, 0 facts, and a session context.')
 })

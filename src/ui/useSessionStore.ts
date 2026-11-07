@@ -214,7 +214,7 @@ export function useSessionStore() {
     }
   }, [releaseRecovery, backup])
 
-  const hasContent = session.journal.length + session.facts.length > 0
+  const hasContent = session.journal.length + session.facts.length > 0 || session.context.trim() !== ''
   const hasUnsavedChanges = hasContent && (file.status === 'unsaved' || file.status === 'error' || file.status === 'saving')
   // New and Open replace the session and the crash copy, so they confirm first.
   const wouldDiscard = hasUnsavedChanges || recovered !== null

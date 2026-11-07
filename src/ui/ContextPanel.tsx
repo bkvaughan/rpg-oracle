@@ -1,22 +1,13 @@
-import { useState } from 'react'
-
-// The session's background, written once and sent with every interpretation. Saves on blur,
-// like play notes, so the file autosaves once per edit rather than on every keystroke.
+// The session's background, written once and sent with every interpretation. Every keystroke
+// goes to the session, like fact edits: the crash copy is then never behind what's on screen
+// (a write started as the page unloads doesn't finish), and the file autosave is debounced.
 
 interface Props {
   context: string
-  onSave: (context: string) => void
+  onChange: (context: string) => void
 }
 
-export default function ContextPanel({ context, onSave }: Props) {
-  const [draft, setDraft] = useState(context)
-  // Opening, restoring or starting a session replaces the context; follow it without
-  // remounting, which would close the panel.
-  const [shown, setShown] = useState(context)
-  if (context !== shown) {
-    setShown(context)
-    setDraft(context)
-  }
+export default function ContextPanel({ context, onChange }: Props) {
   const preview = context.trim().split('\n')[0]
 
   return (
@@ -27,10 +18,9 @@ export default function ContextPanel({ context, onSave }: Props) {
       <textarea
         aria-label="Session context"
         rows={3}
-        value={draft}
+        value={context}
         placeholder="Who the PC is, where they are, what they're after. Sent with every interpretation."
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={() => draft !== context && onSave(draft)}
+        onChange={(e) => onChange(e.target.value)}
       />
     </details>
   )

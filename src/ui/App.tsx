@@ -138,7 +138,7 @@ export default function App() {
             <SessionBar store={store} />
             <ContextPanel
               context={session.context}
-              onSave={(context) => dispatch({ type: 'setContext', context, at: now() })}
+              onChange={(context) => dispatch({ type: 'setContext', context, at: now() })}
             />
             <AiSettingsPanel
             settings={aiSettings}

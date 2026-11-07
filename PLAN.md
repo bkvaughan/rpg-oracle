@@ -26,7 +26,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 16 (UI/UX pass, run as a 5-iteration loop): done, approved, committed and pushed
 - Part 17 (drop Or, When and Where from readings): done, approved, committed and pushed with Part 16 (deploy for `d8c431a` succeeded 2026-11-06)
 - Part 18 (second UI/UX loop, 10 iterations): done, approved, committed and pushed (deploy for `0480e19` succeeded 2026-11-06)
-- Part 19 (session context): done, approved, committed and pushed
+- Part 19 (session context): done, approved, committed and pushed. Review fixes: done, awaiting Brandon's review
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -391,6 +391,7 @@ Brandon, after his first real session (2026-11-06): a place for broader context 
 - [x] `context: z.string().default('')` on the session; older files load with an empty context, no schema bump
 - [x] Reducer action `setContext`
 - [x] Sent first in the user prompt as "# Session context (from the player)" when set; one system-prompt guideline to treat it as established
-- [x] "Session context" fold-out in the toolbar, between the session bar and AI settings; the summary previews the first line; saves on blur
+- [x] "Session context" fold-out in the toolbar, between the session bar and AI settings; the summary previews the first line; every keystroke goes to the session (first built to save on blur; changed after review, see below)
 - [x] Tests: schema default, reducer, prompt context, prompt, ContextPanel component, App, and the e2e request body
 - [x] ORACLE_SPEC.md updated
+- [x] Review fixes (2026-11-06): a session holding only a context counts as work, so New, Open and Restore ask first; the recovery banner mentions the context; the context saves on every keystroke, because a crash-copy write started as the page unloads doesn't finish (checked in Chromium), so saving on blur or pagehide lost text typed just before a reload; the spec no longer gives two things the name "Session context"

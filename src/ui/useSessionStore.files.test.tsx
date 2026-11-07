@@ -113,6 +113,14 @@ describe('with the File System Access API', () => {
     expect(result.current.session.name).toBe('The Barrow Lord')
   })
 
+  test('a session holding only a context counts as work, so New and Open ask first', async () => {
+    const { result } = await renderStore()
+    expect(result.current.hasContent).toBe(false)
+    act(() => result.current.dispatch({ type: 'setContext', context: 'Thuel at the barrow', at: T1 }))
+    expect(result.current.hasContent).toBe(true)
+    expect(result.current.wouldDiscard).toBe(true)
+  })
+
   test('New starts an empty session with no file', async () => {
     const good = fakeHandle('barrow.json', serializeSession(sampleSession()))
     installPickers({ open: async () => [good.handle] })

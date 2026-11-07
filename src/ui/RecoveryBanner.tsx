@@ -18,7 +18,8 @@ export default function RecoveryBanner({ session, confirmReplace, onRestore, onD
     <section className="panel recovery" role="alert">
       <p>
         Found unsaved changes to <strong>{session.name}</strong> from {when}:{' '}
-        {count(session.journal.length, 'question', 'questions')}, {count(session.facts.length, 'fact', 'facts')}.
+        {count(session.journal.length, 'question', 'questions')}, {count(session.facts.length, 'fact', 'facts')}
+        {session.context.trim() && ', and a session context'}.
       </p>
       {confirming ? (
         <span className="confirm">

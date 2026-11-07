@@ -137,3 +137,30 @@ test('without a key, the hint opens AI settings at the key field', async ({ page
   await expect(page.getByLabel('Anthropic API key')).toBeFocused()
   await expect(page.getByLabel('Anthropic API key')).toBeInViewport()
 })
+
+test('a session context still being typed survives a reload', async ({ page }) => {
+  await page.goto('/')
+  await page.locator('.context-panel summary').click()
+  // Typed, not filled, and the field keeps focus: nothing has saved it yet.
+  await page.getByRole('textbox', { name: 'Session context' }).pressSequentially('Thuel at the barrow')
+  // Each keystroke goes to the recovery copy; wait for the last one, as the copy is async.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          new Promise<string | null>((resolve) => {
+            const open = indexedDB.open('rpg-oracle', 1)
+            open.onsuccess = () => {
+              const get = open.result.transaction('recovery').objectStore('recovery').get('current')
+              get.onsuccess = () => resolve(get.result?.session.context ?? null)
+            }
+          }),
+      ),
+    )
+    .toBe('Thuel at the barrow')
+  await page.reload()
+  const banner = page.getByRole('alert')
+  await expect(banner).toContainText('0 questions, 0 facts, and a session context.')
+  await banner.getByRole('button', { name: 'Restore' }).click()
+  await expect(page.locator('.context-panel summary')).toContainText('Thuel at the barrow')
+})
