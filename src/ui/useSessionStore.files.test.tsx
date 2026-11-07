@@ -27,6 +27,10 @@ function fakeHandle(name: string, contents = '', failWrites = false) {
   return { handle: handle as unknown as FileSystemFileHandle, writes }
 }
 
+/** The installed picker stand-ins, for checking how they were called. */
+const picker = (name: 'showOpenFilePicker' | 'showSaveFilePicker') =>
+  (window as unknown as Record<typeof name, ReturnType<typeof vi.fn>>)[name]
+
 const abort = () => Promise.reject(new DOMException('The user aborted a request.', 'AbortError'))
 
 function installPickers(pickers: { open?: () => Promise<unknown>; save?: () => Promise<unknown> }) {
@@ -71,6 +75,8 @@ describe('with the File System Access API', () => {
     await act(() => result.current.save())
     expect(result.current.file).toMatchObject({ status: 'saved', fileName: 'barrow.json' })
     expect(lastWritten(writes).facts.map((f) => f.text)).toEqual(['The gate is barred'])
+    // Save filters to session files, so a new file gets the .json extension.
+    expect(picker('showSaveFilePicker')).toHaveBeenCalledWith(expect.objectContaining({ types: [expect.objectContaining({ accept: { 'application/json': ['.json'] } })] }))
 
     pinFact(result.current, 'A dead lord hoards here')
     await waitFor(() => expect(writes).toHaveLength(2), { timeout: 2000 })
@@ -104,6 +110,8 @@ describe('with the File System Access API', () => {
     await act(() => result.current.open())
     expect(result.current.session.name).toBe('The Barrow Lord')
     expect(result.current.file).toMatchObject({ status: 'saved', fileName: 'barrow.json' })
+    // Open has no type filter (it greys out files on Chrome for macOS); the contents are checked instead.
+    expect(picker('showOpenFilePicker')).toHaveBeenCalledWith()
 
     const bad = fakeHandle('notes.json', '{"hello": 1}')
     installPickers({ open: async () => [bad.handle] })

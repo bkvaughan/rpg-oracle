@@ -17,7 +17,6 @@ export interface OpenedFile {
 interface PickerOptions {
   types?: { description: string; accept: Record<string, string[]> }[]
   suggestedName?: string
-  excludeAcceptAllOption?: boolean
 }
 interface PickerWindow {
   showOpenFilePicker(options?: PickerOptions): Promise<FileSystemFileHandle[]>
@@ -74,7 +73,9 @@ async function readOpened(file: File, handle: FileSystemFileHandle | null): Prom
 /** File System Access: pick and read a session file. Null if the player cancels. */
 export async function openWithPicker(): Promise<OpenedFile | null> {
   try {
-    const [handle] = await pickers().showOpenFilePicker({ types: FILE_TYPES, excludeAcceptAllOption: true })
+    // No type filter: Chrome on macOS can grey out matching files the first time the picker
+    // opens. Any file can be picked; readOpened rejects one that isn't a session.
+    const [handle] = await pickers().showOpenFilePicker()
     return await readOpened(await handle.getFile(), handle)
   } catch (e) {
     if (isCancel(e)) return null
