@@ -24,3 +24,6 @@ playwright-report
 blob-report
 playwright/.cache
 sessions/*
+
+# Claude Code local state (loop plugin)
+.claude/
