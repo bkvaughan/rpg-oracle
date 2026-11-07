@@ -11,9 +11,11 @@ interface Props {
   onInterpret: (signal: AbortSignal) => Promise<void>
   onPinFact: (text: string) => void
   onFollowUp: (followUp: FollowUp) => void
+  /** Opens AI settings at the key field, from the no-key hint. */
+  onOpenSettings?: () => void
 }
 
-export default function Interpretation({ reading, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
+export default function Interpretation({ reading, hasKey, onInterpret, onPinFact, onFollowUp, onOpenSettings }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const controller = useRef<AbortController | null>(null)
@@ -58,11 +60,29 @@ export default function Interpretation({ reading, hasKey, onInterpret, onPinFact
             </button>
           </>
         ) : (
-          <button type="button" className="btn btn-small" onClick={() => void run()} disabled={!hasKey}>
+          // With a key and no reading yet, interpreting is the next step, so it gets the primary style.
+          <button
+            type="button"
+            className={`btn btn-small${hasKey && !reading ? ' btn-primary' : ''}`}
+            onClick={() => void run()}
+            disabled={!hasKey}
+          >
             {error ? 'Try again' : reading ? 'Interpret again' : 'Interpret'}
           </button>
         )}
-        {!hasKey && <span className="secondary">Add an API key in AI settings to interpret results.</span>}
+        {!hasKey && (
+          <span className="secondary">
+            Add an API key in{' '}
+            {onOpenSettings ? (
+              <button type="button" className="link-button" onClick={onOpenSettings}>
+                AI settings
+              </button>
+            ) : (
+              'AI settings'
+            )}{' '}
+            to interpret results.
+          </span>
+        )}
       </div>
       {error && (
         <p className="status-error" role="alert">

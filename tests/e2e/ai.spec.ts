@@ -86,3 +86,18 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
   // The lazily loaded SDK chunk and the API call are both allowed by the policy.
   expect(problems).toEqual([])
 })
+
+test('with a key saved, the SDK is fetched before the first Interpret; without one, never', async ({ page }) => {
+  const chunks: string[] = []
+  page.on('request', (r) => {
+    if (/\/assets\/client-[\w-]+\.js$/.test(r.url())) chunks.push(r.url())
+  })
+  await page.goto('/')
+  await page.waitForTimeout(500)
+  expect(chunks).toEqual([])
+
+  await page.getByLabel('Anthropic API key').fill('sk-ant-e2e')
+  await page.locator('.ai-settings').getByRole('button', { name: 'Save' }).click()
+  await expect.poll(() => chunks.length, { timeout: 8000 }).toBe(1)
+  await expect(page.getByRole('button', { name: 'Interpret' })).toHaveCount(0)
+})

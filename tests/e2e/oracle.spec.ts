@@ -69,6 +69,12 @@ test('Activity & Reaction for an encountered creature', async ({ page }) => {
 
 test('unsaved work survives a reload through the recovery copy', async ({ page }) => {
   await page.goto('/')
+  // Asking scrolls down to the result. After the reload the page starts at the top, so the
+  // banner is in view rather than above wherever the browser would restore the scroll to.
+  await page.getByLabel('Your question').fill('What waits here?')
+  await page.getByRole('button', { name: 'Draw two cards' }).click()
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(300)
+  // Pinned last, so once the recovery copy has the fact it has the question too.
   await page.getByLabel('New fact').fill('The barrow lord hunts at night')
   await page.getByRole('button', { name: 'Pin', exact: true }).click()
   // The recovery copy is written asynchronously; wait for it before reloading.
@@ -89,6 +95,8 @@ test('unsaved work survives a reload through the recovery copy', async ({ page }
   await page.reload()
   const banner = page.getByRole('alert')
   await expect(banner).toContainText('Found unsaved changes')
+  await expect(banner).toContainText('1 question, 1 fact.')
+  await expect(banner).toBeInViewport()
   await banner.getByRole('button', { name: 'Restore' }).click()
   await expect(page.getByLabel('Fact 1', { exact: true })).toHaveValue('The barrow lord hunts at night')
 })
@@ -117,4 +125,15 @@ test('keyboard: the first-visit guide, "/" to the question, Escape to cancel an 
   await page.keyboard.press('Escape')
   await expect(page.getByRole('button', { name: 'Interpret' })).toBeEnabled()
   await expect(page.getByRole('alert')).toHaveCount(0)
+})
+
+test('without a key, the hint opens AI settings at the key field', async ({ page }) => {
+  await page.goto('/')
+  await page.locator('.ai-settings summary').click()
+  await expect(page.getByLabel('Anthropic API key')).toBeHidden()
+  await page.getByRole('radio', { name: /Fortune die/ }).check({ force: true })
+  await page.getByRole('button', { name: 'Roll the Fortune die' }).click()
+  await page.getByRole('button', { name: 'AI settings', exact: true }).click()
+  await expect(page.getByLabel('Anthropic API key')).toBeFocused()
+  await expect(page.getByLabel('Anthropic API key')).toBeInViewport()
 })

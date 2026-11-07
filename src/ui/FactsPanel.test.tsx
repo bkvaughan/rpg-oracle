@@ -22,3 +22,9 @@ test('a fact left blank is removed on blur; the remove button removes one too', 
   await user.click(screen.getByRole('button', { name: 'Remove fact 3' }))
   expect(onRemove).toHaveBeenLastCalledWith('f3')
 })
+
+test('says what pinning a fact is for', () => {
+  render(<FactsPanel facts={[]} onAdd={() => {}} onEdit={() => {}} onRemove={() => {}} />)
+  expect(screen.getByText(/go with every interpretation/)).toBeInTheDocument()
+  expect(screen.getByText('No facts pinned yet.')).toBeInTheDocument()
+})

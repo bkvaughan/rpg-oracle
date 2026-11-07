@@ -10,6 +10,10 @@ import './styles/oracle.css'
 import { startAtmosphere } from './ui/atmosphere.ts'
 import App from './ui/App.tsx'
 
+// A reload starts a fresh page (the session comes back only through the recovery banner), so
+// the browser's restored scroll position points at nothing and can hide that banner.
+history.scrollRestoration = 'manual'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

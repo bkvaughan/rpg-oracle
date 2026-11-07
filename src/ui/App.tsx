@@ -22,6 +22,15 @@ function scrollToTop(el: HTMLElement | null) {
   el?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
 }
 
+/** Opens AI settings, brings them into view and puts the cursor in the key field. */
+function openAiSettings() {
+  const details = document.getElementById('ai-settings') as HTMLDetailsElement | null
+  if (!details) return
+  details.open = true
+  scrollToTop(details)
+  document.getElementById('ai-key')?.focus({ preventScroll: true })
+}
+
 /** Brings the ask form into view and puts the cursor in the question. */
 function focusQuestion(ask: HTMLElement | null) {
   scrollToTop(ask)
@@ -36,6 +45,17 @@ export default function App() {
   // A follow-up remounts the ask form with its question, tool and likelihood filled in.
   const [prefill, setPrefill] = useState<{ request: Partial<AskRequest>; n: number }>({ request: {}, n: 0 })
   const askRef = useRef<HTMLDivElement>(null)
+
+  // The SDK is most of the JavaScript and loads on first use. With a key saved, fetch it while
+  // the browser is idle, so the first Interpret doesn't wait for the download.
+  const hasKey = aiSettings.apiKey !== ''
+  useEffect(() => {
+    if (!hasKey) return
+    const load = () => void import('../ai/client.ts').catch(() => {})
+    if (!('requestIdleCallback' in window)) return void setTimeout(load, 2000)
+    const id = requestIdleCallback(load, { timeout: 5000 })
+    return () => cancelIdleCallback(id)
+  }, [hasKey])
 
   // "/" jumps to the question from anywhere on the page, as on many search-first sites.
   useEffect(() => {
@@ -136,10 +156,11 @@ export default function App() {
                 entry={selected}
                 onRollHour={onRollHour}
                 onSaveNote={(note) => dispatch({ type: 'setEntryNote', entryId: selected.id, note, at: now() })}
-                hasKey={aiSettings.apiKey !== ''}
+                hasKey={hasKey}
                 onInterpret={onInterpret}
                 onPinFact={(text) => pinFact(text, 'ai')}
                 onFollowUp={onFollowUp}
+                onOpenSettings={openAiSettings}
               />
             )}
           </div>

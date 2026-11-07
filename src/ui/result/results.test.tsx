@@ -49,6 +49,16 @@ describe('BonesResult', () => {
     expect(screen.getByText(/^Fortune: an extra benefit/)).toBeInTheDocument()
   })
 
+  test('names the dice visibly with the book terms, without repeating them to screen readers', () => {
+    const dice = { judgment: 'Yes', fate: ['Nil', 'Nil'], fortune: 'Nil' } as const
+    const { container } = render(
+      <BonesResult result={{ tool: 'bones', likelihood: 'even', cast: { ...dice, fate: [...dice.fate] }, reroll: null, final: { ...dice, fate: [...dice.fate] } }} />,
+    )
+    const captions = [...container.querySelectorAll('.die-caption')]
+    expect(captions.map((c) => c.textContent)).toEqual(['Hammer of Judgment', 'Twins of Fate', 'Fortune die'])
+    for (const c of captions) expect(c).toHaveAttribute('aria-hidden', 'true')
+  })
+
   test('shows a reroll as the original face and what it became', () => {
     render(
       <BonesResult
@@ -101,6 +111,17 @@ describe('FortuneResult', () => {
 })
 
 describe('Interpretation', () => {
+  test('Interpret is the primary action only while a key is saved and there is no reading yet', () => {
+    const props = { onInterpret: async () => {}, onPinFact: () => {}, onFollowUp: () => {} }
+    const reading = { ruling: 'A sentry.', why: 'Yes.', follow_ups: [], new_facts: [] }
+    const { rerender } = render(<Interpretation reading={null} hasKey {...props} />)
+    expect(screen.getByRole('button', { name: 'Interpret' })).toHaveClass('btn-primary')
+    rerender(<Interpretation reading={null} hasKey={false} {...props} />)
+    expect(screen.getByRole('button', { name: 'Interpret' })).not.toHaveClass('btn-primary')
+    rerender(<Interpretation reading={reading} hasKey {...props} />)
+    expect(screen.getByRole('button', { name: 'Interpret again' })).not.toHaveClass('btn-primary')
+  })
+
   test('Escape cancels a running request, quietly', async () => {
     const user = userEvent.setup()
     const { AiError } = await import('../../ai/errors.ts')
@@ -194,5 +215,36 @@ describe('ResultView note', () => {
     await user.type(box, 'She raised the alarm')
     await user.tab()
     expect(onSaveNote).toHaveBeenCalledWith('She raised the alarm')
+  })
+})
+
+describe('ResultView heading', () => {
+  const entry = (question: string) => ({
+    id: 'e',
+    at: '2026-11-06T20:00:00.000Z',
+    question,
+    result: { tool: 'fortune' as const, face: 'Nil' as const },
+    reading: null,
+    note: '',
+  })
+  const view = (question: string) => (
+    <ResultView
+      entry={entry(question)}
+      onRollHour={() => {}}
+      onSaveNote={() => {}}
+      hasKey={false}
+      onInterpret={async () => {}}
+      onPinFact={() => {}}
+      onFollowUp={() => {}}
+    />
+  )
+
+  test('names the result with the question, or quietly says there was none', () => {
+    const { rerender } = render(view('Does the blow land?'))
+    expect(screen.getByRole('article', { name: 'Does the blow land?' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2 })).not.toHaveClass('no-question')
+    rerender(view(''))
+    expect(screen.getByRole('article', { name: 'No question asked' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2 })).toHaveClass('no-question')
   })
 })

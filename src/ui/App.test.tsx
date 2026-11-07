@@ -111,3 +111,16 @@ test('rolling the exact hour and writing a note are kept on the entry and shown 
   await user.tab()
   expect(within(screen.getByRole('region', { name: 'Journal' })).getByText('Thuel hid until dawn')).toHaveClass('journal-note')
 })
+
+test('without a key, "AI settings" in the hint opens the settings at the key field', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  const details = screen.getByText(/^AI settings/, { selector: 'summary' }).closest('details')!
+  // Opened by default when there's no key; close it, as a player who dismissed it would have.
+  details.open = false
+  await user.click(screen.getByRole('radio', { name: /Fortune die/ }))
+  await user.click(screen.getByRole('button', { name: 'Roll the Fortune die' }))
+  await user.click(screen.getByRole('button', { name: 'AI settings' }))
+  expect(details.open).toBe(true)
+  expect(screen.getByLabelText('Anthropic API key')).toHaveFocus()
+})

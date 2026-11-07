@@ -36,15 +36,17 @@ interface Props {
   onInterpret: (signal: AbortSignal) => Promise<void>
   onPinFact: (text: string) => void
   onFollowUp: (followUp: FollowUp) => void
+  onOpenSettings?: () => void
 }
 
-export default function ResultView({ entry, onRollHour, onSaveNote, hasKey, onInterpret, onPinFact, onFollowUp }: Props) {
+export default function ResultView({ entry, onRollHour, onSaveNote, hasKey, onInterpret, onPinFact, onFollowUp, onOpenSettings }: Props) {
   const { result } = entry
   return (
     <article className="panel result" aria-labelledby={`result-${entry.id}`}>
       <p className="eyebrow">{TOOL_NAME[result.tool]}</p>
-      <h2 id={`result-${entry.id}`} className="result-question">
-        {entry.question || <span className="secondary">No question asked</span>}
+      {/* Fortune and Activity & Reaction need no question; the heading still names the result. */}
+      <h2 id={`result-${entry.id}`} className={`result-question${entry.question ? '' : ' no-question'}`}>
+        {entry.question || 'No question asked'}
       </h2>
       {result.tool === 'signs' && <SignsResult result={result} onRollHour={onRollHour} />}
       {result.tool === 'bones' && <BonesResult result={result} />}
@@ -57,6 +59,7 @@ export default function ResultView({ entry, onRollHour, onSaveNote, hasKey, onIn
         onInterpret={onInterpret}
         onPinFact={onPinFact}
         onFollowUp={onFollowUp}
+        onOpenSettings={onOpenSettings}
       />
       <NoteField note={entry.note} onSave={onSaveNote} />
     </article>

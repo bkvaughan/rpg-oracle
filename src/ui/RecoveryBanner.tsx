@@ -9,13 +9,16 @@ interface Props {
   onDiscard: () => void
 }
 
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
+
 export default function RecoveryBanner({ session, confirmReplace, onRestore, onDiscard }: Props) {
   const [confirming, setConfirming] = useState(false)
   const when = new Date(session.updatedAt).toLocaleString()
   return (
     <section className="panel recovery" role="alert">
       <p>
-        Found unsaved changes to <strong>{session.name}</strong> from {when}.
+        Found unsaved changes to <strong>{session.name}</strong> from {when}:{' '}
+        {count(session.journal.length, 'question', 'questions')}, {count(session.facts.length, 'fact', 'facts')}.
       </p>
       {confirming ? (
         <span className="confirm">

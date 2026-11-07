@@ -24,7 +24,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 15 (interpret automatically): built and committed, then reverted at Brandon's request (2026-11-06: worse in use than it sounded). Interpret stays a button
 - Signs time and direction beside the cards: committed and pushed with Parts 14-15 (deploy for `a99e6ba` succeeded 2026-11-06)
 - Part 16 (UI/UX pass, run as a 5-iteration loop): done, approved, committed and pushed
-- Part 17 (drop Or, When and Where from readings): done, approved, committed and pushed with Part 16
+- Part 17 (drop Or, When and Where from readings): done, approved, committed and pushed with Part 16 (deploy for `d8c431a` succeeded 2026-11-06)
+- Part 18 (second UI/UX loop, 10 iterations): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -318,6 +319,58 @@ Brandon (2026-11-06): remove the alternate, time and direction under the interpr
 - [x] "Use this reading" goes: `useAlternate`, `chooseReading` and `chosenRuling` are removed. Older files load; an alternate the player had chosen becomes that entry's ruling (`adoptChosenAlternate` in `session.ts`)
 - [x] `ORACLE_SPEC.md` reading contract and AI call updated
 - [x] Tests: old readings load with a chosen alternate kept as the ruling; ReadingView shows no Or/When/Where; the prompt asks for none of them; e2e checks the structured-output schema has only ruling, why, follow_ups and new_facts. `sessions/testing-responses.json` still loads
+
+---
+
+## Part 18: Second UI/UX loop
+
+Brandon asked (2026-11-06) for another UI/UX pass, as a loop of up to ten iterations. Same scope rule as Part 16: layout, clarity and feedback for a lean source of answers; no new mechanics. Uncommitted until he reviews it.
+
+Iteration 1
+- [x] Bones: on wide screens the answer and what it means sit beside the dice (like the Signs' time and direction), with the Fortune twist below across both
+- [x] Interpret gets the primary style while a key is saved and there's no reading yet: it's the next step
+- [x] Tests: component test for when Interpret is primary; e2e and axe pass
+
+Iteration 2
+- [x] Activity & Reaction: on wide screens Activity and Reaction sit side by side, split by a rule, about 250px shorter
+- [x] Tests: `tests/e2e/layout.spec.ts` checks by position that Signs, Bones and Activity & Reaction put their halves side by side at 1280px and stack at 390px with no sideways scroll; checked that the desktop cases fail when the wide-screen CSS doesn't apply. 16 e2e
+
+Iteration 3
+- [x] Faster first reading: with a key saved, the SDK chunk (about 380 KB, as large as the rest of the app) is fetched while the browser is idle, not on the first Interpret click. No key, no fetch
+- [x] A result with no question (Fortune, Activity & Reaction) gets a small, quiet "No question asked" heading instead of a large grey one; it still names the result for screen readers
+- [x] Tests: e2e that the SDK chunk isn't fetched without a key and is fetched after saving one, before any click; component test for the heading. 177 unit/component, 17 e2e
+
+Iteration 4
+- [x] Without a key, "AI settings" in the result's hint is a link: it opens the settings, scrolls to them and puts the cursor in the key field
+- [x] Tests: App test (settings closed, link opens them, key field focused); e2e (key field focused and in view). 178 unit/component, 18 e2e
+
+Iteration 5
+- [x] Fix: after a reload the browser restored the old scroll position, so the recovery banner (at the top) could be off screen; the page now starts at the top (`history.scrollRestoration = 'manual'` in `main.tsx`)
+- [x] The recovery banner says what the copy holds ("1 question, 1 fact"), so the player can judge whether to restore it
+- [x] Tests: `RecoveryBanner.test.tsx` (counts and plurals; Restore, and Replace/Keep when the current session holds work); the e2e recovery test now asks first (scrolling down), and checks the counts and that the banner is in view; checked that it fails without the fix. 180 unit/component, 18 e2e
+
+Iteration 6
+- [x] Bones: visible captions under the dice in the book's terms (Hammer of Judgment, Twins of Fate across both Twins, Fortune die); hidden from screen readers, since each die's label already names it
+- [x] Tests: component test for the captions and their `aria-hidden`; axe passes. 181 unit/component, 18 e2e
+
+Iteration 7
+- [x] Coverage gap: the session store's file flows were 48% covered. `useSessionStore.files.test.tsx` runs them against a stand-in File System Access API: Save picks and writes, then later changes autosave to the same file; cancelling a picker changes nothing; a failed write is reported and the work stays in memory; Open loads a file and reports a damaged one; New starts empty; without the API, Save downloads and Open reads a file input. Store 48% -> 94%, `fileStore.ts` 100% of lines, overall 79% -> 87%
+- [x] Established facts: a one-line hint says pinned facts go with every interpretation
+- [x] Removed the banner tests duplicated in iteration 5 (the store tests already cover Restore/Replace/Keep). 188 unit/component, 18 e2e
+
+Iteration 8
+- [x] Phones: the title shrinks and the tagline is hidden, so the ask button sits on the first screen (its bottom was at 915px on an 844px phone, now 796px)
+- [x] Tests: e2e that on a 390x844 phone the ask button is fully in view on load (key saved, settings closed); `AiSettingsPanel.test.tsx` (open without a key, trimmed key and chosen model saved, the visit-only message and its clearing, closed with a key, Forget key); settings fall back on corrupt or retired stored values. 192 unit/component, 19 e2e
+
+Iteration 9
+- [x] Fix: one long unbroken word in a question widened the main grid column to fit it, so every panel stretched and a 390px phone page scrolled sideways (730px wide). `.stack` now uses `minmax(0, 1fr)` and `overflow-wrap: break-word`, so long words wrap
+- [x] Tests: e2e drives a long unbroken word through the session name, question, note and a fact at 390px and checks there's no sideways scroll; checked that it fails (730px) without the fix. 192 unit/component, 20 e2e
+
+Iteration 10
+- [x] Review pass: a screenshot tour of a full session at desktop and phone widths; no regressions found
+- [x] All checks: 192 unit/component tests (176 at the start of Part 18), 20 e2e (17 at the start), typecheck, lint, build. Coverage 87% of lines (79% at the start); the rest is mostly the decorative `atmosphere.ts`
+
+Notes: uncommitted, for Brandon's review. Two real bugs found and fixed with regression tests: the recovery banner hidden after a reload (iteration 5) and sideways scroll from long words (iteration 9). Each other iteration is a separable change.
 
 ---
 

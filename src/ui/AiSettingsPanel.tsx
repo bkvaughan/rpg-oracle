@@ -21,7 +21,7 @@ export default function AiSettingsPanel({ settings, onSave, onForget }: Props) {
   }
 
   return (
-    <details className="ai-settings" open={!settings.apiKey || undefined}>
+    <details id="ai-settings" className="ai-settings" open={!settings.apiKey || undefined}>
       <summary className="label">AI settings {settings.apiKey ? '· key saved' : '· no key yet'}</summary>
       <form onSubmit={submit} className="ai-form">
         <p className="secondary">
@@ -32,6 +32,7 @@ export default function AiSettingsPanel({ settings, onSave, onForget }: Props) {
           <label className="field">
             <span className="label">Anthropic API key</span>
             <input
+              id="ai-key"
               type="password"
               value={apiKey}
               onChange={(e) => (setApiKey(e.target.value), setSaved(null))}

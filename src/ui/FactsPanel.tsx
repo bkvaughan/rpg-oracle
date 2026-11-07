@@ -25,6 +25,7 @@ export default function FactsPanel({ facts, onAdd, onEdit, onRemove }: Props) {
       <h2 id="facts-title" className="panel-title">
         Established facts
       </h2>
+      <p className="panel-hint secondary">Pinned facts go with every interpretation, so the oracle stays consistent.</p>
       {facts.length === 0 && <p className="empty">No facts pinned yet.</p>}
       <ul className="facts-list">
         {facts.map((f, i) => (
