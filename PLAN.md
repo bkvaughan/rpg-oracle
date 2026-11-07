@@ -28,6 +28,7 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 18 (second UI/UX loop, 10 iterations): done, approved, committed and pushed (deploy for `0480e19` succeeded 2026-11-06)
 - Part 19 (session context): done, approved, committed and pushed. Review fixes: done, committed
 - Part 20 (plain rulings, Open without a file-type filter): done, approved, committed and pushed
+- Part 21 (look and feel of the core rules): done, approved, committed and pushed. Open: whether to delete the unused `src/ui/atmosphere.ts`
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -405,3 +406,18 @@ Brandon (2026-11-06): the ruling repeated the words that Why then explains. The 
 - [x] ORACLE_SPEC.md (target voice, the returned fields, the worked example) and the e2e mock reading updated
 - [x] Prompt test for the new guidance
 - [x] Open's file picker has no type filter: Chrome on macOS greyed out session files the first time it opened (Brandon, 2026-11-06). The contents are still checked, so a wrong file is reported and changes nothing. Save keeps the filter
+
+---
+
+## Part 21: Look and feel of the core rules (Brandon, 2026-11-07)
+
+- [x] Replace the Torchlit dark theme with the core rules' page style: parchment page, ink serif body, oxblood display headings and title bars, salmon-striped lists, peach selection
+- [x] Fonts: Metamorphous (display) and Cardo (body, labels) replace Pirata One, IM Fell English SC and Alegreya
+- [x] Draw our own riveted iron band for the top and bottom of the page; parchment grain replaces fog, embers and torchlight
+- [x] Restyle buttons, choices, inputs, dice, compass, rulings and the Fortune twist for a light page
+- [x] Gitignore `toa-docs/` (the book PDF); update CLAUDE.md Design Rules
+- [x] Brandon reviews the look (approved 2026-11-07)
+- [ ] Decide whether to delete the now-unused `src/ui/atmosphere.ts`
+
+**Success criteria:** the site reads as a page of the core rules, all checks pass (including axe contrast), and nothing is copied from the book.
+
