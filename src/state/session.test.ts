@@ -67,6 +67,11 @@ describe('session model', () => {
     expect(sessionSchema.parse(old)).toEqual(sampleSession())
   })
 
+  test('a session saved before the context field loads with an empty context', () => {
+    const { context: _, ...old } = sampleSession()
+    expect(sessionSchema.parse(old).context).toBe('')
+  })
+
   test('the Bones answer is derived from the final dice, not stored', () => {
     const entry = sampleSession().journal[1]
     if (entry.result.tool !== 'bones') throw new Error('expected a bones entry')

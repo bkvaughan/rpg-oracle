@@ -46,6 +46,10 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
   await page.getByLabel('Anthropic API key').fill('sk-ant-e2e')
   await page.locator('.ai-settings').getByRole('button', { name: 'Save' }).click()
 
+  // The session context goes with every interpretation.
+  await page.locator('.context-panel summary').click()
+  await page.getByRole('textbox', { name: 'Session context' }).fill('Thuel, a barbarian, has come to the barrow at dusk')
+
   await page.getByLabel('Your question').fill("What's going on at this ruin?")
   await page.getByRole('button', { name: 'Draw two cards' }).click()
   await page.getByRole('button', { name: 'Interpret' }).click()
@@ -55,6 +59,7 @@ test('Interpret calls the Anthropic API with the saved key and shows the reading
   expect(key).toBe('Bearer sk-ant-e2e')
   expect(body).toMatchObject({ model: 'claude-opus-5-5', fallbacks: 'default', output_config: { effort: 'medium' } })
   expect(JSON.stringify(body)).toContain("What's going on at this ruin?")
+  expect(JSON.stringify(body)).toContain('# Session context (from the player)\\nThuel, a barbarian, has come to the barrow at dusk')
 
   await page.getByRole('button', { name: /Is there still gold in the barrow\?/ }).click()
   await expect(page.getByLabel('Your question')).toHaveValue('Is there still gold in the barrow?')

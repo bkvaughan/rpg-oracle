@@ -25,7 +25,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Signs time and direction beside the cards: committed and pushed with Parts 14-15 (deploy for `a99e6ba` succeeded 2026-11-06)
 - Part 16 (UI/UX pass, run as a 5-iteration loop): done, approved, committed and pushed
 - Part 17 (drop Or, When and Where from readings): done, approved, committed and pushed with Part 16 (deploy for `d8c431a` succeeded 2026-11-06)
-- Part 18 (second UI/UX loop, 10 iterations): done, approved, committed and pushed
+- Part 18 (second UI/UX loop, 10 iterations): done, approved, committed and pushed (deploy for `0480e19` succeeded 2026-11-06)
+- Part 19 (session context): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -382,3 +383,14 @@ Notes: uncommitted, for Brandon's review. Two real bugs found and fixed with reg
 
 ## Verification (whole project)
 `npm run lint && npm run typecheck && npm test && npm run test:e2e && npm run build` passes locally and in CI. Then do a manual playthrough of the spec's Part 4 examples on the deployed site.
+
+## Part 19: Session context
+
+Brandon, after his first real session (2026-11-06): a place for broader context that applies to every question and roll.
+
+- [x] `context: z.string().default('')` on the session; older files load with an empty context, no schema bump
+- [x] Reducer action `setContext`
+- [x] Sent first in the user prompt as "# Session context (from the player)" when set; one system-prompt guideline to treat it as established
+- [x] "Session context" fold-out in the toolbar, between the session bar and AI settings; the summary previews the first line; saves on blur
+- [x] Tests: schema default, reducer, prompt context, prompt, ContextPanel component, App, and the e2e request body
+- [x] ORACLE_SPEC.md updated

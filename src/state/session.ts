@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { storedReadingSchema } from '../ai/schema.ts'
 import { resolve, type BonesResult } from '../engine/bones.ts'
 
-// A session is one play-through's journal: who the PC is, where they are, every question
+// A session is one play-through's journal: the player's background context, every question
 // asked with its raw oracle result, and the facts the player has pinned. Saved as a JSON file.
 
 export const SCHEMA_VERSION = 1
@@ -99,6 +99,8 @@ export const sessionSchema = z.object({
   schemaVersion: z.literal(SCHEMA_VERSION),
   id: z.string().min(1),
   name: z.string(),
+  /** Background for every question: the PC, the place, the situation, in the player's words. */
+  context: z.string().default(''),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   journal: z.array(entrySchema),
@@ -119,6 +121,7 @@ export function newSession(at: string, id: string = crypto.randomUUID()): Sessio
     schemaVersion: SCHEMA_VERSION,
     id,
     name: 'Untitled session',
+    context: '',
     createdAt: at,
     updatedAt: at,
     journal: [],

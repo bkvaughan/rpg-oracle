@@ -14,6 +14,11 @@ describe('sessionReducer', () => {
     expect(s).toMatchObject({ name: 'Barrow', updatedAt: T1, createdAt: T0 })
   })
 
+  test('setContext records the session background', () => {
+    const s = sessionReducer(newSession(T0, 'x'), { type: 'setContext', context: 'Thuel, a barbarian, at the barrow', at: T1 })
+    expect(s).toMatchObject({ context: 'Thuel, a barbarian, at the barrow', updatedAt: T1 })
+  })
+
   test('journal entries are added, read, and deleted', () => {
     let s = newSession(T0, 'x')
     s = sessionReducer(s, { type: 'addEntry', entry: bonesEntry('e1'), at: T1 })

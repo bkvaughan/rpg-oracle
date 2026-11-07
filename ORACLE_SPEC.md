@@ -414,6 +414,7 @@ The AI should be told the outcome as a fact ("Double No, Fortune"), with the raw
   - Deck: both cards with all four words, the time icon, the direction, and the card's one-line `art` description (in `deck_of_signs.json`).
   - Bones: the cast, any reroll, the final answer and magnitude, and the Fortune result.
 - **Session context**: a short journal of recent questions, answers, and established facts. The session no longer keeps the PC or location (decision, Brandon, 2026-11-06: the site is a source of answers, not a character sheet); older files that have them still load, and the fields are dropped. Cap this (for example, the last 20 entries plus a pinned "facts" list) so prompts stay small.
+- **Session context** (decision, Brandon, 2026-11-06). One free-text field on the session, in the player's words: the PC, the place, the situation. It is sent first with every interpretation, when set, and the AI treats it as established. It replaces the old structured PC and location fields with something lighter.
 - **Play notes** (decision, Brandon, 2026-11-06). Each entry can carry the player's note on what happened in play. Notes are sent with the recent entries, and with the entry being interpreted, and the AI treats them as established.
 - Optionally, the relevant **book procedure** that triggered the question (e.g. "Exploring a hex → Small Ruin → Read the Signs").
 

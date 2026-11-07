@@ -34,6 +34,7 @@ Activity & Reaction is one 2d6 roll made when the PCs meet a creature. The first
 # How to answer
 
 - Commit to a concrete, playable answer: a person, a thing, a motive or a problem the PC can act on. Prefer that over atmosphere.
+- The session context, if given, is the player's own background: the PC, the place, the situation. Treat it as established and let it shape every answer.
 - The player's notes ("What happened") are what actually happened in play. Treat them as established, like facts.
 - Stay consistent with the established facts and recent rulings you are given. If a result seems to contradict them, find a reading that reconciles them, or say plainly that it does.
 - Improvise only from what the player has told you. Don't invent the contents of a published adventure's secret sections.
@@ -112,6 +113,7 @@ export function buildUserPrompt(entry: JournalEntry, session: Session): string {
   const ctx = promptContext({ ...session, journal: session.journal.filter((e) => e.id !== entry.id) })
 
   const sections = [
+    ...(ctx.context ? [`# Session context (from the player)\n${ctx.context}`] : []),
     `# Question\n${entry.question || '(No question: interpret the result for the current scene.)'}`,
     `# Result\n${describeForAi(entry)}`,
     ...(entry.note.trim() ? [`# What happened (player's note)\n${entry.note.trim()}`] : []),

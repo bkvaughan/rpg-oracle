@@ -57,6 +57,17 @@ describe('buildUserPrompt', () => {
     expect(buildUserPrompt(session.journal[1], session)).not.toContain("player's note")
   })
 
+  test('gives the session context first, and leaves the section out when there is none', () => {
+    const session = { ...sampleSession(), context: '  Thuel, a barbarian, hunts the barrow lord.\n' }
+    const prompt = buildUserPrompt(session.journal[1], session)
+    expect(prompt.startsWith('# Session context (from the player)\nThuel, a barbarian, hunts the barrow lord.\n\n# Question')).toBe(true)
+    expect(buildUserPrompt(session.journal[1], { ...session, context: '  ' })).not.toContain('# Session context')
+  })
+
+  test('the system prompt treats the session context as established', () => {
+    expect(SYSTEM_PROMPT).toContain("The session context, if given, is the player's own background")
+  })
+
   test('the system prompt treats player notes as established', () => {
     expect(SYSTEM_PROMPT).toContain('notes ("What happened") are what actually happened in play')
   })

@@ -124,3 +124,12 @@ test('without a key, "AI settings" in the hint opens the settings at the key fie
   expect(details.open).toBe(true)
   expect(screen.getByLabelText('Anthropic API key')).toHaveFocus()
 })
+
+test('the session context is kept on the session and previewed in its summary', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(screen.getByText('Session context', { exact: false, selector: 'summary' }))
+  await user.type(screen.getByRole('textbox', { name: 'Session context' }), 'Thuel hunts the barrow lord')
+  await user.tab()
+  expect(screen.getByText('· Thuel hunts the barrow lord')).toBeInTheDocument()
+})

@@ -208,6 +208,7 @@ textarea::placeholder {
   grid-column: 1 / -1;
   font-size: 0.85rem;
 }
+.toolbar .context-panel,
 .toolbar .ai-settings {
   margin-top: 0.6rem;
   padding-top: 0.6rem;
@@ -753,6 +754,7 @@ select {
   border: 1px solid var(--line);
   padding: 0.55rem 0.75rem;
 }
+.context-panel summary,
 .ai-settings summary {
   cursor: pointer;
 }
@@ -805,6 +807,21 @@ select {
 .reading h3 {
   font-weight: 400;
   margin: 1.1rem 0 0.5rem;
+}
+/* One line in the summary, so a long context doesn't push the ask form down. */
+.context-panel summary {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.context-preview {
+  font-family: var(--font-body);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.context-panel textarea {
+  margin-top: 0.6rem;
+  width: 100%;
 }
 .note-field {
   margin-top: 1rem;

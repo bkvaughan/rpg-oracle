@@ -52,6 +52,11 @@ describe('promptContext', () => {
     expect(promptContext(session).recent.map((r) => r.note)).toEqual(['Thuel climbed the wall', ''])
   })
 
+  test('carries the session context, trimmed', () => {
+    expect(promptContext({ ...sampleSession(), context: ' At the barrow \n' }).context).toBe('At the barrow')
+    expect(promptContext(sampleSession()).context).toBe('')
+  })
+
   test(`keeps only the last ${RECENT_LIMIT} entries but every fact`, () => {
     const session = sampleSession()
     session.journal = Array.from({ length: 25 }, (_, i) => bonesEntry(`e${i}`, `Question ${i}`))

@@ -4,8 +4,8 @@ import { reactionFor } from '../data/reaction.ts'
 import { reactionTotal } from '../engine/reaction.ts'
 import { bonesOutcome, type OracleResult, type Session } from './session.ts'
 
-// The slice of a session sent with each AI request (ORACLE_SPEC.md Part 3): every pinned
-// fact, and only the most recent journal entries, so prompts stay small.
+// The slice of a session sent with each AI request (ORACLE_SPEC.md Part 3): the player's
+// context, every pinned fact, and only the most recent journal entries, so prompts stay small.
 
 export const RECENT_LIMIT = 20
 
@@ -41,6 +41,8 @@ export function describeResult(result: OracleResult): string {
 }
 
 export interface PromptContext {
+  /** The player's background for the session, trimmed; empty if none. */
+  context: string
   facts: string[]
   recent: { question: string; result: string; ruling: string | null; note: string }[]
   /** How many older entries were left out. */
@@ -50,6 +52,7 @@ export interface PromptContext {
 export function promptContext(session: Session, limit = RECENT_LIMIT): PromptContext {
   const recent = session.journal.slice(-limit)
   return {
+    context: session.context.trim(),
     facts: session.facts.map((f) => f.text),
     recent: recent.map((e) => ({ question: e.question, result: describeResult(e.result), ruling: e.reading?.ruling ?? null, note: e.note })),
     omitted: session.journal.length - recent.length,

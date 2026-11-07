@@ -8,6 +8,7 @@ import { ask, type AskRequest } from './ask.ts'
 import { isTypingTarget } from './keys.ts'
 import AiSettingsPanel from './AiSettingsPanel.tsx'
 import AskPanel from './AskPanel.tsx'
+import ContextPanel from './ContextPanel.tsx'
 import FactsPanel from './FactsPanel.tsx'
 import FirstSteps from './FirstSteps.tsx'
 import Journal from './Journal.tsx'
@@ -135,6 +136,10 @@ export default function App() {
           {/* Session file and AI settings share one compact bar, so the ask form is near the top. */}
           <div className="panel toolbar">
             <SessionBar store={store} />
+            <ContextPanel
+              context={session.context}
+              onSave={(context) => dispatch({ type: 'setContext', context, at: now() })}
+            />
             <AiSettingsPanel
             settings={aiSettings}
             onSave={(s) => {
