@@ -79,7 +79,7 @@ Arrow pointing up = **North**. All 8 compass points appear in the deck (N 6, NE 
 ### The book's worked example (p.213)
 > You Read the Signs to learn more about a random barbarian tribe in a ruin. Drawing two cards reveals Magician, Conjuring, Learned, Enchanted and Death, Decaying, Uncaring, Doomed. Applying Magician, Doomed, and Decaying, you interpret this to mean the Thuel tribe camping in the ruins have been cursed by a resident undead sorcerer!
 
-That is the target voice for the core interpretation: name the words used, then give one concrete, playable fact about the world.
+The book names the words used, then gives one concrete, playable fact about the world. The site splits the two (decision, Brandon, 2026-11-06): the ruling states the fact plainly, and Why names the words, so the reading doesn't say the same thing twice.
 
 ### Full card list
 Transcribed from the official card art. `#` matches the image order on the Perchance generator (`card_urls` below).
@@ -419,8 +419,8 @@ The AI should be told the outcome as a fact ("Double No, Fortune"), with the raw
 - Optionally, the relevant **book procedure** that triggered the question (e.g. "Exploring a hex → Small Ruin → Read the Signs").
 
 ### What the AI returns (both tools)
-1. **The ruling.** One or two sentences in the book's voice that commit to a concrete, playable answer. For the deck, name the words used ("Applying Undead, Covetous, Gilded…"), and tie in the primary card's time or direction when it matters.
-2. **Why.** Briefly, how the words or dice support it. For the Bones, explain what Double or Triple changes and what the Fortune or Misfortune twist is.
+1. **The ruling.** One or two sentences in the book's voice that commit to a concrete, playable answer. It states the answer plainly and doesn't name the words or explain the reasoning; that is Why's job (decision, Brandon, 2026-11-06: naming the words in both was redundant). For the deck, tie in the primary card's time or direction when it matters.
+2. **Why.** Briefly, how the words or dice support it. For the deck, name the words used. For the Bones, explain what Double or Triple changes and what the Fortune or Misfortune twist is.
 3. **Follow-ups.** One to three questions to ask next, each tagged with a suggested tool and likelihood (e.g. "Bones, likely yes"). Follow-ups suggest only the Signs or the Bones: Activity & Reaction and the Fortune die are never suggested (decision, Brandon, 2026-11-06, after trying Reaction follow-ups in play).
 
 Return this as structured JSON so the site can lay it out and log it, and keep each section short. A good shape:
@@ -468,8 +468,8 @@ The reading used to also carry an alternate reading (which the player could adop
 **Question.** What's going on at this ruin?
 **Draw (secure RNG).** #3 **Undead · Leeching · Unhinged · Terrifying** (Dark Moon, SW) and #41 **Dragon · Searching · Covetous · Gilded** (Dark Sun, SE).
 
-- **Ruling.** Applying Undead, Covetous, Gilded, and Searching, the ruin is the barrow of a petty lord buried with his treasure. He rises each night, maddened, to hunt for a gilded heirloom that grave robbers stole from his tomb.
-- **Why.** *Dragon* is read as a metaphor: a dead man coiled around his hoard. *Leeching*: whoever carries his gold weakens until it's returned. *Unhinged*: he can't be reasoned with.
+- **Ruling.** The ruin is the barrow of a petty lord buried with his treasure. He rises each night, maddened, to hunt for a gilded heirloom that grave robbers stole from his tomb.
+- **Why.** *Undead*, *Covetous*, *Gilded* and *Searching*, with *Dragon* read as a metaphor: a dead man coiled around his hoard. *Leeching*: whoever carries his gold weakens until it's returned. *Unhinged*: he can't be reasoned with.
 - **Alternate.** Take *Dragon* literally. The ruin is built around a young dragon's gilded skeleton, and something undead and starving is stripping it.
 - **Time and direction.** He hunts in the Late Night (primary card, Dark Moon). Southwest is where the robbers fled.
 - **Follow-ups.** "Is there still gold in the barrow?" (Bones, `likely-yes`). "Is the PC carrying gilded coin?" (Bones, `likely-no`).

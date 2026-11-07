@@ -4,7 +4,7 @@ import { watchForViolations } from './csp.ts'
 test.use({ reducedMotion: 'reduce' })
 
 const reading = {
-  ruling: 'Applying Undead and Covetous, a dead lord hoards here.',
+  ruling: 'A dead lord hoards here.',
   why: 'The words point to a greedy corpse.',
   follow_ups: [{ question: 'Is there still gold in the barrow?', tool: 'bones', likelihood: 'likely-yes' }],
   new_facts: ['A dead lord hoards in the ruin'],

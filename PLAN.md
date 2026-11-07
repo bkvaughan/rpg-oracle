@@ -26,7 +26,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 16 (UI/UX pass, run as a 5-iteration loop): done, approved, committed and pushed
 - Part 17 (drop Or, When and Where from readings): done, approved, committed and pushed with Part 16 (deploy for `d8c431a` succeeded 2026-11-06)
 - Part 18 (second UI/UX loop, 10 iterations): done, approved, committed and pushed (deploy for `0480e19` succeeded 2026-11-06)
-- Part 19 (session context): done, approved, committed and pushed. Review fixes: done, awaiting Brandon's review
+- Part 19 (session context): done, approved, committed and pushed. Review fixes: done, committed
+- Part 20 (plain rulings, Open without a file-type filter): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -395,3 +396,12 @@ Brandon, after his first real session (2026-11-06): a place for broader context 
 - [x] Tests: schema default, reducer, prompt context, prompt, ContextPanel component, App, and the e2e request body
 - [x] ORACLE_SPEC.md updated
 - [x] Review fixes (2026-11-06): a session holding only a context counts as work, so New, Open and Restore ask first; the recovery banner mentions the context; the context saves on every keystroke, because a crash-copy write started as the page unloads doesn't finish (checked in Chromium), so saving on blur or pagehide lost text typed just before a reload; the spec no longer gives two things the name "Session context"
+
+## Part 20: Plain rulings
+
+Brandon (2026-11-06): the ruling repeated the words that Why then explains. The ruling now states the answer plainly, and Why names the words.
+
+- [x] System prompt: the ruling doesn't name the words, art or dice or explain itself; Why names the Signs words; the worked example follows suit
+- [x] ORACLE_SPEC.md (target voice, the returned fields, the worked example) and the e2e mock reading updated
+- [x] Prompt test for the new guidance
+- [x] Open's file picker has no type filter: Chrome on macOS greyed out session files the first time it opened (Brandon, 2026-11-06). The contents are still checked, so a wrong file is reported and changes nothing. Save keeps the filter

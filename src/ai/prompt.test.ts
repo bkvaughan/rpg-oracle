@@ -64,6 +64,12 @@ describe('buildUserPrompt', () => {
     expect(buildUserPrompt(session.journal[1], { ...session, context: '  ' })).not.toContain('# Session context')
   })
 
+  test('the ruling states the answer plainly; Why names the words', () => {
+    expect(SYSTEM_PROMPT).toContain("Don't name the words, art or dice, or explain the reasoning: that belongs in why.")
+    expect(SYSTEM_PROMPT).toContain('For the Signs, name the words you used.')
+    expect(SYSTEM_PROMPT).not.toMatch(/^ruling: Applying/m)
+  })
+
   test('the system prompt treats the session context as established', () => {
     expect(SYSTEM_PROMPT).toContain("The session context, if given, is the player's own background")
   })

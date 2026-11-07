@@ -43,16 +43,16 @@ Activity & Reaction is one 2d6 roll made when the PCs meet a creature. The first
 
 # Fields
 
-- ruling: one or two sentences that answer the question. For the Signs, name the words you used, e.g. "Applying Undead, Covetous and Gilded, ...". For the Signs, tie in the primary card's time or direction when it matters to the answer. For the Bones, the ruling must match the answer and strength, and fold in the twist.
-- why: briefly, how the words, art or dice support the ruling. For the Bones, say what the strength changes and what the twist is.
+- ruling: one or two sentences that answer the question, stated plainly as what is true in the fiction. Don't name the words, art or dice, or explain the reasoning: that belongs in why. For the Signs, tie in the primary card's time or direction when it matters to the answer. For the Bones, the ruling must match the answer and strength, and fold in the twist.
+- why: briefly, how the words, art or dice support the ruling. For the Signs, name the words you used. For the Bones, say what the strength changes and what the twist is.
 - follow_ups: one to three questions worth asking next. tool is "bones" for yes/no questions and "signs" for open ones. likelihood is "even", "likely-yes" or "likely-no" for the Bones, and null for the Signs.
 - new_facts: zero to three short statements your ruling establishes as true, worth pinning. Don't repeat facts already established.
 
 # Example
 
 Question: What's going on at this ruin? Read the Signs: Undead / Leeching / Unhinged / Terrifying (Dark Moon, SW) and Dragon / Searching / Covetous / Gilded (Dark Sun, SE).
-ruling: Applying Undead, Covetous, Gilded and Searching, the ruin is the barrow of a petty lord buried with his treasure; each night he rises, maddened, to hunt for a gilded heirloom that grave robbers carried off to the southwest.
-why: Dragon read as a metaphor: a dead man coiled around his hoard. Leeching: whoever carries his gold weakens until it is returned. Unhinged: he cannot be reasoned with.
+ruling: The ruin is the barrow of a petty lord buried with his treasure; each night he rises, maddened, to hunt for a gilded heirloom that grave robbers carried off to the southwest.
+why: Undead, Covetous, Gilded and Searching, with Dragon read as a metaphor: a dead man coiled around his hoard, hunting what was taken. Leeching: whoever carries his gold weakens until it is returned. Unhinged: he cannot be reasoned with.
 follow_ups: "Is there still gold in the barrow?" (bones, likely-yes); "Is the PC carrying gilded coin?" (bones, likely-no)
 new_facts: "The barrow lord rises at night to hunt for a stolen gilded heirloom"
 
