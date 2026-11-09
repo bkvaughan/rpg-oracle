@@ -8,7 +8,7 @@ test('loads the app under the Content-Security-Policy', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1)
   await expect(page).toHaveTitle('RPG Oracle')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('RPG Oracle')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Wolves of the Hyperborean Sea')
   // Fonts, card art and the atmosphere's data: textures all load under the policy.
   await page.getByLabel('Your question').fill('What is here?')
   await page.getByRole('button', { name: 'Draw two cards' }).click()

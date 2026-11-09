@@ -5,7 +5,7 @@ import App from './App.tsx'
 
 test('shows the app title', () => {
   render(<App />)
-  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('RPG Oracle')
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Wolves of the Hyperborean Sea')
 })
 
 test('asking the Bones adds a journal entry and shows the result', async () => {

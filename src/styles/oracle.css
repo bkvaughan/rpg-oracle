@@ -1,8 +1,9 @@
 /* Oracle-specific styles, built on the Torchlit tokens in global.css. */
 
 /* ───────────── Layout ───────────── */
+/* No site header above it, so the hero carries the page's top spacing. */
 .hero-compact {
-  padding: clamp(0.75rem, 3vh, 1.75rem) 0 clamp(0.75rem, 2.5vh, 1.5rem);
+  padding: clamp(2rem, 6vh, 3.5rem) 0 clamp(0.75rem, 2.5vh, 1.5rem);
 }
 .hero-compact .display {
   font-size: clamp(2.2rem, 7vw, 3.25rem);
@@ -10,7 +11,7 @@
 /* Phones: the title shrinks and the tagline goes, so the ask form's button is on the first screen. */
 @media (max-width: 34rem) {
   .hero-compact {
-    padding: 0.25rem 0 0.75rem;
+    padding: 1.25rem 0 0.75rem;
   }
   .hero-compact .display {
     font-size: 2rem;
