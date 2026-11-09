@@ -5,7 +5,7 @@ dist-ssr
 *.local
 
 # The core rules PDF, kept locally for reference only; never commit it
-toa-docs/
+rpg-docs/
 
 # Source card art (47 MB); the site uses the generated WebP in public/
 data/cards/*.png

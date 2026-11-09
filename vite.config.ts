@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config'
 
 // Content-Security-Policy for the deployed site. Only the Anthropic API may be contacted
 // (the player's own key), and no third-party code or fonts load. `data:` images cover the
-// inline SVG parchment texture and iron band. Added at build time only, because the
+// atmosphere's inline SVG noise and fog textures. Added at build time only, because the
 // dev server injects inline styles and scripts that this policy would block.
 export const CSP = [
   "default-src 'self'",

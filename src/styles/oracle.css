@@ -1,4 +1,4 @@
-/* Oracle-specific styles, built on the tokens in global.css. */
+/* Oracle-specific styles, built on the Torchlit tokens in global.css. */
 
 /* ───────────── Layout ───────────── */
 .hero-compact {
@@ -36,9 +36,21 @@
   align-items: start;
 }
 
+.panel {
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+}
+
 .panel-hint {
   margin: -0.5rem 0 1rem;
   font-size: 0.92rem;
+}
+.panel-title {
+  font-family: var(--font-label);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  font-size: 1.35rem;
+  color: #ece6d8;
+  margin: 0 0 1rem;
 }
 
 .secondary {
@@ -60,8 +72,8 @@ textarea {
   font: inherit;
   font-size: 1.05rem;
   color: var(--ink);
-  background: var(--field);
-  border: 1px solid rgb(35 31 32 / 0.35);
+  background: rgb(0 0 0 / 0.45);
+  border: 1px solid var(--line);
   padding: 0.55rem 0.75rem;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -73,12 +85,12 @@ textarea {
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent), 0 0 18px -6px var(--accent);
 }
 input::placeholder,
 textarea::placeholder {
-  color: color-mix(in srgb, var(--ink-dim) 80%, transparent);
+  color: color-mix(in srgb, var(--ink-dim) 70%, transparent);
   font-style: italic;
 }
 
@@ -97,50 +109,43 @@ textarea::placeholder {
 /* ───────────── Buttons ───────────── */
 .btn {
   font-family: var(--font-label);
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  background: var(--field);
-  border: 1px solid var(--accent);
-  padding: 0.5rem 1.1rem;
+  color: var(--ink);
+  background: rgb(0 0 0 / 0.35);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  padding: 0.55rem 1.2rem;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 .btn:hover:not(:disabled) {
-  background: var(--stripe);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 22px -8px var(--accent);
 }
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 .btn-primary {
-  background: var(--accent);
-  color: var(--on-accent);
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0.06em;
+  background: color-mix(in srgb, var(--accent) 22%, rgb(0 0 0 / 0.5));
+  border-color: var(--accent);
+  color: #f3ead6;
   font-size: 1.2rem;
-  padding: 0.6rem 1.6rem;
-}
-.btn-primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--accent) 85%, white);
+  padding: 0.7rem 1.6rem;
 }
 .btn-small {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   padding: 0.3rem 0.8rem;
 }
 .btn-danger {
-  border-color: var(--blood);
-  color: var(--blood);
+  border-color: color-mix(in srgb, var(--blood) 80%, transparent);
+  color: #e6b1a8;
 }
 .btn-quiet {
   border-color: transparent;
   background: none;
   color: var(--ink-dim);
-  font-family: var(--font-body);
-  font-weight: 400;
   font-size: 1.2rem;
   line-height: 1;
   padding: 0.25rem 0.55rem;
@@ -158,7 +163,7 @@ textarea::placeholder {
 /* A button that reads as an inline link, for an action inside a sentence. */
 .link-button {
   font: inherit;
-  color: var(--link);
+  color: var(--accent);
   background: none;
   border: 0;
   padding: 0;
@@ -167,7 +172,7 @@ textarea::placeholder {
   cursor: pointer;
 }
 .link-button:hover {
-  color: var(--accent);
+  color: #f3ead6;
 }
 
 .confirm {
@@ -221,13 +226,13 @@ textarea::placeholder {
   color: var(--ink-dim);
 }
 .status-saved {
-  color: #2f5a4a;
+  color: color-mix(in srgb, var(--ink-dim) 60%, #9fc3b8);
 }
 .status-unsaved {
   color: var(--accent);
 }
 .status-error {
-  color: var(--blood);
+  color: #e6b1a8;
   font-style: normal;
 }
 .session-actions {
@@ -238,8 +243,7 @@ textarea::placeholder {
 }
 .recovery {
   margin-bottom: 1.5rem;
-  border-color: var(--accent);
-  border-left-width: 4px;
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 }
 .recovery p {
   margin: 0 0 0.75rem;
@@ -272,9 +276,9 @@ textarea::placeholder {
   gap: 0.1rem;
   padding: 0.5rem 0.8rem;
   border: 1px solid var(--line);
-  background: var(--field);
+  background: rgb(0 0 0 / 0.3);
   cursor: pointer;
-  transition: border-color 0.25s, color 0.25s, background 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
 }
 .choice input {
   position: absolute;
@@ -285,22 +289,16 @@ textarea::placeholder {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-.choice:hover {
-  background: var(--stripe);
-}
 .choice.selected {
   border-color: var(--accent);
-  background: var(--accent);
-}
-.choice.selected .choice-name,
-.choice.selected .choice-hint {
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--accent) 10%, rgb(0 0 0 / 0.4));
+  box-shadow: 0 0 26px -12px var(--accent);
 }
 .choice-name {
   font-family: var(--font-label);
-  font-weight: 700;
+  letter-spacing: 0.06em;
   font-size: 1.05rem;
-  color: var(--ink-strong);
+  color: #ece6d8;
 }
 .choices-inline .choice {
   text-align: center;
@@ -332,10 +330,9 @@ kbd {
   font-family: var(--font-label);
   font-size: 0.9em;
   padding: 0.05rem 0.4rem;
-  border: 1px solid rgb(35 31 32 / 0.35);
+  border: 1px solid var(--line);
   border-bottom-width: 2px;
   border-radius: 0.25rem;
-  background: var(--field);
   color: var(--ink);
 }
 
@@ -358,10 +355,10 @@ kbd {
 }
 .result-question {
   font-family: var(--font-label);
-  font-weight: 700;
+  font-weight: 400;
   font-size: clamp(1.3rem, 3.5vw, 1.75rem);
   line-height: 1.25;
-  color: var(--ink-strong);
+  color: #ece6d8;
   margin: 0 0 1rem;
 }
 
@@ -389,13 +386,13 @@ kbd {
   width: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 8px 14px rgb(60 40 20 / 0.35));
+  filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.75));
 }
 .sign-words {
   display: block;
   margin-top: 0.6rem;
   font-family: var(--font-label);
-  font-weight: 700;
+  letter-spacing: 0.04em;
   font-size: 0.95rem;
   line-height: 1.4;
 }
@@ -403,7 +400,7 @@ kbd {
   from {
     opacity: 0;
     transform: perspective(900px) rotateY(-70deg) translateY(10px);
-    filter: brightness(1.6);
+    filter: brightness(0.3);
   }
 }
 
@@ -416,7 +413,7 @@ kbd {
   border-top: 1px solid var(--line);
 }
 .sign-details h3 {
-  font-weight: 700;
+  font-weight: 400;
   margin: 0 0 0.4rem;
 }
 .sign-details p {
@@ -463,12 +460,12 @@ kbd {
   stroke-width: 1.6;
 }
 .time-icon.light {
-  fill: #fffdf8;
-  stroke: var(--ink);
+  fill: #e8dcc4;
+  stroke: #e8dcc4;
 }
 .time-icon.dark {
-  fill: var(--ink);
-  stroke: var(--ink);
+  fill: #1a1c1d;
+  stroke: #cfc8b8;
 }
 
 .compass {
@@ -476,8 +473,8 @@ kbd {
   height: 5.5rem;
 }
 .compass-ring {
-  fill: var(--field);
-  stroke: rgb(35 31 32 / 0.35);
+  fill: rgb(0 0 0 / 0.35);
+  stroke: var(--line);
 }
 .compass-letter {
   font-family: var(--font-label);
@@ -496,6 +493,9 @@ kbd {
 }
 .compass-primary path {
   fill: var(--accent);
+}
+.compass-primary {
+  filter: drop-shadow(0 0 4px var(--accent));
 }
 .compass-secondary line {
   stroke: var(--ink-dim);
@@ -522,7 +522,6 @@ kbd {
 }
 .die-caption {
   font-family: var(--font-label);
-  font-weight: 700;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -538,7 +537,7 @@ kbd {
   width: 4rem;
   height: 4rem;
   border-radius: 0.6rem;
-  box-shadow: inset 0 -4px 0 rgb(0 0 0 / 0.25), 0 6px 12px -6px rgb(60 40 20 / 0.6);
+  box-shadow: inset 0 -4px 0 rgb(0 0 0 / 0.3), 0 10px 20px -8px rgb(0 0 0 / 0.9);
   animation: die-tumble 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .die:nth-child(2) {
@@ -558,11 +557,11 @@ kbd {
   background: linear-gradient(160deg, #a63426, var(--blood) 60%, #5e1a12);
 }
 .die-fate {
-  background: linear-gradient(160deg, #fbf8f1, #e3dccb 60%, #c4b9a2);
-  border: 1px solid rgb(35 31 32 / 0.35);
+  background: linear-gradient(160deg, #ece6d8, #cfc6b2 60%, #a89e88);
 }
 .die-fortune {
-  background: linear-gradient(160deg, #3a3536, #231f20 60%, #120e0e);
+  background: linear-gradient(160deg, #2b2f30, #191c1d 60%, #0d0f10);
+  border: 1px solid var(--line);
 }
 .die.dim {
   opacity: 0.35;
@@ -590,18 +589,18 @@ kbd {
 
 .bones-answer {
   font-family: var(--font-display);
-  font-size: clamp(2.6rem, 10vw, 4.25rem);
+  font-size: clamp(3rem, 12vw, 5rem);
   line-height: 1;
-  text-transform: uppercase;
   margin: 0.25rem 0 0.5rem;
-  color: var(--accent);
+  color: #ece6d8;
+  text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 45%, transparent), 0 2px 0 rgb(0 0 0 / 0.8);
   animation: ink-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
 }
 .bones-answer.answer-no {
-  color: var(--ink-strong);
+  text-shadow: 0 0 30px color-mix(in srgb, var(--blood) 70%, transparent), 0 2px 0 rgb(0 0 0 / 0.8);
 }
 .bones-answer .strength {
-  color: var(--ink-dim);
+  color: var(--accent);
 }
 .bones-note {
   margin: 0 0 0.35rem;
@@ -624,11 +623,11 @@ kbd {
 .fortune-twist {
   margin: 1rem 0 0.5rem;
   padding: 0.6rem 1rem;
-  border-left: 4px solid var(--line);
-  background: var(--stripe);
+  border-left: 2px solid var(--line);
+  background: rgb(0 0 0 / 0.3);
 }
 .twist-fortune {
-  border-left-color: #b07a12;
+  border-left-color: #e7c45a;
 }
 .twist-misfortune {
   border-left-color: var(--blood);
@@ -647,22 +646,15 @@ kbd {
   max-height: 32rem;
   overflow-y: auto;
 }
-.journal-list {
-  gap: 0;
-}
 .journal-list li {
   display: flex;
   align-items: start;
   gap: 0.25rem;
   border: 1px solid transparent;
 }
-.journal-list li:nth-child(odd),
-.facts-list li:nth-child(odd) {
-  background: var(--stripe);
-}
 .journal-list li.selected {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--stripe-head) 55%, var(--field));
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 .journal-entry {
   flex: 1;
@@ -705,8 +697,8 @@ kbd {
 }
 .journal-question {
   font-family: var(--font-label);
-  font-weight: 700;
-  color: var(--ink-strong);
+  letter-spacing: 0.04em;
+  color: #ece6d8;
   transition: color 0.2s;
 }
 .journal-result {
@@ -728,9 +720,7 @@ kbd {
   margin: 0 0 1rem;
   padding: 0;
   display: grid;
-}
-.facts-list li {
-  padding: 0.3rem 0.5rem;
+  gap: 0.5rem;
 }
 .facts-list li,
 .fact-add {
@@ -760,8 +750,8 @@ select {
   font: inherit;
   font-size: 1rem;
   color: var(--ink);
-  background: var(--field);
-  border: 1px solid rgb(35 31 32 / 0.35);
+  background: rgb(0 0 0 / 0.45);
+  border: 1px solid var(--line);
   padding: 0.55rem 0.75rem;
 }
 .context-panel summary,
@@ -815,7 +805,7 @@ select {
   margin-right: 0.35rem;
 }
 .reading h3 {
-  font-weight: 700;
+  font-weight: 400;
   margin: 1.1rem 0 0.5rem;
 }
 /* One line in the summary, so a long context doesn't push the ask form down. */
@@ -840,10 +830,10 @@ select {
 .reading-ruling {
   font-size: 1.25rem;
   line-height: 1.55;
-  color: var(--ink-strong);
+  color: #ece6d8;
   padding: 0.75rem 1rem;
-  border-left: 4px solid var(--accent);
-  background: var(--stripe);
+  border-left: 2px solid var(--accent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 9%, transparent), transparent);
 }
 .follow-ups,
 .suggested-facts {
@@ -881,15 +871,15 @@ select {
 }
 .activity-status {
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 8vw, 3.25rem);
+  font-size: clamp(2.4rem, 9vw, 3.75rem);
   line-height: 1;
-  text-transform: uppercase;
   margin: 0.25rem 0 0.75rem;
-  color: var(--accent);
+  color: #ece6d8;
+  text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 45%, transparent), 0 2px 0 rgb(0 0 0 / 0.8);
   animation: ink-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
 }
 .activity-roll {
-  color: var(--ink-dim);
+  color: var(--accent);
 }
 .activity-result p {
   margin: 0 0 0.6rem;
@@ -901,7 +891,6 @@ select {
 /* ───────────── Reaction roll ───────────── */
 .die-pips {
   background: linear-gradient(160deg, #ffffff, #eeeeec 60%, #cfcecb);
-  border: 1px solid rgb(35 31 32 / 0.35);
 }
 .die-pips svg {
   width: 80%;
@@ -914,7 +903,7 @@ select {
   border-top: 1px solid var(--line);
 }
 .reaction-result h3 {
-  font-weight: 700;
+  font-weight: 400;
   margin: 0;
 }
 /* Wide screens: Activity and Reaction side by side, split by a rule, like the other results. */

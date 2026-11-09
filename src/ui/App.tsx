@@ -110,7 +110,6 @@ export default function App() {
 
   return (
     <>
-      <div className="iron-band" aria-hidden="true" />
       <header className="site-header">
         <a className="site-title" href="./">
           <svg className="flame" viewBox="0 0 24 32" aria-hidden="true">
@@ -195,7 +194,6 @@ export default function App() {
           <a href="https://perchance.org/tales-of-argosa-read-the-signs">official Deck of Signs</a>; dice faces from the{' '}
           <a href="https://dddice.com/dice/consult-the-bones-lnutsc0l">official Consult the Bones set</a>.
         </p>
-        <div className="iron-band" aria-hidden="true" />
       </footer>
     </>
   )

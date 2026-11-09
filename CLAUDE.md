@@ -14,7 +14,7 @@ A web-based solo-play oracle for *Tales of Argosa*. It simulates the book's two 
 - npm as the package manager; current Node LTS
 - Vitest + React Testing Library for unit and component tests; Playwright (Chromium only) with `@axe-core/playwright` for end-to-end and accessibility tests
 - oxlint (Vite React TypeScript template default) and `tsc -b` for typechecking
-- Plain CSS with custom properties. No UI component library. Visual design follows the *Tales of Argosa* core rules' page style; see Design Rules
+- Plain CSS with custom properties. No UI component library. Visual design follows `../personal-blog` (Torchlit Chronicles); see Design Rules
 - zod for the card data, session files and AI responses
 - AI: bring-your-own-key. The Anthropic SDK runs in the browser with the player's own key, stored only in their browser. All network access goes through `src/ai/client.ts`, which the UI loads with `import()` so the SDK stays out of the initial bundle. Default model Claude Opus 5.5; see ORACLE_SPEC.md "The AI call". Load the `claude-api` skill before changing AI code
 - Sessions: JSON files on disk via the File System Access API (autosave to the open file); Download / Open fallback on browsers without it; IndexedDB copy for crash recovery. `schemaVersion` on every file
@@ -43,8 +43,8 @@ rpg-oracle/
     engine/           rng, signs, bones
     state/            Session type, reducer, file store (disk), recovery (IndexedDB), prompt context
     ai/               schema (reading contract), settings (BYOK), prompt, client (SDK; lazy-loaded), errors
-    styles/           global.css (tokens, parchment page, iron band, panels); oracle.css (forms, results, dice, journal)
-    ui/               App and panels; result/ (Signs, Bones, Fortune, dice, compass); useSessionStore (file + recovery wiring); ask.ts
+    styles/           global.css (ported from personal-blog: tokens, atmosphere, panels); oracle.css (forms, results, dice, journal)
+    ui/               App and panels; result/ (Signs, Bones, Fortune, dice, compass); useSessionStore (file + recovery wiring); ask.ts; atmosphere.ts (decorative)
   tests/e2e/          Playwright tests
 ```
 
@@ -71,16 +71,15 @@ Unit tests sit next to the code they test (`foo.ts` and `foo.test.ts`).
 
 ## Design Rules
 
-The look follows the *Tales of Argosa* core rules' page style (Brandon, 2026-11-07; replaces the Torchlit Chronicles look). It is our own approximation: free fonts and CSS/SVG ornaments drawn here, never images, fonts or layout copied out of the book. The book PDF lives in `toa-docs/` (gitignored) for reference.
+The look follows Brandon's blog, Torchlit Chronicles (`../personal-blog`), adopted 2026-11-05. Brandon tried the Tales of Argosa core-rules look (2026-11-07) and a HYPERBOREA 3e look (2026-11-08) and went back to this one: it looked better. `src/styles/global.css` and `src/ui/atmosphere.ts` are ports of that blog's `src/styles/global.css` and `src/scripts/atmosphere.ts`; keep them in step and extend rather than restyle.
 
-- Palette (tokens in `src/styles/global.css`): pale parchment page (`--bg`), ink-black text (`--ink`), oxblood `--accent` (`#52100e`) for headings, title bars and primary actions, salmon `--stripe` rows and peach `--stripe-head`, `--link` blue, ember-red `--blood` for the Hammer of Judgment
-- Fonts (self-hosted via @fontsource, latin subsets): Metamorphous for display (stand-in for the book's display face), Cardo for body and labels (stand-in for its Calisto body). Labels are small bold caps, like the book's table column headers
-- Panel titles are full-width oxblood bars with light caps, like the book's table titles. Lists (journal, facts) are striped like its tables
-- The riveted `.iron-band` tops and tails the page; `.page-texture` (in `index.html`, outside React) gives the parchment grain. Readable content sits on a `.panel`
+- Grimdark palette: charcoal background (`--bg`), bone text (`--ink`), desaturated teal mist (`--mist`), lantern-amber accent (`--accent`), ember-red `--blood`. Default theme: accent `#d08a3a`, mist `#2f4b4b`, effect `embers`
+- Fonts (self-hosted via @fontsource): Pirata One for display (`.display`), IM Fell English SC for labels (`.label`, `.eyebrow`), Alegreya for body
+- Decoration lives in the background layers (`.atmo-*` in `index.html`, outside React, started by `startAtmosphere()` in `main.tsx`). The backdrop is a solid dark ground with tiling grain; the blog's drifting fog is left out (visible seams; Brandon, 2026-11-08). Readable content always sits on a solid `.panel` with bracket corners
 - All motion stops under `prefers-reduced-motion`
 - No browser dialogs (`alert`/`confirm`): destructive actions use inline confirm buttons
-- Result reveals use the `fade-up` / `ink-in` animations
-- No Tales of Argosa logo, cover art or book images
+- Oracle-specific: the parchment card art sits on dark panels; the Hammer of Judgment uses `--blood` red; result reveals use the existing `fade-up` / `ink-in` animations
+- No Tales of Argosa logo or trade dress
 
 ## Commands
 

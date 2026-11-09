@@ -28,7 +28,8 @@ Work through the parts in order and tick each box when it is done. Each part end
 - Part 18 (second UI/UX loop, 10 iterations): done, approved, committed and pushed (deploy for `0480e19` succeeded 2026-11-06)
 - Part 19 (session context): done, approved, committed and pushed. Review fixes: done, committed
 - Part 20 (plain rulings, Open without a file-type filter): done, approved, committed and pushed
-- Part 21 (look and feel of the core rules): done, approved, committed and pushed. Open: whether to delete the unused `src/ui/atmosphere.ts`
+- Part 21 (look and feel of the core rules): done, approved, committed and pushed
+- Part 22 (back to Torchlit, no fog): done, approved, committed and pushed
 
 ## Decisions (from Brandon, 2026-11-05)
 
@@ -417,7 +418,19 @@ Brandon (2026-11-06): the ruling repeated the words that Why then explains. The 
 - [x] Restyle buttons, choices, inputs, dice, compass, rulings and the Fortune twist for a light page
 - [x] Gitignore `toa-docs/` (the book PDF); update CLAUDE.md Design Rules
 - [x] Brandon reviews the look (approved 2026-11-07)
-- [ ] Decide whether to delete the now-unused `src/ui/atmosphere.ts`
+- [x] Decide whether to delete the now-unused `src/ui/atmosphere.ts`: kept, and back in use in Part 22
 
 **Success criteria:** the site reads as a page of the core rules, all checks pass (including axe contrast), and nothing is copied from the book.
 
+---
+
+## Part 22: Back to the Torchlit Chronicles look (Brandon, 2026-11-08)
+
+A HYPERBOREA 3e Player's Manual look was built and reverted before commit; Brandon found the original theme looked better than either book style.
+
+- [x] Restore the Torchlit styles, fonts, atmosphere layers, favicon and CSP comment from before Part 21 (`c476e11^`); keep `toa-docs/` gitignored
+- [x] Restore the Torchlit Design Rules in CLAUDE.md
+- [x] Drop the drifting fog and misty gradients (visible seams); the backdrop is a solid dark ground with seamless fine grain and a faint coarse mottle. Embers and torchlight stay
+- [x] Brandon reviews the look (approved 2026-11-08)
+
+**Success criteria:** the site matches `../personal-blog` again and all checks pass.

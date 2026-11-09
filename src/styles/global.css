@@ -1,31 +1,30 @@
-/* Design system after the Tales of Argosa core rules: a pale parchment page, ink-black serif
-   body, oxblood display headings and title bars, salmon-striped rows, riveted iron bands.
-   Our own approximation with free fonts and hand-drawn ornaments; nothing is taken from the book. */
+/* Design system ported from personal-blog (Torchlit Chronicles) src/styles/global.css.
+   Keep the two in step: same tokens, fonts, atmosphere layers and panel style. */
 
 /* ───────────── Tokens ───────────── */
 :root {
-  --bg: #f6f1e7; /* parchment */
-  --ink: #231f20;
-  --ink-strong: #120e0e;
-  --ink-dim: #5b4a42;
-  --line: rgb(35 31 32 / 0.18);
-  --panel: rgb(255 253 248 / 0.72);
-  --field: #fffdf8;
+  --bg: #0b0d0e;
+  --ink: #d9d4c7; /* bone */
+  --ink-dim: #8e928d;
+  --line: rgb(190 200 198 / 0.14);
+  --panel: rgb(13 15 16 / 0.82);
+  --blood: #8f2a1f;
 
-  --accent: #52100e; /* oxblood: headings, title bars, primary actions */
-  --on-accent: #fbf3ea;
-  --blood: #8f2a1f; /* the Hammer of Judgment */
-  --stripe: #f8dacd; /* table row */
-  --stripe-head: #fbb27b; /* table column header */
-  --link: #3a53a4;
+  /* Overridden per campaign via inline style on <body>. */
+  --accent: #d08a3a;
+  --mist: #2f4b4b;
 
-  --font-display: 'Metamorphous', 'Cinzel Decorative', serif;
-  --font-label: 'Cardo', 'Iowan Old Style', Georgia, serif;
-  --font-body: 'Cardo', 'Iowan Old Style', Georgia, serif;
+  --font-display: 'Pirata One', 'UnifrakturCook', serif;
+  --font-label: 'IM Fell English SC', 'Cormorant SC', serif;
+  --font-body: 'Alegreya', 'Iowan Old Style', Georgia, serif;
 
-  --pad: clamp(1.1rem, 3vw, 1.75rem);
+  /* Torch position, driven by atmosphere.ts. */
+  --tx: 50vw;
+  --ty: 30vh;
+  --flicker: 1;
+  --torch-r: 520px;
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 *,
@@ -47,60 +46,65 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1.12rem;
-  line-height: 1.6;
+  font-size: 1.15rem;
+  line-height: 1.7;
   overflow-x: hidden;
 }
 
 a {
-  color: var(--link);
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
   text-underline-offset: 0.2em;
-  transition: color 0.2s;
+  transition: color 0.2s, text-shadow 0.2s;
 }
 a:hover {
-  color: var(--accent);
-}
-
-strong,
-b {
-  font-weight: 700;
+  color: color-mix(in srgb, var(--accent) 70%, white);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 
 ::selection {
-  background: var(--stripe-head);
-  color: var(--ink-strong);
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: white;
 }
 
-/* ───────────── Page ───────────── */
-/* Parchment: faint mottled grain, with the edges a touch darker like an old page. */
-.page-texture {
+/* ───────────── Atmosphere ───────────── */
+.atmo {
   position: fixed;
   inset: 0;
-  z-index: 0;
   pointer-events: none;
-  background:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.012 .02' numOctaves='4' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .45  0 0 0 0 .35  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .3  0 0 0 0 .25  0 0 0 0 .2  0 0 0 .12 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"),
-    radial-gradient(ellipse 85% 75% at 50% 45%, transparent 55%, rgb(120 90 60 / 0.14) 100%);
 }
 
-/* A riveted iron band, drawn here: a pale bar with an ink outline, scrolled end caps and a row
-   of dark rivets around a larger central boss. */
-.iron-band {
-  position: relative;
-  z-index: 10;
-  height: 36px;
-  margin: 0 clamp(0.25rem, 2vw, 1.5rem);
-  padding: 0 56px;
+/* A solid dark ground with two layers of grain: fine speckle and a faint coarse mottle, like
+   worn stone. Both tiles use stitchTiles so their edges join without a seam. No fog: its
+   drifting tiles showed visible seams (Brandon, 2026-11-08). */
+.atmo-base {
+  z-index: 0;
   background:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='36'><path d='M60 9H26C22 9 20 5 15 4S4 6 3 12c-1 4 2 7 5 6-2-1-2-4 0-5s5 0 6 3v4c-1 3-4 4-6 3-3-1-6 2-5 6 1 6 9 8 12 7s7-5 11-5H60Z' fill='%23ece8e1' stroke='%23231f20' stroke-width='2' stroke-linejoin='round'/><ellipse cx='40' cy='18' rx='6' ry='5' fill='%23231f20'/><ellipse cx='37.9' cy='16.0' rx='1.8' ry='1.2' fill='%23fff' fill-opacity='.75'/></svg>")
-      left center / 60px 36px no-repeat border-box,
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='36'><g transform='matrix(-1 0 0 1 60 0)'><path d='M60 9H26C22 9 20 5 15 4S4 6 3 12c-1 4 2 7 5 6-2-1-2-4 0-5s5 0 6 3v4c-1 3-4 4-6 3-3-1-6 2-5 6 1 6 9 8 12 7s7-5 11-5H60Z' fill='%23ece8e1' stroke='%23231f20' stroke-width='2' stroke-linejoin='round'/><ellipse cx='40' cy='18' rx='6' ry='5' fill='%23231f20'/><ellipse cx='37.9' cy='16.0' rx='1.8' ry='1.2' fill='%23fff' fill-opacity='.75'/></g></svg>")
-      right center / 60px 36px no-repeat border-box,
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='36'><rect x='0' y='9' width='48' height='18' fill='%23ece8e1'/><ellipse cx='24' cy='18' rx='19' ry='16' fill='%23ece8e1' stroke='%23231f20' stroke-width='2'/><ellipse cx='24' cy='18' rx='12' ry='10' fill='%23231f20'/><ellipse cx='19.8' cy='14.0' rx='3.6' ry='2.5' fill='%23fff' fill-opacity='.75'/></svg>")
-      center / 48px 36px no-repeat border-box,
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='36'><rect x='-1' y='9' width='58' height='18' fill='%23ece8e1'/><path d='M-1 9H57M-1 27H57' stroke='%23231f20' stroke-width='2'/><ellipse cx='28' cy='18' rx='6' ry='5' fill='%23231f20'/><ellipse cx='25.9' cy='16.0' rx='1.8' ry='1.2' fill='%23fff' fill-opacity='.75'/></svg>")
-      center / 56px 36px repeat-x content-box;
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='480' height='480'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='.025' numOctaves='4' seed='5' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .58  0 0 0 0 .58  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23m)'/></svg>"),
+    var(--bg);
+}
+
+.atmo-particles {
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+/* Darkness everywhere except a warm pool of light around the torch. */
+.atmo-torch {
+  z-index: 3;
+  background:
+    radial-gradient(
+      circle calc(var(--torch-r) * var(--flicker)) at var(--tx) var(--ty),
+      color-mix(in srgb, var(--accent) 13%, transparent),
+      transparent 75%
+    ),
+    radial-gradient(
+      circle calc(var(--torch-r) * 1.7 * var(--flicker)) at var(--tx) var(--ty),
+      transparent 25%,
+      rgb(0 0 0 / 0.6) 100%
+    );
 }
 
 /* ───────────── Chrome ───────────── */
@@ -112,18 +116,17 @@ main,
 }
 
 .site-header {
-  padding: 0.9rem clamp(1rem, 4vw, 2.5rem) 0.25rem;
+  padding: 1.25rem clamp(1rem, 4vw, 2.5rem);
 }
 
 .site-title {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--accent);
+  gap: 0.6rem;
+  font-family: var(--font-label);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -131,6 +134,16 @@ main,
   width: 0.9em;
   height: 1.2em;
   fill: var(--accent);
+  filter: drop-shadow(0 0 6px var(--accent));
+  transform-origin: 50% 100%;
+  animation: flame 2.4s ease-in-out infinite;
+}
+
+@keyframes flame {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); opacity: 1; }
+  25% { transform: scale(0.94, 1.06) rotate(-2deg); opacity: 0.9; }
+  50% { transform: scale(1.04, 0.95) rotate(1.5deg); opacity: 1; }
+  75% { transform: scale(0.97, 1.04) rotate(-1deg); opacity: 0.85; }
 }
 
 main {
@@ -138,18 +151,17 @@ main {
   width: 100%;
   max-width: 62rem;
   margin: 0 auto;
-  padding: 0 1rem 3rem;
+  padding: 0 1rem 4rem;
 }
 
 .site-footer {
-  padding: 1.25rem 1rem 1rem;
+  padding: 2rem 1rem 2.5rem;
   text-align: center;
   font-size: 0.85rem;
   color: var(--ink-dim);
 }
 .site-footer p {
-  margin: 0.25rem auto 1rem;
-  max-width: 52rem;
+  margin: 0.25rem 0;
 }
 
 /* ───────────── Type ───────────── */
@@ -158,9 +170,10 @@ main {
   font-weight: 400;
   line-height: 1;
   margin: 0;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  color: #ece6d8;
+  text-shadow:
+    0 0 30px color-mix(in srgb, var(--accent) 35%, transparent),
+    0 2px 0 rgb(0 0 0 / 0.8);
   animation: ink-in 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
@@ -172,24 +185,18 @@ main {
   }
 }
 
-/* Small bold caps, like the book's table column headers. */
 .label {
   font-family: var(--font-label);
-  font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.12em;
   color: var(--ink-dim);
+  font-size: 0.95rem;
 }
 
-/* Oxblood section heading, like the book's in-text headings. */
 .eyebrow {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-family: var(--font-label);
+  letter-spacing: 0.18em;
   color: var(--accent);
-  font-size: 1.2rem;
-  line-height: 1.2;
+  font-size: 1rem;
   margin: 0 0 0.75rem;
 }
 
@@ -202,12 +209,22 @@ main {
   font-size: clamp(3rem, 11vw, 6.5rem);
 }
 .hero .lede {
-  margin: 0.75rem auto 0;
+  margin: 1.25rem auto 0;
   max-width: 36rem;
   font-style: italic;
   color: var(--ink-dim);
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   animation: fade-up 1.2s 0.5s both;
+}
+
+.rule {
+  width: min(22rem, 70%);
+  height: 1px;
+  margin: 2rem auto 0;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+  animation: fade-up 1.2s 0.8s both;
 }
 
 @keyframes fade-up {
@@ -217,28 +234,39 @@ main {
   }
 }
 
-/* ───────────── Panels ───────────── */
+/* ───────────── Panels & cards ───────────── */
 .panel {
   position: relative;
-  padding: var(--pad);
   background: var(--panel);
   border: 1px solid var(--line);
-  box-shadow: 0 1px 2px rgb(60 40 20 / 0.08), 0 10px 24px -16px rgb(60 40 20 / 0.35);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow:
+    0 30px 80px -20px rgb(0 0 0 / 0.9),
+    inset 0 1px 0 rgb(255 255 255 / 0.03);
 }
 
-/* The panel's title is a full-width oxblood bar, like the book's table titles. */
-.panel-title {
-  margin: calc(-1 * var(--pad)) calc(-1 * var(--pad)) 1rem;
-  padding: 0.45rem var(--pad);
-  background: var(--accent);
-  color: var(--on-accent);
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 1.3rem;
-  line-height: 1.2;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-align: center;
+/* Bracket-style corner ornaments. */
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  pointer-events: none;
+}
+.panel::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: 0;
+  border-top: 0;
 }
 
 .grid {
